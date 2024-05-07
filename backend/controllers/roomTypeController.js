@@ -1,4 +1,5 @@
 const RoomType = require("../models/roomTypeModel");
+const Room = require("../models/roomModel")
 
 const createRoomType = async (req, res) => {
   try {
@@ -33,7 +34,15 @@ const deleteRoomType = async (req,res) =>{
     }
     const deletedRoom = await RoomType.findOneAndDelete({_id: id})
 
-    return res.status(200).json({message: "Room type with corresponding rooms deleted successfully",deletedRoom})
+
+    if (!deletedRoom) {
+      return res.status(404).json({ message: "Room type not found." });
+    }
+
+    await Room.deleteMany({ type: id });
+
+
+    return res.status(200).json({message: "Room type and associated rooms deleted successfully.",deletedRoom})
 
 
   }catch(err){

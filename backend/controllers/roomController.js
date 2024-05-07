@@ -1,5 +1,19 @@
 const Room = require("../models/roomModel");
 
+
+const getRooms = async (req,res)=>{
+  try{
+    const rooms = await Room.find()
+
+    if(!rooms){
+      return res.status(404).json({message: "No Rooms available"})
+    }
+
+    return res.status(200).json(rooms)
+  }catch(err){
+    return res.status(500).json({messsage: err})
+  }
+}
 const createRoom = async (req, res) => {
   try {
     const images = req.files.map((file) => ({
@@ -22,4 +36,4 @@ const createRoom = async (req, res) => {
 };
 
 
-module.exports = {createRoom,}
+module.exports = {createRoom,getRooms}

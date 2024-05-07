@@ -1,4 +1,4 @@
-const { createRoom } = require("../controllers/roomController");
+const { createRoom, getRooms } = require("../controllers/roomController");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
@@ -25,6 +25,9 @@ const upload = multer({
   }
 });
 
+router.get("/",getRooms)
+
 router.post("/add", upload.array("images"), createRoom);
+
 
 module.exports = router;
