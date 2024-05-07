@@ -1,0 +1,44 @@
+const RoomType = require("../models/roomTypeModel");
+
+const createRoomType = async (req, res) => {
+  try {
+    const existingRoomType = await RoomType.findOne(req.body);
+    if (existingRoomType) {
+      return res.status(409).json({ error: "Room type already exists!" });
+    }
+
+    const newRoomType = await RoomType.create(req.body);
+
+    return res.status(201).json({ message: "Room type created", roomType: newRoomType });
+  } catch (err) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const getRoomTypes = async (req, res) => {
+  try {
+    const roomTypes = await RoomType.find();
+    return res.status(200).json(roomTypes);
+  } catch (err) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const deleteRoomType = async (req,res) =>{
+  try{
+    const {id} = req.params;
+
+    if(!id){
+      return res.status(404).json({message: "No such room type with that id"})
+    }
+    const deletedRoom = await RoomType.findOneAndDelete({_id: id})
+
+    return res.status(200).json({message: "Room type with corresponding rooms deleted successfully",deletedRoom})
+
+
+  }catch(err){
+    return res.status(500).json({message: err})
+  }
+}
+
+module.exports = { createRoomType, getRoomTypes,deleteRoomType };

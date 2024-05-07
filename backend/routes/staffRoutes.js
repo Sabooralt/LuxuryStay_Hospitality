@@ -1,6 +1,6 @@
 const express = require('express')
 
-const {loginStaff,signupStaff,getStaff, updateStaffRole, deleteStaff} = require('../controllers/staffController')
+const {loginStaff,signupStaff,getStaff, updateStaffRole, deleteStaff,updateStaffDetails} = require('../controllers/staffController')
 
 const router = express.Router()
 
@@ -15,6 +15,8 @@ router.post('/signup',signupStaff);
 //update role
 
 router.patch('/update_role/:id',updateStaffRole)
+
+router.patch('/update_details/:id',updateStaffDetails)
 router.delete('/delete/:id',deleteStaff)
 
 module.exports = router

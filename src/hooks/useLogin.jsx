@@ -1,25 +1,32 @@
-import axios from "axios";
 import { useState } from "react";
+import { useAuthContextProvider } from "./useAuthContext";
+import axios from "axios";
 
-export const useSignup = () => {
+export const useLogin = () => {
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(null);
+  const { dispatch } = useAuthContextProvider();
   const [responseG, setResponseG] = useState(null);
 
-  const signup = async (data) => {
+  const Login = async (data) => {
+   
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post("/api/user/signup", {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        contact: data.contactNumber,
+      const response = await axios.post("/api/user/login", {
         email: data.email,
         password: data.password,
       });
 
-      setResponseG(response.data);
+      if(response.status === 200){
+        setResponseG(response.data);
+        dispatch({type: "LOGIN",payload: response.data})
+
+        localStorage.setItem("user",JSON.stringify(response.data))
+
+      }
+
 
 
     } catch (err) {
@@ -39,5 +46,5 @@ export const useSignup = () => {
     setIsLoading(false);
   };
 
-  return { isLoading, signup, error, responseG };
+  return { isLoading, Login, error, responseG };
 };

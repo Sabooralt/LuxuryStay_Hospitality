@@ -13,6 +13,17 @@ export const staffReducer = (state, action) => {
       return {
         staffs: [action.payload.fullStaff, ...state.staffs],
       };
+
+      case "UPDATE_STAFF_DETAILS": 
+      const updatedDetails = state.staffs.map((staff)=>{
+        if(staff._id === action.payload._id){
+          return { staff: action.payload }
+        }
+        return staff
+      })
+      return{
+        ...state,staffs : updatedDetails
+      }
       case "UPDATE_STAFF_ROLE":
         const updatedRole = state.staffs.map((staff)=>{
           if(staff._id === action.payload._id){

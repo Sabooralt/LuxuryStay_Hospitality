@@ -6,8 +6,12 @@ const app = express();
 
 //routes initialization
 
-const guestRoutes = require('./routes/guestRoutes')
-const staffRoutes = require('./routes/staffRoutes')
+const userRoutes = require('./routes/userRoutes')
+const staffRoutes = require('./routes/staffRoutes');
+const roomRoutes = require('./routes/roomRoutes');
+
+const roomTypeRoutes = require('./routes/roomTypeRoutes');
+
 
 
 app.use(express.json());
@@ -29,6 +33,9 @@ mongoose
     console.log(error);
   })
 
-  app.use("/api/guest",guestRoutes);
+  app.use("/api/user",userRoutes);
   app.use("/api/staff",staffRoutes);
+  app.use("/api/roomType",roomTypeRoutes)
+  app.use("/api/room",roomRoutes);
+
 

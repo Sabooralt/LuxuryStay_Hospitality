@@ -15,9 +15,10 @@ import { useSignup } from "@/hooks/useSignup";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useFormik } from "formik";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import * as Yup from "yup";
 
-export function LoginForm() {
+export function SignupForm() {
   const { toast } = useToast();
 
   const { signup, isLoading, error, responseG } = useSignup();
@@ -155,9 +156,7 @@ export function LoginForm() {
               {...formik.getFieldProps("password")}
             />
             {formik.touched.password && (
-              <p className="text-red-600 text-xs">
-                {formik.errors.password}
-              </p>
+              <p className="text-red-600 text-xs">{formik.errors.password}</p>
             )}
           </div>
           <div className="grid gap-2">
@@ -193,7 +192,10 @@ export function LoginForm() {
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
-          Already have an account? <p className="underline">Sign in</p>
+          Already have an account?{" "}
+          <Link className="underline" to="/login">
+            Sign in
+          </Link>
         </div>
       </CardContent>
     </Card>

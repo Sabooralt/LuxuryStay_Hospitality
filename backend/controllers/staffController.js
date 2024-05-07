@@ -2,6 +2,7 @@ require("dotenv").config();
 const Staff = require("../models/staffModel");
 
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "15d" });
@@ -30,6 +31,31 @@ const deleteStaff = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+const updateStaffDetails = async (req, res) => {
+  const { id } = req.params;
+  const { password, ...updateData } = req.body;
+
+  try {
+    let staff = await Staff.findById(id);
+
+    if (!staff) {
+      return res.status(404).json({ message: "No such staff!" });
+    }
+
+    if (password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      updateData.password = hashedPassword;
+    }
+
+    staff = await Staff.findByIdAndUpdate(id, {...updateData}, { new: true });
+
+    return res.status(200).json({ message: "Staff details updated!", staff });
+  } catch (err) {
+    console.error("Error updating staff details:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 const updateStaffRole = async (req, res) => {
   const { id } = req.params;
@@ -44,13 +70,11 @@ const updateStaffRole = async (req, res) => {
     staff.role = req.body.role;
     await staff.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Staff role updated successfully",
-        _id: staff._id,
-        role: staff.role,
-      });
+    res.status(200).json({
+      message: "Staff role updated successfully",
+      _id: staff._id,
+      role: staff.role,
+    });
   } catch (error) {
     console.error("Error updating role:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -83,8 +107,7 @@ const signupStaff = async (req, res) => {
     const staff = await Staff.signup(username, password, role);
 
     const token = createToken(staff._id);
-  const fullStaff = await Staff.findById(staff._id)
-
+    const fullStaff = await Staff.findById(staff._id);
 
     res.status(200).json({ fullStaff, password, token });
   } catch (err) {
@@ -98,4 +121,5 @@ module.exports = {
   getStaff,
   updateStaffRole,
   deleteStaff,
+  updateStaffDetails,
 };

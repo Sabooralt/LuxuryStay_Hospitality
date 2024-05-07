@@ -49,6 +49,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { CSVLink } from "react-csv";
 import ExportCSV from "@/utils/ExportCSV";
+import { EditStaff } from "./EditStaff";
 
 export default function StaffList() {
   const [isLoading, setIsLoading] = useState(false);
@@ -156,28 +157,29 @@ export default function StaffList() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        
-            
-          <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger >
-         <ExportCSV data={staffs} filename={"staff_data"}>
-            <Button size="sm" variant="outline" className="h-7 gap-1 text-sm">
-              <File className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only">Export</span>
-            </Button>
-          </ExportCSV>
-        
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Export data in CSV format</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <ExportCSV data={staffs} filename={"staff_data"}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 gap-1 text-sm"
+                >
+                  <File className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only">Export</span>
+                </Button>
+              </ExportCSV>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Export data in CSV format</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <Card>
         <CardHeader className="px-7">
-          <CardTitle>Staffs</CardTitle>
+          <CardTitle className="text-2xl">Staffs</CardTitle>
           <CardDescription>
             View and manage staff member's information effortlessly in one
             place.
@@ -238,18 +240,9 @@ export default function StaffList() {
                             <p>Delete staff</p>
                           </TooltipContent>
                         </Tooltip>
-
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="outline" size="icon">
-                              <UpdateIcon className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Update staff</p>
-                          </TooltipContent>
-                        </Tooltip>
                       </TooltipProvider>
+
+                      <EditStaff staff={staff} />
                     </TableCell>
 
                     <TableCell className="hidden md:table-cell">
