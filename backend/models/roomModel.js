@@ -3,6 +3,12 @@ const Schema = mongoose.Schema;
 
 const roomSchema = new Schema(
   {
+
+    adminId:{
+      type: Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
     roomNumber: {
       type: Number,
       required: true,
@@ -10,7 +16,7 @@ const roomSchema = new Schema(
     },
     type: {
       type: Schema.Types.ObjectId,
-      ref: "Category",
+      ref: "roomType",
       required: true,
     },
     description: {

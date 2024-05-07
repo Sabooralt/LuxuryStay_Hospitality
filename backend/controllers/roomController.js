@@ -6,6 +6,9 @@ const createRoom = async (req, res) => {
       filepath: file.filename,
     }));
 
+    if(!req.body){
+      return res.json({message: "Req.body"})
+    }
     const room = await Room.create({ ...req.body, images: images });
 
     res.status(201).json({ message: "Room created successfully", room: room });

@@ -19,8 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 
 import { useEffect, useState } from "react";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -30,69 +28,57 @@ import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ScrollBar } from "@/components/ui/scroll-area";
 import axios from "axios";
+import { useAddRoom } from "@/hooks/useAddRoom";
 
 export const AddRoom = () => {
-  const [isLoading, setIsLoading] = useState();
+
+  // Form States
+  const [roomNumber,setRoomNumber] = useState(null);
+  const [description,setDescription] = useState('');
+  const [type,setType] = useState('');
+  const [capacity,setCapacity] = useState(null);
+  const [pricePerNight,setPricePerNight] = useState(null);
+  const [amenities,setAmenities] = useState([]);
   const [images, setImages] = useState([]);
+  
+  const [roomData, setRoomData] = useState({
+    roomNumber,
+    description,
+    type,
+    capacity,
+    pricePerNight,
+    amenities,
+    images,
+  });
+  useEffect(() => {
+    setRoomData({
+      roomNumber,
+      description,
+      type,
+      capacity,
+      pricePerNight,
+      amenities,
+      images,
+    });
+  }, [roomNumber, description, type, capacity, pricePerNight, amenities, images]);
+// Form States
+  
+
+
+  const [isLoading, setIsLoading] = useState();
   const { roomTypes } = useRoomTypeContext();
   const { user } = useAuthContextProvider();
+  const {InsertRoom} = useAddRoom();
 
-  const InsertRoom = async (data) => {
-    
-      const formData = new FormData();
-      formData.append("roomNumber", data.roomNumber);
-      formData.append("type", data.type);
-      formData.append("capacity", data.capacity);
-      formData.append("description", data.description);
-      formData.append("pricePerNight", data.pricePerNight);
-      data.images.forEach((image) => {
-        formData.append("images", image);
-      });
-      formData.append("adminId", user._id);
-      
-      const response = await axios.postForm("/api/room/add", formData);
+  const handleImage = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setImages(selectedFiles);
+  };
+
   
-      console.log(response.data);
-    
-  };
-
-  const formik = useFormik({
-    initialValues: {
-      roomNumber: "",
-      type: "",
-      capacity: "",
-      description: "",
-      pricePerNight: "",
-      amenities: [],
-      images: [],
-    },
-
-    validationSchema: Yup.object({
-      roomNumber: Yup.string().trim().required("Room Number is required."),
-      type: Yup.string().trim().required("Type is required."),
-      capacity: Yup.string().trim().required("Capacity is required."),
-      description: Yup.string().trim().required("Description is required."),
-      pricePerNight: Yup.string().trim().required("Price is required."),
-    }),
-    onSubmit: async (values) => {
-      try {
-        await InsertRoom(values);
-        console.log(values)
-      } catch (error) {
-        console.error("Error submitting room:", error);
-       
-      }
-    }
-  });
-  const handleChange = (e) => {
-    formik.setFieldValue("images", e.currentTarget.files);
-
-    const selectedImages = Array.from(e.target.files);
-    setImages(selectedImages);
-  };
   return (
     <Card className="w-full max-w-md">
-      <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={(e)=>InsertRoom(roomData,e)}  encType="multipart/form-data">
         <CardHeader>
           <CardTitle className="text-2xl">Add Room</CardTitle>
           <CardDescription>
@@ -105,23 +91,18 @@ export const AddRoom = () => {
             <Input
               type="text"
               placeholder="401"
-              {...formik.getFieldProps("roomNumber")}
+             value={roomData.roomNumber}
+             onChange={(e)=>setRoomNumber(e.target.value)}
             />
 
-            {formik.touched.roomNumber && formik.errors.roomNumber && (
-              <p className="text-red-600 m-0 text-xs">
-                {formik.errors.roomNumber}
-              </p>
-            )}
           </div>
 
           <div className="grid gap-2">
             <Label>Room Type</Label>
-            <Select onValueChange={(e) => formik.setFieldValue("type", e)}>
+            <Select onValueChange={(e) => setType(e)}>
               <SelectTrigger className="w-100">
                 <SelectValue
-                  {...formik.getFieldProps("role")}
-                  placeholder="Select a role"
+                  placeholder="Select room type"
                 />
               </SelectTrigger>
               <SelectContent>
@@ -136,36 +117,18 @@ export const AddRoom = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            {formik.touched.type && formik.errors.type && (
-              <p className="text-red-600 m-0 text-xs">{formik.errors.type}</p>
-            )}
           </div>
           <div className="grid gap-2">
             <Label>Room Description</Label>
-            <Input type="text" {...formik.getFieldProps("description")} />
-            {formik.touched.description && formik.errors.description && (
-              <p className="text-red-600 m-0 text-xs">
-                {formik.errors.description}
-              </p>
-            )}
+            <Input type="text" onChange={(e)=>setDescription(e.target.value)} />
           </div>
           <div className="grid gap-2">
             <Label>Room Capacity</Label>
-            <Input type="tel" {...formik.getFieldProps("capacity")} />
-            {formik.touched.capacity && formik.errors.capacity && (
-              <p className="text-red-600 m-0 text-xs">
-                {formik.errors.capacity}
-              </p>
-            )}
+            <Input type="tel" onChange={(e)=>setCapacity(e.target.value)} />
           </div>
           <div className="grid gap-2">
             <Label>Room Price per night</Label>
-            <Input type="tel" {...formik.getFieldProps("pricePerNight")} />
-            {formik.touched.pricePerNight && formik.errors.pricePerNight && (
-              <p className="text-red-600 m-0 text-xs">
-                {formik.errors.pricePerNight}
-              </p>
-            )}
+            <Input type="tel" onChange={(e)=>setPricePerNight(e.target.value)} />
           </div>
           <div className="grid gap-2">
             <Label>Room Images</Label>
@@ -173,7 +136,7 @@ export const AddRoom = () => {
               type="file"
               multiple
               accept="image/*"
-              onChange={handleChange}
+              onChange={handleImage}
             />
 
             <ScrollArea className="flex flex-row overflow-auto gap-4 h-52 mt-5 whitespace-nowrap rounded-md border">
@@ -196,8 +159,6 @@ export const AddRoom = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={!formik.isValid || !formik.dirty || isLoading}
-            onClick={formik.handleSubmit}
           >
             {isLoading ? (
               <>
