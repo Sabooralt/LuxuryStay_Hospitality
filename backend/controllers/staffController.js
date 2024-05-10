@@ -96,7 +96,7 @@ const loginStaff = async (req, res) => {
       token,
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: `${err.message}` });
   }
 };
 

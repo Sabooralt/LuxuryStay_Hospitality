@@ -31,8 +31,11 @@ import { Input } from "@/components/ui/input";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
+import { useAuthContextProvider } from "@/hooks/useAuthContext";
+import { BreadcrumbDemo } from "@/globalComponents/Breadcrumb";
 
 export const AdminHeader = () => {
+  const {user,logout} = useAuthContextProvider();
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <Sheet>
@@ -89,32 +92,7 @@ export const AdminHeader = () => {
           </nav>
         </SheetContent>
       </Sheet>
-      <Breadcrumb className="hidden md:flex">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="#">Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/admin/staff">Staff</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-          <BreadcrumbLink>
-          <Link to='/admin/addproduct'>
-
-          Edit Product
-          </Link>
-          
-          </BreadcrumbLink>
-            
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+        <BreadcrumbDemo/>
       <div className="relative ml-auto flex-1 md:grow-0">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
@@ -130,8 +108,8 @@ export const AdminHeader = () => {
             size="icon"
             className="overflow-hidden rounded-full"
           >
-            <image
-              src="/placeholder-user.jpg"
+            <img
+              src="/Avatars/02.png"
               width={36}
               height={36}
               alt="Avatar"
@@ -140,12 +118,11 @@ export const AdminHeader = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{user.first_name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

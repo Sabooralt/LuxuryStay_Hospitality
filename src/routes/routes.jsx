@@ -9,9 +9,17 @@ import { LoginForm } from "@/pages/Client/Login/components/Login";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Guests } from "@/pages/AdminDashboard/pages/Guests";
 import { Rooms } from "@/pages/AdminDashboard/pages/Rooms";
+import { DashboardHome } from "@/pages/AdminDashboard/pages/Main";
+import { Settings } from "@/pages/AdminDashboard/pages/Settings";
+import { useStaffAuthContext } from "@/hooks/useStaffAuth";
+import { StaffLogin } from "@/pages/Client/Login/components/staffLogin";
+import { StaffDashboard } from "@/pages/StaffDashboard/components/pages/RootLayout";
+import { StaffHome } from "@/pages/StaffDashboard/components/Home";
+import { Tasks } from "@/pages/AdminDashboard/pages/Task";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
+  const { staff } = useStaffAuthContext();
 
   return (
     <Routes>
@@ -33,6 +41,10 @@ export const AdminRoutes = () => {
             )
           }
         />
+        <Route
+          path="/StaffLogin"
+          element={staff ? <Navigate to="/staff" /> : <StaffLogin />}
+        />
       </Route>
 
       {/*  Admin Routes */}
@@ -42,10 +54,22 @@ export const AdminRoutes = () => {
           user && user.role === "admin" ? <Dashboard /> : <Navigate to="/" />
         }
       >
+        <Route index element={<DashboardHome />} />
         <Route path="/admin/addproduct" element={<AddProduct />} />
         <Route path="/admin/staffs" element={<Staff />} />
         <Route path="/admin/guests" element={<Guests />} />
         <Route path="/admin/rooms" element={<Rooms />} />
+        <Route path="/admin/tasks" element={<Tasks />} />
+        <Route path="/admin/settings" element={<Settings />} />
+      </Route>
+
+      {/* Staff Routes */}
+
+      <Route path="/staff" element={staff ? <StaffDashboard/> : <StaffLogin/>}>
+
+        <Route index element={<StaffHome/>} />
+
+
       </Route>
     </Routes>
   );

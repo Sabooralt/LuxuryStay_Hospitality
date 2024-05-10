@@ -35,5 +35,33 @@ const createRoom = async (req, res) => {
   }
 };
 
+const checkRoomNumber = async (req, res) => {
+  try {
+    const { roomNumber } = req.body;
 
-module.exports = {createRoom,getRooms}
+    console.log("Checking room number:", roomNumber);
+
+    const avail = await Room.find({ roomNumber: roomNumber });
+
+    console.log("Found rooms:", avail);
+
+    if (avail.length === 0) {
+      console.log("Room number available");
+      return res
+        .status(200)
+        .json({ success: true, message: "Room number available" });
+    }
+
+    console.log("Room number not available");
+    return res
+      .status(409)
+      .json({ success: false, message: "Room number not available" });
+  } catch (err) {
+    console.error("Error:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
+module.exports = {createRoom,getRooms,checkRoomNumber}

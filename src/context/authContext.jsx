@@ -21,6 +21,11 @@ export const AuthContextProvider = ({ children }) => {
     user: null,
   });
 
+  const logout = () => {
+    localStorage.removeItem('user'); // Clear user data from local storage
+    dispatch({ type: "LOGOUT" }); // Dispatch logout action
+  };
+
   useEffect(()=>{
     const user = JSON.parse(localStorage.getItem('user'))
 
@@ -31,7 +36,7 @@ export const AuthContextProvider = ({ children }) => {
 
   console.log("AuthContext state: ", state);
   return (
-    <AuthContext.Provider value={{ ...state, dispatch }}>
+    <AuthContext.Provider value={{ ...state, dispatch,logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,8 +3,7 @@ const Schema = mongoose.Schema;
 
 const roomSchema = new Schema(
   {
-
-    adminId:{
+    adminId: {
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
@@ -23,10 +22,15 @@ const roomSchema = new Schema(
       type: String,
       required: true,
     },
+    availibility: {
+      type: String,
+      enum: ["Available", "Not available"],
+      default: "Available",
+    },
     status: {
       type: String,
-      enum : ["cleaning,","occupied","available"],
-      default : "occupied"
+      enum: ["cleaning,", "occupied", "maintenance", "vacant"],
+      default: "occupied",
     },
     capacity: {
       type: Number,

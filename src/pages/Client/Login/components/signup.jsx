@@ -187,9 +187,11 @@ export function SignupForm() {
               <>Create an account</>
             )}
           </Button>
+          <Link to='/StaffLogin'>
           <Button variant="outline" className="w-full">
             Staff login
           </Button>
+          </Link>
         </form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}

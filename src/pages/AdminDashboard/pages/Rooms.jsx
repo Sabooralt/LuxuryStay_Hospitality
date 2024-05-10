@@ -16,10 +16,14 @@ export const Rooms = () => {
         
           <AddRoom />
           <AddRoomType />
+
+  <div className="grid col-span-2 gap-4">
+  <h1 className="text-4xl font-semibold">Rooms</h1>
 <div className="grid grid-cols-4 md:grid-cols-2 col-span-2 items-start sm:grid-cols-1">
       {room && room.map((room) => <RoomCard className='row-span-1' room={room} />)}
-
 </div>
+  </div>
+
         
       </div>
     </>

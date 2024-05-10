@@ -30,9 +30,14 @@ import { ScrollBar } from "@/components/ui/scroll-area";
 import { useAddRoom } from "@/hooks/useAddRoom";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { Check, CheckCheckIcon, Cross, X } from "lucide-react";
 
 export const AddRoom = () => {
   // Form States
+
+  const [roomNumberStatus, setRoomNumberStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [roomNumber, setRoomNumber] = useState(null);
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
@@ -76,10 +81,39 @@ export const AddRoom = () => {
   const { user } = useAuthContextProvider();
   const { InsertRoom, isLoading, responseG, error } = useAddRoom();
 
+  const checkAvail = async () => {
+    setLoading(null);
+    setRoomNumberStatus(null);
+
+    try {
+      setLoading(true);
+      if (roomNumber.trim() === "") {
+        setLoading(false);
+        return null;
+      }
+
+      const response = await axios.post("/api/room/check_room_number", {
+        roomNumber,
+      });
+
+      if (response.status === 200) {
+        setLoading(false);
+        setRoomNumberStatus(response.data);
+      }
+    } catch (err) {
+      setLoading(false);
+      setRoomNumberStatus(err.response.data);
+    }
+  };
+
   const handleImage = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setImages(selectedFiles);
   };
+  const handleRoomNumber = (e)=>{
+    setRoomNumber(e.target.value);
+    setRoomNumberStatus(null)
+  }
 
   useEffect(() => {
     if (responseG) {
@@ -113,13 +147,48 @@ export const AddRoom = () => {
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="username">Room Number</Label>
-            <Input required
+            <Label>Room Number</Label>
+            <Input
+              required
               type="number"
               placeholder="401"
-              value={roomData.roomNumber}
-              onChange={(e) => setRoomNumber(e.target.value)}
+              value={roomNumber}
+              onChange={(e) => handleRoomNumber(e)}
             />
+            <div className="flex flex-row justify-between items-center">
+              <p className="text-xs text-gray-600">(Must be unique)</p>
+
+              <Button
+                size="xs"
+                type="button"
+                onClick={checkAvail}
+                className={`text-xs text-white p-[0.3rem] ${
+                  loading ? "bg-gray-400" : roomNumberStatus ? (roomNumberStatus.success ? "bg-green-500" : "bg-red-500") : ""
+                }`}
+                disabled={loading || roomNumberStatus || !roomNumber}
+              >
+                {loading ? (
+                  <>
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait...
+                  </>
+                ) : roomNumberStatus ? (
+                  roomNumberStatus.success ? (
+                    <>
+                      <Check  className="h-4 w-4"/>
+                      Room Number Available
+                    </>
+                  ) : (
+                    <>
+                      <X  className="h-4 w-4"/>
+                      Room Number not available
+                    </>
+                  )
+                ) : (
+                  <>Check availability</>
+                )}
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-2">
@@ -143,25 +212,32 @@ export const AddRoom = () => {
           </div>
           <div className="grid gap-2">
             <Label>Room Description</Label>
-            <Textarea required
+            <Textarea
+              required
               type="text"
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
             <Label>Room Capacity</Label>
-            <Input required type="number" onChange={(e) => setCapacity(e.target.value)} />
+            <Input
+              required
+              type="number"
+              onChange={(e) => setCapacity(e.target.value)}
+            />
           </div>
           <div className="grid gap-2">
             <Label>Room Price per night</Label>
-            <Input required
+            <Input
+              required
               type="number"
               onChange={(e) => setPricePerNight(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
             <Label>Room Images</Label>
-            <Input required
+            <Input
+              required
               type="file"
               multiple
               accept="image/*"

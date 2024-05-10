@@ -45,14 +45,14 @@ staffSchema.statics.signup = async function (username, password, role) {
   return staff;
 };
 
-staffSchema.statics.login = async function (email, password) {
+staffSchema.statics.login = async function (username, password) {
   if (!username || !password) {
     throw Error("All fields must be filled ");
   }
   const staff = await this.findOne({ username });
 
   if (!staff) {
-    throw Error("Incorrect email");
+    throw Error("Incorrect username");
   }
 
   const match = await bcrypt.compare(password, staff.password)

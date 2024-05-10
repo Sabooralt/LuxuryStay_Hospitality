@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,25 +17,24 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
 
-export function LoginForm() {
+export function StaffLogin() {
   const { toast } = useToast();
 
   const { Login, isLoading, error, responseG } = useLogin();
   const formik = useFormik({
     initialValues: {
-      email: "",
+      username: "",
       password: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string()
+      username: Yup.string()
         .trim()
-        .email("Invalid email format")
-        .required("Email is required."),
+        .required("Username is required."),
 
       password: Yup.string().trim().required("Password is required."),
     }),
-    onSubmit: async (data) => {
-      await Login(data,"user");
+    onSubmit: async (values) => {
+      await Login(values,"staff");
     },
   });
 
@@ -56,7 +54,7 @@ export function LoginForm() {
     if (responseG) {
       toast({
         title: "Logged in!",
-        description: `Welcome ${responseG.first_name} ${responseG.last_name}`,
+        description: `Welcome ${responseG.username}`,
       });
     }
   }, [responseG]);
@@ -66,23 +64,23 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Enter your staff details below to login to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={formik.handleSubmit}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label>Username</Label>
             <Input
-              id="email"
-              type="email"
-              {...formik.getFieldProps("email")}
-              placeholder="m@example.com"
+              
+              type="text"
+              {...formik.getFieldProps("username")}
+              placeholder="jdoe20"
             />
-             {formik.touched.email && (
+             {formik.touched.username && (
               <p className="text-red-600 text-xs">
-                {formik.errors.email}
+                {formik.errors.username}
               </p>
             )}
           </div>
@@ -117,12 +115,6 @@ export function LoginForm() {
 
         </div>
           </form>
-        <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="#" className="underline">
-            Sign up
-          </Link>
-        </div>
       </CardContent>
     </Card>
   );

@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.text-muted-foreground{
+    @apply text-gray-600
+}
+.breadcrumb-active{
+    @apply text-black
+}
