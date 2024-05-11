@@ -12,6 +12,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,12 +29,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import * as Yup from 'yup'
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { StaffCombobox } from "@/components/ui/combobox";
 import { useFormik, useFormikContext } from "formik";
 import axios from "axios";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
+import Priorities from "@/utils/PriorityList";
 
 export function AddTask() {
   const [date, setDate] = useState(null);
@@ -38,32 +49,33 @@ export function AddTask() {
   };
   const handleDateSelect = (selectedDate) => {
     setDate(selectedDate);
-    formik.setFieldValue("deadline",selectedDate)
-  }
+    formik.setFieldValue("deadline", selectedDate);
+  };
   const handleSubmit = async (values) => {
     if (!user) {
       return null;
     }
 
     try {
-        const response = await axios.post(
-          "/api/task/create",
-          {
-            ...values,
-            createdBy: user._id,
-            ...(assignAll ? { assignedTo: null } : { assignedTo: selectedStaffs }),
-            assignedAll: assignAll,
+      const response = await axios.post(
+        "/api/task/create",
+        {
+          ...values,
+          createdBy: user._id,
+          ...(assignAll
+            ? { assignedTo: null }
+            : { assignedTo: selectedStaffs }),
+          assignedAll: assignAll,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`
-            }
-          }
-        );
-      } catch (err) {
-        console.log(err);
-      }
-      
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const formik = useFormik({
@@ -71,10 +83,22 @@ export function AddTask() {
       title: "",
       description: "",
       deadline: date,
+      assignedTo: selectedStaffs,
       assignAll: assignAll,
+      priority: "",
     },
+    validationSchema: Yup.object({
+
+        title: Yup.string().trim().required("Title is required."),
+        description: Yup.string().trim().required("Description is required."),
+        deadline: Yup.string().trim().required("Deadline is required."),
+        priority: Yup.string().trim().required("Priority is required.")
+        
+
+
+    }),
     onSubmit: async (values) => {
-        console.log(values)
+      console.log(values);
       await handleSubmit(values);
     },
   });
@@ -87,10 +111,15 @@ export function AddTask() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={formik.handleSubmit} className="grid gap-3">
+        <form onSubmit={formik.handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
             <Label>Task Title</Label>
-            <Input type="text" {...formik.getFieldProps("title")} required />
+            <Input type="text" {...formik.getFieldProps("title")}/>
+            {formik.touched.title && formik.errors.title && (
+                <p className="text-red-600 m-0 text-xs">
+                  {formik.errors.title}
+                </p>
+              )}
           </div>
 
           <div className="grid gap-2">
@@ -98,18 +127,21 @@ export function AddTask() {
             <Textarea
               rows="1"
               {...formik.getFieldProps("description")}
-              required
             />
+              {formik.touched.description && formik.errors.description && (
+                <p className="text-red-600 m-0 text-xs">
+                  {formik.errors.description}
+                </p>
+              )}
           </div>
           <div className="grid gap-2">
             <Label>Deadline</Label>
             <Popover className="w-full">
               <PopoverTrigger asChild>
                 <Button
-
                   variant={"outline"}
                   className={cn(
-                    "w-[240px] justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
                 >
@@ -126,6 +158,11 @@ export function AddTask() {
                 />
               </PopoverContent>
             </Popover>
+            {formik.errors.deadline && (
+                <p className="text-red-600 m-0 text-xs">
+                  {formik.errors.deadline}
+                </p>
+              )}
           </div>
           <div className="grid gap-2">
             <Label>Assign To: </Label>
@@ -133,9 +170,6 @@ export function AddTask() {
               disabled={assignAll}
               onSelectedStaffsChange={handleSelectedStaffsChange}
             />
-          </div>
-          <div className="gap-4 grid">
-            <Label>Assign to all</Label>
             <div className="flex flex-row items-center gap-2">
               <Switch
                 checked={assignAll}
@@ -144,10 +178,37 @@ export function AddTask() {
               <Label>Assign to every staff</Label>
             </div>
           </div>
+
+          <div className="gap-2 mt-2 grid">
+            <Label>Priority</Label>
+            <Select className="w-full" onValueChange={(e) => formik.setFieldValue("priority", e)}>
+              <SelectTrigger className="w-full">
+                <SelectValue
+                  {...formik.getFieldProps("priority")}
+                  placeholder="Select priority"
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Priority</SelectLabel>
+                  {Priorities.map((item, index) => (
+                    <SelectItem value={item} key={index}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {formik.touched.priority && formik.errors.priority && (
+                <p className="text-red-600 m-0 text-xs">
+                  {formik.errors.priority}
+                </p>
+              )}
+          </div>
           <Button
             type="submit"
             disabled={!formik.isValid || !formik.dirty}
-            className="w-full"
+            className="w-full mt-5"
           >
             Create Task
           </Button>

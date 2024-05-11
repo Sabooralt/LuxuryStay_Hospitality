@@ -12,8 +12,15 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }) {
+  const isPastDate = (date) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return date < today;
+  };
+
   return (
     (<DayPicker
+    disabled={isPastDate}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{

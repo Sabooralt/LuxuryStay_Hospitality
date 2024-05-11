@@ -53,7 +53,7 @@ export function StaffCombobox({ onSelectedStaffsChange,disabled }) {
               {staffs.map((staff) => (
                 <CommandItem
                   key={staff._id}
-                  value={staff._id}
+                  value={staff.username}
                   onSelect={() => {
                     toggleSelection(staff._id);
                   }}
