@@ -60,7 +60,7 @@ export const AdminSidebar = () => {
 
         {sideItems.map((item,index)=>(
 
-        <TooltipProvider>
+        <TooltipProvider key={index}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link

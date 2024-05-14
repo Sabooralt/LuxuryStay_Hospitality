@@ -59,7 +59,7 @@ export const StaffsContextProvider = ({ children }) => {
         console.log(err);
       }
     };
-    fetchStaff();
+    fetchStaff();  
   }, []);
   return (
     <StaffContext.Provider value={{ ...state, dispatch }}>

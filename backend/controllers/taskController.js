@@ -1,15 +1,80 @@
-const Task = require('../models/taskModel');
+const Task = require("../models/taskModel");
+const User = require("../models/userModel")
 
 const createTask = async (req, res) => {
   try {
     const { title, description, deadline, createdBy } = req.body;
+
     const task = await Task.create({ ...req.body });
+    const createdByUser = await User.findById(createdBy).select("first_name last_name");
+    task.createdBy = createdByUser;
+
+    req.io.emit("createTask", task);
 
     return res.status(201).json({ success: true, message: "Task created!", task });
   } catch (err) {
-    console.error('Error creating task:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Error creating task:", err);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-module.exports = { createTask };
+
+const getTask = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const tasks = await Task.find({
+      assignedTo: id,
+      assignedAll: true,
+    }).populate([
+      { path: "createdBy", select: ["first_name", "last_name"] },
+      { path: "seenBy", select: "username" }
+    ]);
+
+    if (tasks.length === 0) {
+      return res.status(404).json({ success: false, message: "No tasks found for the staff" });
+    }
+
+    return res.status(200).json({ success: true, message: "Tasks fetched successfully!", tasks });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const viewBy  = async (req,res)=>{
+  try{
+    const {staffId,taskId} = req.params;
+    const task = await Task.findById(taskId);
+
+    if(!task.seenBy.includes(staffId)){
+      task.seenBy.push(staffId);
+
+      await task.save();
+
+      return res.status(200).json({success: true})
+
+    }
+    else{
+      return res.status(409).json({success: false,message: "Already seen"})
+    }
+
+    
+  }catch(err){
+    return res.status(500).json({success: false,message: err})
+  }
+}
+
+
+const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const task = await Task.findByIdAndDelete({ _id: id });
+
+    return res.status(200).json(task);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = { createTask, getTask, deleteTask,viewBy };

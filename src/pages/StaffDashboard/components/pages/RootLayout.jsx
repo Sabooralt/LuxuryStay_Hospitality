@@ -33,10 +33,14 @@ import { Link } from "react-router-dom"
 import { StaffSidebar } from "../Sidebar"
 import { StaffHeader } from "../Header"
 import { useStaffAuthContext } from "@/hooks/useStaffAuth"
+import { TaskCard } from "@/pages/AdminDashboard/components/task/TaskCard"
+import { useTaskContext } from "@/hooks/useTaskContext"
 
 
   export function StaffDashboard() {
     const {staff} = useStaffAuthContext();
+    const {task} = useTaskContext();
+
     return (
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <StaffSidebar/>
@@ -49,16 +53,12 @@ import { useStaffAuthContext } from "@/hooks/useStaffAuth"
               <p className="font-semibold">{staff.username} ({staff.role})</p>
             </div>
             <div
-              className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm" x-chunk="dashboard-02-chunk-1"
+              className="flex flex-1 items-center rounded-lg border border-dashed shadow-sm" x-chunk="dashboard-02-chunk-1"
             >
-              <div className="flex flex-col items-center gap-1 text-center">
-                <h3 className="text-2xl font-bold tracking-tight">
-                  You have no products
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  You can start selling as soon as you add a product.
-                </p>
-                <Button className="mt-4">Add Product</Button>
+              <div className="flex flex-col w-full gap-1 ">
+                {task ? task.map((t)=>(
+                  <TaskCard task={t}/>
+                )):<div>Loading...</div>}
               </div>
             </div>
           </main>

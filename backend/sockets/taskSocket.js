@@ -5,11 +5,7 @@ module.exports = (io) => {
     console.log("A client connected to task socket");
 
     socket.on("createTask", (newTask) => {
-      Task.create(newTask).then((task) => {
-        io.emit("taskCreated", task); // Broadcast the new task to all connected clients
-      }).catch((error) => {
-        console.error("Error creating task:", error);
-      });
+      io.emit("taskCreated", newTask);
     });
 
     socket.on("disconnect", () => {

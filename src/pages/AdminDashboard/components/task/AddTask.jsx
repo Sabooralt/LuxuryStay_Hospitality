@@ -29,7 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import * as Yup from 'yup'
+import * as Yup from "yup";
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { StaffCombobox } from "@/components/ui/combobox";
@@ -37,12 +37,16 @@ import { useFormik, useFormikContext } from "formik";
 import axios from "axios";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import Priorities from "@/utils/PriorityList";
+import { socket } from "@/socket";
+import { useTaskContext } from "@/hooks/useTaskContext";
+import { useToast } from "@/components/ui/use-toast";
 
 export function AddTask() {
   const [date, setDate] = useState(null);
   const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [assignAll, setAssignAll] = useState(false);
   const { user } = useAuthContextProvider();
+  const {toast} = useToast();
 
   const handleSelectedStaffsChange = (staffIds) => {
     setSelectedStaffs(staffIds);
@@ -73,9 +77,14 @@ export function AddTask() {
           },
         }
       );
-    } catch (err) {
-      console.log(err);
-    }
+
+      if(response.status === 201){
+        toast({
+          title: response.data.message,
+          
+        })
+      }
+    } catch (err) {}
   };
 
   const formik = useFormik({
@@ -88,14 +97,10 @@ export function AddTask() {
       priority: "",
     },
     validationSchema: Yup.object({
-
-        title: Yup.string().trim().required("Title is required."),
-        description: Yup.string().trim().required("Description is required."),
-        deadline: Yup.string().trim().required("Deadline is required."),
-        priority: Yup.string().trim().required("Priority is required.")
-        
-
-
+      title: Yup.string().trim().required("Title is required."),
+      description: Yup.string().trim().required("Description is required."),
+      deadline: Yup.string().trim().required("Deadline is required."),
+      priority: Yup.string().trim().required("Priority is required."),
     }),
     onSubmit: async (values) => {
       console.log(values);
@@ -114,25 +119,20 @@ export function AddTask() {
         <form onSubmit={formik.handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
             <Label>Task Title</Label>
-            <Input type="text" {...formik.getFieldProps("title")}/>
+            <Input type="text" {...formik.getFieldProps("title")} />
             {formik.touched.title && formik.errors.title && (
-                <p className="text-red-600 m-0 text-xs">
-                  {formik.errors.title}
-                </p>
-              )}
+              <p className="text-red-600 m-0 text-xs">{formik.errors.title}</p>
+            )}
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="last-name">Description</Label>
-            <Textarea
-              rows="1"
-              {...formik.getFieldProps("description")}
-            />
-              {formik.touched.description && formik.errors.description && (
-                <p className="text-red-600 m-0 text-xs">
-                  {formik.errors.description}
-                </p>
-              )}
+            <Textarea rows="1" {...formik.getFieldProps("description")} />
+            {formik.touched.description && formik.errors.description && (
+              <p className="text-red-600 m-0 text-xs">
+                {formik.errors.description}
+              </p>
+            )}
           </div>
           <div className="grid gap-2">
             <Label>Deadline</Label>
@@ -159,10 +159,10 @@ export function AddTask() {
               </PopoverContent>
             </Popover>
             {formik.errors.deadline && (
-                <p className="text-red-600 m-0 text-xs">
-                  {formik.errors.deadline}
-                </p>
-              )}
+              <p className="text-red-600 m-0 text-xs">
+                {formik.errors.deadline}
+              </p>
+            )}
           </div>
           <div className="grid gap-2">
             <Label>Assign To: </Label>
@@ -181,7 +181,10 @@ export function AddTask() {
 
           <div className="gap-2 mt-2 grid">
             <Label>Priority</Label>
-            <Select className="w-full" onValueChange={(e) => formik.setFieldValue("priority", e)}>
+            <Select
+              className="w-full"
+              onValueChange={(e) => formik.setFieldValue("priority", e)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue
                   {...formik.getFieldProps("priority")}
@@ -200,10 +203,10 @@ export function AddTask() {
               </SelectContent>
             </Select>
             {formik.touched.priority && formik.errors.priority && (
-                <p className="text-red-600 m-0 text-xs">
-                  {formik.errors.priority}
-                </p>
-              )}
+              <p className="text-red-600 m-0 text-xs">
+                {formik.errors.priority}
+              </p>
+            )}
           </div>
           <Button
             type="submit"

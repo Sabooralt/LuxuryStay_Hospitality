@@ -8,20 +8,21 @@ import { AuthContextProvider } from "./context/authContext.jsx";
 import { RoomTypeContextProvider } from "./context/roomTypeContext.jsx";
 import { RoomContextProvider } from "./context/roomContext.jsx";
 import { StaffAuthContextProvider } from "./context/staffAuthContext.jsx";
+import { TaskContextProvider } from "./context/TaskContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthContextProvider>
       <RoomContextProvider>
-
-      <StaffsContextProvider>
-        <RoomTypeContextProvider>
-          <StaffAuthContextProvider>
-
-          <App />
-          </StaffAuthContextProvider>
-        </RoomTypeContextProvider>
-      </StaffsContextProvider>
+        <StaffsContextProvider>
+          <RoomTypeContextProvider>
+            <StaffAuthContextProvider>
+              <TaskContextProvider>
+                <App />
+              </TaskContextProvider>
+            </StaffAuthContextProvider>
+          </RoomTypeContextProvider>
+        </StaffsContextProvider>
       </RoomContextProvider>
     </AuthContextProvider>
     <Toaster />
