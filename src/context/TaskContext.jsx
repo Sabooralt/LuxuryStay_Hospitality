@@ -12,12 +12,25 @@ export const taskReducer = (state, action) => {
       return {
         task: action.payload.tasks,
       };
-      case "CREATE_TASK":
-        return {
-          ...state,
-          task: state.task ? [action.payload, ...state.task] : [action.payload]
-        };
-      
+    case "CREATE_TASK":
+      return {
+        ...state,
+        task: state.task ? [action.payload, ...state.task] : [action.payload],
+      };
+
+    case "SET_SEENBY":
+      const updatedTasks = state.task.map((task) => {
+        if (task._id === action.payload.taskId) {
+          return { ...task, seenBy: action.payload.seenBy };
+        }
+        return task;
+      });
+
+      return {
+        ...state,
+        task: updatedTasks,
+      };
+
     case "DELETE_TASK":
       return {
         task: state.task.filter((w) => w._id !== action.payload._id),
@@ -33,7 +46,6 @@ export const TaskContextProvider = ({ children }) => {
   });
   const { staff } = useStaffAuthContext();
   const { user } = useAuthContextProvider();
-
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -55,27 +67,36 @@ export const TaskContextProvider = ({ children }) => {
     };
     fetchTasks();
 
-    console.log('staff',staff)
-  }, [staff]);
+    console.log("staff", staff);
+  }, [staff,dispatch]);
 
   useEffect(() => {
     const handleCreateTask = (newTask) => {
       if (staff && newTask && newTask.assignedTo !== undefined) {
         const loggedInStaffId = staff._id;
-        if (newTask.assignedAll || newTask.assignedTo.includes(loggedInStaffId)) {
+        if (
+          newTask.assignedAll ||
+          newTask.assignedTo.includes(loggedInStaffId)
+        ) {
           dispatch({ type: "CREATE_TASK", payload: newTask });
         } else if (newTask.assignedAll) {
-          // If assignedAll is true but the loggedInStaffId is not in assignedTo, dispatch anyway
+         
           dispatch({ type: "CREATE_TASK", payload: newTask });
         }
       }
     };
-  
+
+    const updateSeenByContext = (seenBy)=>{
+console.log(seenBy)
+      dispatch({type: "SET_SEENBY",payload: seenBy})
+    }
+
     socket.on("createTask", handleCreateTask);
-  
-    
+
+    socket.on('taskMarkedAsSeen',updateSeenByContext)
+
+
   }, [staff]);
-  
 
   console.log("TaskContext state: ", state);
 

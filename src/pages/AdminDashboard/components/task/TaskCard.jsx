@@ -18,8 +18,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Trash2 } from "lucide-react";
+import { CheckCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { socket } from "@/socket";
 
 export const TaskCard = ({ task }) => {
   const { dispatch } = useTaskContext();
@@ -63,6 +64,8 @@ export const TaskCard = ({ task }) => {
       console.log(err);
     }
   };
+
+ 
 
   const markTaskAsSeen = async () => {
     try {
@@ -134,14 +137,19 @@ export const TaskCard = ({ task }) => {
 
           {user && user.role === "admin" && (
             <div className="flex gap-1">
-              <p className="font-semibold">Seen By: </p>
+              {task.seenBy && (
+                <>
+                  <p className="font-semibold">Seen By: </p>
 
-              {task.seenBy &&
-                task.seenBy.map((seen, index) => (
-                  <p>
-                    {seen.username} {index !== task.seenBy.length - 1 && ", "}
-                  </p>
-                ))}
+                  {task.seenBy.map((seen, index) => (
+                    <p className="flex flex-row items-center ">
+                      {seen.username}{" "}
+                      <CheckCheck className="h-3.5 w-3.h-3.5 text-blue-600" />{" "}
+                      {index !== task.seenBy.length - 1 && ", "}
+                    </p>
+                  ))}
+                </>
+              )}
             </div>
           )}
         </div>

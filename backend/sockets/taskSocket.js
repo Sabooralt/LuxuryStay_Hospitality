@@ -8,6 +8,9 @@ module.exports = (io) => {
       io.emit("taskCreated", newTask);
     });
 
+    socket.on("markTaskAsSeen", ({ taskId, staffId }) => {
+      socket.broadcast.emit("taskMarkedAsSeen", { taskId, staffId });
+    });
     socket.on("disconnect", () => {
       console.log("A client disconnected from task socket");
     });

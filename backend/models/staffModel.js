@@ -61,4 +61,5 @@ staffSchema.statics.login = async function (username, password) {
   }
 return staff
 };
+
 module.exports = mongoose.model("Staff", staffSchema);
