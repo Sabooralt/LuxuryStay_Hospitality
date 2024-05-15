@@ -19,13 +19,9 @@ export const useAddRoom = () => {
     formData.append("capacity", data.capacity);
     formData.append("description", data.description);
     formData.append("pricePerNight", data.pricePerNight);
-
-    // Append images (if available)
     data.images.forEach((image) => {
       formData.append("images", image);
     });
-
-    // Add any other relevant properties (e.g., adminId)
     formData.append("adminId", user._id);
 
     try {

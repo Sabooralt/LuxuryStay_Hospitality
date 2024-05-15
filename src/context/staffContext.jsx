@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 
 export const StaffContext = createContext();
 
@@ -43,16 +43,22 @@ export const staffReducer = (state, action) => {
 };
 
 export const StaffsContextProvider = ({ children }) => {
+
+  const [isLoading,setIsLoading] = useState(false);
   const [state, dispatch] = useReducer(staffReducer, {
     staffs: null,
+   loading: isLoading,
   });
 
   useEffect(() => {
     const fetchStaff = async () => {
+
+      setIsLoading(false);
       try {
         const response = await axios.get("/api/staff");
         if (response.status === 201) {
           dispatch({ type: "SET_STAFF", payload: response.data });
+          setIsLoading(true)
           console.log(response.data)
         }
       } catch (err) {

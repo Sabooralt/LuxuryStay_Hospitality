@@ -35,6 +35,19 @@ export const taskReducer = (state, action) => {
       return {
         task: state.task.filter((w) => w._id !== action.payload._id),
       };
+
+    case "MARK_COMPLETED":
+      const updateStatus = state.task.map((task) => {
+        if (task._id === action.payload.taskId) {
+          return { ...task, status: action.payload.status, completedBy: action.payload.completedBy };
+        }
+        return task;
+      });
+
+      return {
+        ...state,
+        task: updateStatus,
+      };
     default:
       return state;
   }
@@ -44,7 +57,7 @@ export const TaskContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(taskReducer, {
     task: null,
   });
-  const { staff } = useStaffAuthContext();
+  const { staff,loading } = useStaffAuthContext();
   const { user } = useAuthContextProvider();
 
   useEffect(() => {
@@ -65,10 +78,14 @@ export const TaskContextProvider = ({ children }) => {
         console.log("Error fetching tasks:", err);
       }
     };
-    fetchTasks();
+
+    if(!loading){
+      fetchTasks();
+
+    }
 
     console.log("staff", staff);
-  }, [staff,dispatch]);
+  }, [staff, dispatch,loading]);
 
   useEffect(() => {
     const handleCreateTask = (newTask) => {
@@ -80,22 +97,25 @@ export const TaskContextProvider = ({ children }) => {
         ) {
           dispatch({ type: "CREATE_TASK", payload: newTask });
         } else if (newTask.assignedAll) {
-         
           dispatch({ type: "CREATE_TASK", payload: newTask });
         }
       }
     };
 
-    const updateSeenByContext = (seenBy)=>{
-console.log(seenBy)
-      dispatch({type: "SET_SEENBY",payload: seenBy})
+    const updateSeenByContext = (seenBy) => {
+      console.log(seenBy);
+      dispatch({ type: "SET_SEENBY", payload: seenBy });
+    };
+
+    const handleCompleted = (taskState)=>{
+      dispatch({type: "MARK_COMPLETED",payload: taskState})
     }
+
+    socket.on("taskCompleted",handleCompleted)
 
     socket.on("createTask", handleCreateTask);
 
-    socket.on('taskMarkedAsSeen',updateSeenByContext)
-
-
+    socket.on("taskMarkedAsSeen", updateSeenByContext);
   }, [staff]);
 
   console.log("TaskContext state: ", state);

@@ -10,8 +10,6 @@ function App() {
   useEffect(()=>{
     socket.connect();
     socket.emit('test','hello!')
-
-
   },[])
 
   return (

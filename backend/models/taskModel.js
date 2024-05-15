@@ -36,6 +36,10 @@ const taskSchema = new Schema(
       enum: ["Pending", "In Progress", "Completed"],
       default: "Pending",
     },
+    completedBy : {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
