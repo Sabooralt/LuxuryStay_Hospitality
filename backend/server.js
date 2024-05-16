@@ -20,9 +20,11 @@ const staffRoutes = require("./routes/staffRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const roomTypeRoutes = require("./routes/roomTypeRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const notiRoutes = require("./routes/notiRoutes")
 
 // Sockets initialization
 const taskSocket = require("./sockets/taskSocket");
+const notiSocket = require("./sockets/notificationSocket")
 
 app.use(express.json());
 app.use(cors());
@@ -38,9 +40,12 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/roomType", roomTypeRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/task", taskRoutes);
+app.use("/api/notis",notiRoutes)
 
 //Sockets
 taskSocket(io);
+notiSocket(io)
+
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -54,19 +59,21 @@ mongoose
     console.log(error);
   });
 
+  const socketUserMap = {};
 
   io.on("connection", (socket) => {
-  console.log(`A user connected ${socket.id}`);
+    console.log("A client connected:", socket.id);
 
-  // Listen for test event
-  socket.on("test", (data) => {
-    console.log("Test event received:", data);
-  });
+    socket.on("login", ({ userId, staffId }) => {
+         const id = userId || staffId;
+         socketUserMap[socket.id] = { id };
+         console.log(`User/Staff ${id} logged in with socket ${socket.id}`);
+    });
 
-  // Disconnect event
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
+    socket.on("disconnect", () => {
+      delete socketUserMap[socket.id];
+      console.log("A client disconnected:", socket.id);
+    });
 });
 
 

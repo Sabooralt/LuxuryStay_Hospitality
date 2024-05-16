@@ -14,8 +14,10 @@ import { Settings } from "@/pages/AdminDashboard/pages/Settings";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 import { StaffLogin } from "@/pages/Client/Login/components/staffLogin";
 import { StaffDashboard } from "@/pages/StaffDashboard/components/pages/RootLayout";
-import { StaffHome } from "@/pages/StaffDashboard/components/Home";
+import { StaffHome } from "@/pages/StaffDashboard/components/pages/Home";
 import { Tasks } from "@/pages/AdminDashboard/pages/Task";
+import { StaffTasks } from "@/pages/StaffDashboard/components/pages/Tasks";
+import { StaffNotifications } from "@/pages/StaffDashboard/components/pages/Notifications";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -68,6 +70,11 @@ export const AdminRoutes = () => {
       <Route path="/staff" element={staff ? <StaffDashboard/> : <StaffLogin/>}>
 
         <Route index element={<StaffHome/>} />
+
+        <Route  path="/staff/tasks" element={<StaffTasks/>}/>
+        <Route path="/staff/Notifications" element={<StaffNotifications/>}/>
+
+
 
 
       </Route>

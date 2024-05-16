@@ -1,3 +1,4 @@
+import { socket } from "@/socket";
 import { useEffect, useState, useReducer, createContext } from "react";
 
 export const StaffAuthContext = createContext();
@@ -33,6 +34,9 @@ export const StaffAuthContextProvider = ({ children }) => {
       dispatch({type: "LOGIN", payload: staff})
     }
   },[])
+
+
+
 
   console.log("StafAuthContext state: ", state);
   return (

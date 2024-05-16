@@ -21,10 +21,13 @@ import {
 import { Check, CheckCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket";
+import { useToast } from "@/components/ui/use-toast";
 
-export const TaskCard = ({ task }) => {
+export const TaskCard = ({ task, admin }) => {
   const { dispatch } = useTaskContext();
   const [selected, setSelected] = useState(false);
+
+  const { toast } = useToast();
 
   const { staff } = useStaffAuthContext();
 
@@ -54,6 +57,12 @@ export const TaskCard = ({ task }) => {
 
   const handleDeleteTask = async (id) => {
     try {
+      if (user && user.role !== "admin") {
+        toast({
+          title: "Unauthorized!",
+          variant: "destructive",
+        });
+      }
       const response = await axios.delete("/api/task/delete/" + id);
 
       if (response.status === 200) {
@@ -102,8 +111,9 @@ export const TaskCard = ({ task }) => {
   return (
     <Card
       onClick={markTaskAsSeen}
+      id={task._id}
       className={`p-4 pb-6 relative grid shadow-md text-nowrap rounded-[0.4rem] w-full hover:bg-gray-100 transition duration-300 gap-2 cursor-pointer  ${
-        selected || task.completedBy ? "bg-gray-50" : "" 
+        selected || task.completedBy ? "bg-gray-50" : ""
       } `}
     >
       <CardHeader className="grid p-0">
@@ -151,14 +161,14 @@ export const TaskCard = ({ task }) => {
             {formatDate(new Date(task.deadline), "MM/dd/yyyy")}
           </p>
 
-          {user && user.role === "admin" && (
+          {admin && (
             <div className="flex gap-1">
               {task.seenBy.length > 0 && (
                 <>
                   <p className="font-semibold">Seen By: </p>
 
                   {task.seenBy.map((seen, index) => (
-                    <p className="flex flex-row items-center ">
+                    <p key={index} className="flex flex-row items-center ">
                       {seen.username}
                       <CheckCheck className="h-3.5 w-3.h-3.5 text-blue-600" />
                       {index !== task.seenBy.length - 1 && ", "}
@@ -169,7 +179,7 @@ export const TaskCard = ({ task }) => {
             </div>
           )}
         </div>
-        {user && user.role === "admin" && (
+        {admin && (
           <>
             <div className="flex flex-row ml-auto gap-4">
               <TooltipProvider>
@@ -192,8 +202,15 @@ export const TaskCard = ({ task }) => {
           </>
         )}
       </CardFooter>
-      <Button onClick={markAsCompleted} disabled={task.completedBy} className="flex gap-2 text-sm">
-       {task.completedBy ? `Completed by ${task.completedBy.username}` : "Mark as Completed "} <Check className="h-5 w-5" />
+      <Button
+        onClick={markAsCompleted}
+        disabled={task.completedBy}
+        className="flex gap-2 text-sm"
+      >
+        {task.completedBy
+          ? `Completed by ${task.completedBy.username}`
+          : "Mark as Completed "}{" "}
+        <Check className="h-5 w-5" />
       </Button>
     </Card>
   );

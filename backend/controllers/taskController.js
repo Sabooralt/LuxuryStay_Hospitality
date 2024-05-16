@@ -1,18 +1,58 @@
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
 const Staff = require("../models/staffModel");
+const {
+  sendNotificationToAdmins,
+  sendNotificationAllStaff,
+  sendNotificationToStaff,
+} = require("./notificationController");
 
 const createTask = async (req, res) => {
   try {
-    const { title, description, deadline, createdBy } = req.body;
+    const { createdBy } = req.body;
 
     const task = await Task.create({ ...req.body });
+    await task.populate("assignedTo", "username");
+
     const createdByUser = await User.findById(createdBy).select(
       "first_name last_name"
     );
     task.createdBy = createdByUser;
 
     req.io.emit("createTask", task);
+
+    if (task.assignedAll) {
+      await sendNotificationAllStaff(
+        req,
+        "A new task has been assigned to you.",
+        task.description,
+        `/staff/tasks/${task._id}`
+      );
+
+      await sendNotificationToAdmins(
+        req,
+        "A Task has been assigned to All the staff",
+        task.description
+      );
+    }
+
+    if (task.assignedTo && task.assignedTo.length > 0) {
+      const assignedToUsernames = task.assignedTo.map(staff => staff.username).join(', ');
+    
+      await sendNotificationToAdmins(
+        req,
+        `A Task has been assigned to ${assignedToUsernames}`,
+        task.description,
+       
+      );
+      await sendNotificationToStaff(
+        req,
+        `A Task has been assigned to you from ${createdByUser.first_name}`,
+        task.description,
+        task._id,
+        task._id
+      )
+    }
 
     return res
       .status(201)
@@ -35,7 +75,7 @@ const getTask = async (req, res) => {
     }).populate([
       { path: "createdBy", select: ["first_name", "last_name"] },
       { path: "seenBy", select: "username" },
-      {path: "completedBy",select: "username"}
+      { path: "completedBy", select: "username" },
     ]);
 
     if (tasks.length === 0) {
@@ -115,13 +155,16 @@ const markAsCompleted = async (req, res) => {
 
     const updatedTask = await Task.findOneAndUpdate(
       { _id: taskId },
-      { $set: { status: "Completed",completedBy: staffId } },
+      { $set: { status: "Completed", completedBy: staffId } },
       { new: true }
-    ).populate("completedBy","username");
+    ).populate("completedBy", "username");
 
-
-
-    req.io.emit("taskCompleted", { status: updatedTask.status, completedBy: updatedTask.completedBy, taskId, staffId });
+    req.io.emit("taskCompleted", {
+      status: updatedTask.status,
+      completedBy: updatedTask.completedBy,
+      taskId,
+      staffId,
+    });
 
     return res.status(200).json({
       success: true,

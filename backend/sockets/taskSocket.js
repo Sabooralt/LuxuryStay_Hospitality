@@ -1,8 +1,7 @@
-const Task = require("../models/taskModel");
 
 module.exports = (io) => {
   io.on("connection", (socket) => {
-    console.log("A client connected to task socket");
+    console.log("A client connected to notification socket");
 
     socket.on("createTask", (newTask) => {
       io.emit("taskCreated", newTask);

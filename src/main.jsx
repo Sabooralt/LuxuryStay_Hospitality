@@ -9,6 +9,7 @@ import { RoomTypeContextProvider } from "./context/roomTypeContext.jsx";
 import { RoomContextProvider } from "./context/roomContext.jsx";
 import { StaffAuthContextProvider } from "./context/staffAuthContext.jsx";
 import { TaskContextProvider } from "./context/TaskContext.jsx";
+import { NotiContextProvider } from "./context/notiContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <RoomTypeContextProvider>
             <StaffAuthContextProvider>
               <TaskContextProvider>
-                <App />
+                <NotiContextProvider>
+                  <App />
+                </NotiContextProvider>
               </TaskContextProvider>
             </StaffAuthContextProvider>
           </RoomTypeContextProvider>

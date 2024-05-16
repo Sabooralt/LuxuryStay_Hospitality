@@ -24,7 +24,7 @@ export const Tasks = () => {
               {task && task.length > 0 ? (
                 task.map((t) => (
                   <>
-                    <TaskCard task={t} />
+                    <TaskCard task={t} admin={true} />
                   </>
                 ))
               ) : (

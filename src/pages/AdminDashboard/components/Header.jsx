@@ -1,4 +1,6 @@
 import {
+  Bell,
+  Dot,
   Home,
   LineChart,
   Package,
@@ -9,14 +11,6 @@ import {
   Users2,
 } from "lucide-react";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -33,9 +27,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { BreadcrumbDemo } from "@/globalComponents/Breadcrumb";
+import { NotiDropDown } from "@/globalComponents/NotiDropDown";
+
 
 export const AdminHeader = () => {
-  const {user,logout} = useAuthContextProvider();
+  const { user, logout } = useAuthContextProvider();
+
+
+ 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <Sheet>
@@ -92,7 +91,7 @@ export const AdminHeader = () => {
           </nav>
         </SheetContent>
       </Sheet>
-        <BreadcrumbDemo/>
+      <BreadcrumbDemo />
       <div className="relative ml-auto flex-1 md:grow-0">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
@@ -101,6 +100,10 @@ export const AdminHeader = () => {
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
         />
       </div>
+
+<NotiDropDown user={user} userType='user'/>
+ 
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
