@@ -67,16 +67,14 @@ export const AdminRoutes = () => {
 
       {/* Staff Routes */}
 
-      <Route path="/staff" element={staff ? <StaffDashboard/> : <StaffLogin/>}>
+      <Route
+        path="/staff"
+        element={staff ? <StaffDashboard /> : <StaffLogin />}
+      >
+        <Route index element={<StaffHome />} />
 
-        <Route index element={<StaffHome/>} />
-
-        <Route  path="/staff/tasks" element={<StaffTasks/>}/>
-        <Route path="/staff/Notifications" element={<StaffNotifications/>}/>
-
-
-
-
+        <Route path="/staff/tasks" element={<StaffTasks />} />
+        <Route path="/staff/Notifications" element={<StaffNotifications />} />
       </Route>
     </Routes>
   );

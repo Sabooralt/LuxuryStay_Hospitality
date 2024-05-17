@@ -49,7 +49,7 @@ const sideItems = [
   {
     name: "Tasks",
     link: "/admin/tasks",
-    icon: <ClipboardList />
+    icon: <ClipboardList className="h-5 w-5" />
   }
 ];
 
