@@ -18,11 +18,11 @@ import { StaffHome } from "@/pages/StaffDashboard/components/pages/Home";
 import { Tasks } from "@/pages/AdminDashboard/pages/Task";
 import { StaffTasks } from "@/pages/StaffDashboard/components/pages/Tasks";
 import { StaffNotifications } from "@/pages/StaffDashboard/components/pages/Notifications";
+import { StaffRooms } from "@/pages/StaffDashboard/components/pages/Rooms";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
   const { staff } = useStaffAuthContext();
-
   return (
     <Routes>
       <Route path="/" element={<Rootlayout />}>
@@ -73,8 +73,9 @@ export const AdminRoutes = () => {
       >
         <Route index element={<StaffHome />} />
 
-        <Route path="/staff/tasks" element={<StaffTasks />} />
+        <Route path="/staff/Tasks" element={<StaffTasks />} />
         <Route path="/staff/Notifications" element={<StaffNotifications />} />
+        <Route path="/staff/Rooms" element={<StaffRooms />} />
       </Route>
     </Routes>
   );

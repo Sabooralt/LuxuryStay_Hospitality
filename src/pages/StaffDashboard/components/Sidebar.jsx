@@ -9,6 +9,7 @@ import {
   Settings,
   ShoppingCart,
   Users,
+  Warehouse,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,12 @@ import {
 import { Link } from "react-router-dom";
 import { NotiDropDown } from "@/globalComponents/NotiDropDown";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function StaffSidebar() {
   const { staff } = useStaffAuthContext();
@@ -35,14 +42,18 @@ export function StaffSidebar() {
     {
       name: "Tasks",
       icon: <ClipboardList className="h-4 w-4" />,
-      link: "/staff/tasks"
+      link: "/staff/tasks",
     },
     {
       name: "Notifications",
       icon: <BellElectricIcon className="h-4 w-4" />,
-      link: "/staff/notifications"
+      link: "/staff/notifications",
     },
-
+    {
+      name: "Rooms",
+      icon: <Warehouse className="h-5 w-5" />,
+      link: "/staff/rooms",
+    },
   ];
   return (
     <div className="hidden border-r bg-muted/40 md:block">
@@ -59,10 +70,21 @@ export function StaffSidebar() {
         <div className="flex-1">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             {navItems.map((item, index) => (
-              <Link key={index} to={item.link} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
-                {item.icon}
-                {item.name}
-              </Link>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      key={index}
+                      to={item.link}
+                      className="flex w-fit items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                    >
+                      {item.icon}
+                      {item.name}
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">{item.name}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ))}
           </nav>
         </div>
