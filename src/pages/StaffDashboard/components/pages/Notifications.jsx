@@ -5,8 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 export const StaffNotifications = () => {
   const { noti } = useNotiContext();
   return (
-    <div>
-      <h1>Notifications</h1>
+    <>
 
       {noti &&
         noti.map((noti) => (
@@ -20,6 +19,6 @@ export const StaffNotifications = () => {
             </CardFooter>
           </Card>
         ))}
-    </div>
+    </>
   );
 };

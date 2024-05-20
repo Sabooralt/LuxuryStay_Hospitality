@@ -16,12 +16,12 @@ import { useNotiContext } from "@/hooks/useNotiContext";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, Dot } from "lucide-react";
+import { Bell, Check, Dot } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NotiItem } from "./NotiItem";
 
 export const NotiDropDown = ({ user, userType }) => {
-  const { noti: notis } = useNotiContext();
+  const { noti: notis, dispatch } = useNotiContext();
   const noti =
     notis &&
     notis.filter((noti) => {
@@ -32,15 +32,33 @@ export const NotiDropDown = ({ user, userType }) => {
       }
       return false;
     });
-    const totalUnseenLength =
-  noti &&
-  noti.reduce((totalLength, notification) => {
-    return totalLength + (notification.seen === false ? 1 : 0);
-  }, 0);
-  
+
+  const markAllAsSeen = async () => {
+    try {
+      const response = await axios.put(
+        `/api/notis/mark-all-seen/${userType}/${user._id}`
+      );
+
+      if (response.status === 200) {
+        dispatch({ type: "MARK_ALL_AS_SEEN", payload: response.data });
+        console.log("marked as seen!", response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const totalUnseenLength =
+    noti &&
+    noti.reduce((totalLength, notification) => {
+      return totalLength + (notification.seen === false ? 1 : 0);
+    }, 0);
+
   return (
     <div className="grid gap-2 relative">
-          <Badge className='absolute rounded-full w-[17px] h-[17px] p-0 bottom-[-2px] right-[-2px] grid items-center justify-center'>{totalUnseenLength}</Badge>
+      <Badge className="absolute rounded-full w-[17px] h-[17px] p-0 bottom-[-2px] right-[-2px] grid items-center justify-center">
+        {totalUnseenLength}
+      </Badge>
 
       {noti && (
         <DropdownMenu>
@@ -50,17 +68,26 @@ export const NotiDropDown = ({ user, userType }) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[25rem] grid gap-2">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuLabel className="flex flex-row justify-between items-center">
+             <h3 className="text-lg">Notifications</h3>
+              <p
+                onClick={markAllAsSeen}
+                className="font-semibold cursor-pointer text-sm flex flex-row items-center text-blue-400"
+              >
+                <Check className="w-4 h-4"/>
+                Mark all as read
+              </p>
+            </DropdownMenuLabel>
             <div className="flex flex-row justify-between items-center text-sm px-2">
               <p>Earlier</p>
-              <p className="font-semibold">See All</p>
+              <p className="font-semibold cursor-pointer">See All</p>
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <ScrollArea className="h-80 grid gap-2 w-full rounded-md border">
                 <div className="grid gap-1">
-                  {noti.map((noti) => (
-                    <NotiItem noti={noti}/>
+                  {noti.map((noti, index) => (
+                    <NotiItem key={index} noti={noti} />
                   ))}
                 </div>
               </ScrollArea>

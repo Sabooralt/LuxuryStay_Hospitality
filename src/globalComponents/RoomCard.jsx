@@ -31,11 +31,13 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 
 export function RoomCard({ className, room, ...props }) {
   const [error, setError] = useState(null);
   const [responseG, setResponseG] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const {staff} = useStaffAuthContext();
   const { toast } = useToast();
   const roomStatus =
     room.status === "occupied"
@@ -45,15 +47,17 @@ export function RoomCard({ className, room, ...props }) {
       : room.status === "cleaning"
       ? "outline"
       : "";
-
   const updateRoomStatus = async ({ data }) => {
     setError(null);
     setResponseG(null);
     setIsLoading(true);
     try {
-      const response = await axios.patch("/api/room/update_status/" + data.id, {
-        status: data.status,
-      });
+      const response = await axios.patch(
+        `/api/room/${staff._id}/update_status/${data.id}`,
+        {
+          status: data.status,
+        }
+      );
 
       if (response.status === 200) {
         setResponseG(response.data);
@@ -147,36 +151,34 @@ export function RoomCard({ className, room, ...props }) {
           <div className="space-y-1 max flex flex-row items-center gap-4">
             <p className="text-sm font-medium leading-none ">Room Status</p>
             <Select
-            onValueChange={(value) =>
-              updateRoomStatus({
-                data: { id: room._id, status: value },
-              })
-            }
-            defaultValue={room.status}
-          >
-            <SelectTrigger className="w-100">
-              <SelectValue placeholder={room.status} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Roles</SelectLabel>
+              onValueChange={(value) =>
+                updateRoomStatus({
+                  data: { id: room._id, status: value },
+                })
+              }
+              defaultValue={room.status}
+            >
+              <SelectTrigger className="w-100">
+                <SelectValue placeholder={room.status} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Roles</SelectLabel>
 
-                {statusRoom.map((role, index) => (
-                  <SelectItem key={index} value={role}>
-                    {role}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+                  {statusRoom.map((role, index) => (
+                    <SelectItem key={index} value={role}>
+                      {role}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardContent>
-      <CardFooter>
-         
-      </CardFooter>
+      <CardFooter></CardFooter>
     </Card>
   );
 }
 
-export const statusRoom = ["cleaning,", "occupied", "maintenance", "vacant"];
+export const statusRoom = ["cleaning", "occupied", "maintenance", "vacant"];

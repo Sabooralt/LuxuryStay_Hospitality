@@ -37,13 +37,14 @@ const createTask = async (req, res) => {
     }
 
     if (task.assignedTo && task.assignedTo.length > 0) {
-      const assignedToUsernames = task.assignedTo.map(staff => staff.username).join(', ');
-    
+      const assignedToUsernames = task.assignedTo
+        .map((staff) => staff.username)
+        .join(", ");
+
       await sendNotificationToAdmins(
         req,
         `A Task has been assigned to ${assignedToUsernames}`,
-        task.description,
-       
+        task.description
       );
       await sendNotificationToStaff(
         req,
@@ -51,7 +52,7 @@ const createTask = async (req, res) => {
         task.description,
         task._id,
         task._id
-      )
+      );
     }
 
     return res
@@ -166,6 +167,11 @@ const markAsCompleted = async (req, res) => {
       staffId,
     });
 
+    await sendNotificationToAdmins(
+      req,
+      `${updatedTask.title} completed by ${updatedTask.completedBy.username}`,
+      `Task completed by ${updatedTask.completedBy.username}`
+    );
     return res.status(200).json({
       success: true,
       message: "Task marked as completed",

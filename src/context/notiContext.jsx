@@ -16,6 +16,19 @@ export const notiReducer = (state, action) => {
       return {
         noti: [action.payload, ...state.noti],
       };
+      case "MARK_ALL_AS_SEEN":
+  const updatedNotis = state.noti.map((noti) => {
+    const updatedNoti = action.payload.notifications.find(n => n._id === noti._id);
+    if (updatedNoti) {
+      return { ...noti, seen: updatedNoti.seen };
+    }
+    return noti;
+  });
+
+  return {
+    ...state,
+    noti: updatedNotis,
+  };
     case "SET_NOTI_SEEN":
       const updatedNoti = state.noti.map((noti) => {
         if (noti._id === action.payload._id) {

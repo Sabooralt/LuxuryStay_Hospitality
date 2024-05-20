@@ -30,9 +30,11 @@ export const NotiItem = ({ noti }) => {
         >
           <div className={`p-1 flex flex-row items-center`}>
             {!noti.seen && <Dot className="grid w-6 h-6 text-blue-400" />}
-            <div>
-              <h1>{noti.title}</h1>
-              <div className="flex font-sm">
+            <div className="grid gap-2">
+              <h1 className="text-lg">{noti.title}</h1>
+
+              <p className="text-xs">{noti.message}</p>
+              <div className="flex text-xs">
                 {formatDistanceToNow(new Date(noti.createdAt), {
                   addSuffix: true,
                 })}

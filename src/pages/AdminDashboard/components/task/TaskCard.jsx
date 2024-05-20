@@ -148,17 +148,24 @@ export const TaskCard = ({ task, admin }) => {
       </CardContent>
 
       <CardFooter className="p-0">
-        <div className="flex flex-row gap-1 text-xs">
-          <p>Deadline: </p>
-          <p className="font-semibold capitalize">
-            {formatDistanceToNow(new Date(task.deadline), {
-              addSuffix: true,
-            })}{" "}
-          </p>
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="flex flex-row gap-1">
+            <p>Deadline Date: </p>
+            <p className="font-semibold capitalize">
+              {formatDistanceToNow(new Date(task.deadlineDate), {
+                addSuffix: true,
+              })}
+            </p>
+          </div>
+
+          <div className="flex flex-row gap-1">
+            <p>Deadline Time:</p>
+            <p className="font-semibold">{task.deadlineTime}</p>
+          </div>
         </div>
         <div className="absolute flex flex-row justify-between bottom-[2px] gap-1 w-full text-xs overflow-hidden pr-4">
           <p className="text-xs italic">
-            {formatDate(new Date(task.deadline), "MM/dd/yyyy")}
+            {formatDate(new Date(task.deadlineDate), "MM/dd/yyyy")}
           </p>
 
           {admin && (

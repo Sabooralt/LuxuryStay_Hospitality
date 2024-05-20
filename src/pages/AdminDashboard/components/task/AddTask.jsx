@@ -46,14 +46,14 @@ export function AddTask() {
   const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [assignAll, setAssignAll] = useState(false);
   const { user } = useAuthContextProvider();
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const handleSelectedStaffsChange = (staffIds) => {
     setSelectedStaffs(staffIds);
   };
   const handleDateSelect = (selectedDate) => {
     setDate(selectedDate);
-    formik.setFieldValue("deadline", selectedDate);
+    formik.setFieldValue("deadlineDate", selectedDate);
   };
   const handleSubmit = async (values) => {
     if (!user) {
@@ -78,11 +78,10 @@ export function AddTask() {
         }
       );
 
-      if(response.status === 201){
+      if (response.status === 201) {
         toast({
           title: response.data.message,
-          
-        })
+        });
       }
     } catch (err) {}
   };
@@ -91,7 +90,8 @@ export function AddTask() {
     initialValues: {
       title: "",
       description: "",
-      deadline: date,
+      deadlineDate: date,
+      deadlineTime: "",
       assignedTo: selectedStaffs,
       assignAll: assignAll,
       priority: "",
@@ -99,7 +99,8 @@ export function AddTask() {
     validationSchema: Yup.object({
       title: Yup.string().trim().required("Title is required."),
       description: Yup.string().trim().required("Description is required."),
-      deadline: Yup.string().trim().required("Deadline is required."),
+      deadlineDate: Yup.string().trim().required("Deadline date is required."),
+      deadlineTime: Yup.string().trim().required("Deadline time is required."),
       priority: Yup.string().trim().required("Priority is required."),
     }),
     onSubmit: async (values) => {
@@ -135,7 +136,7 @@ export function AddTask() {
             )}
           </div>
           <div className="grid gap-2">
-            <Label>Deadline</Label>
+            <Label>Deadline date</Label>
             <Popover className="w-full">
               <PopoverTrigger asChild>
                 <Button
@@ -158,9 +159,15 @@ export function AddTask() {
                 />
               </PopoverContent>
             </Popover>
-            {formik.errors.deadline && (
+
+            <div className="grid gap-2">
+              <h3 className="font-semibold text-sm">Deadline time</h3>
+
+              <input type="time" className="w-full border-2 p-1 rounded-lg" {...formik.getFieldProps("deadlineTime")} />
+            </div>
+            {formik.errors.deadlineTime && (
               <p className="text-red-600 m-0 text-xs">
-                {formik.errors.deadline}
+                {formik.errors.deadlineTime}
               </p>
             )}
           </div>
@@ -208,6 +215,7 @@ export function AddTask() {
               </p>
             )}
           </div>
+
           <Button
             type="submit"
             disabled={!formik.isValid || !formik.dirty}

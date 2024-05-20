@@ -12,8 +12,12 @@ const taskSchema = new Schema(
       required: true,
     },
     seenBy: [{ type: Schema.Types.ObjectId, ref: "Staff" }],
-    deadline: {
+    deadlineDate: {
       type: Date,
+      required: true,
+    },
+    deadlineTime: {
+      type: String,
       required: true,
     },
     assignedTo: [
@@ -36,7 +40,7 @@ const taskSchema = new Schema(
       enum: ["Pending", "In Progress", "Completed"],
       default: "Pending",
     },
-    completedBy : {
+    completedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Staff",
     },
@@ -49,17 +53,17 @@ const taskSchema = new Schema(
   { timestamps: true }
 );
 
-taskSchema.virtual('seenByUsernames', {
-  ref: 'Staff',
-  localField: 'seenBy',
-  foreignField: '_id',
+taskSchema.virtual("seenByUsernames", {
+  ref: "Staff",
+  localField: "seenBy",
+  foreignField: "_id",
   justOne: false,
-  transform: function(doc, ret) {
-    return ret.map(user => user.username);
-  }
+  transform: function (doc, ret) {
+    return ret.map((user) => user.username);
+  },
 });
 
-taskSchema.set('toObject', { virtuals: true });
-taskSchema.set('toJSON', { virtuals: true });
+taskSchema.set("toObject", { virtuals: true });
+taskSchema.set("toJSON", { virtuals: true });
 
 module.exports = mongoose.model("Task", taskSchema);
