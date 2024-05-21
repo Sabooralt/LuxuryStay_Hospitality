@@ -65,7 +65,7 @@ const checkRoomNumber = async (req, res) => {
   }
 };
 
-const updateStatus = async (req,res) => {
+const updateStatus = async (req, res) => {
   try {
     const { id, staffId } = req.params;
 

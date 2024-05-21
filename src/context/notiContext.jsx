@@ -17,6 +17,10 @@ export const notiReducer = (state, action) => {
       return {
         noti: [action.payload, ...state.noti],
       };
+    case "CLEAR_NOTIS":
+      return {
+        noti: null,
+      };
     case "MARK_ALL_AS_SEEN":
       const updatedNotis = state.noti.map((noti) => {
         const updatedNoti = action.payload.notifications.find(
@@ -54,9 +58,8 @@ export const NotiContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(notiReducer, {
     noti: null,
   });
-  const { toast } = useToast();
 
-  useEffect(() => {
+  /*  useEffect(() => {
     const fetchNotis = async () => {
       try {
         const response = await axios(`/api/notis`);
@@ -69,39 +72,19 @@ export const NotiContextProvider = ({ children }) => {
       }
     };
     fetchNotis();
-  }, [staff]);
+  }, [staff]); */
 
   useEffect(() => {
-    const notiSeenUpdate = (data) => {
-      dispatch({ type: "SET_NOTI_SEEN", payload: data });
-    };
+   
 
     const newNoti = (data) => {
       dispatch({ type: "NEW_NOTI", payload: data });
-
-      console.log("User:", user);
-      console.log("Staff:", staff);
-
-      const staffValues = JSON.parse(localStorage.getItem("staff"));
-      const userValues = JSON.parse(localStorage.getItem("user"));
-
-      console.log("staff", staffValues._id);
-
-      if (data.user && data.user === userValues._id) {
-        toast({ title: "You have a new notification" });
-      }
-
-      if (data.staff && data.staff === staffValues._id) {
-        toast({ title: "You have a new notification" });
-      }
     };
 
     socket.on("notiCreated", newNoti);
-    socket.on("notiSeen", notiSeenUpdate);
 
     return () => {
       socket.off("notiCreated", newNoti);
-      socket.off("notiSeen", notiSeenUpdate);
     };
   }, [socket]);
 

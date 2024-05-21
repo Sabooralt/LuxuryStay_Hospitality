@@ -21,17 +21,7 @@ import { Link } from "react-router-dom";
 import { NotiItem } from "./NotiItem";
 
 export const NotiDropDown = ({ user, userType }) => {
-  const { noti: notis, dispatch } = useNotiContext();
-  const noti =
-    notis &&
-    notis.filter((noti) => {
-      if (userType === "staff") {
-        return noti.staff === user._id;
-      } else if (userType === "user") {
-        return noti.user === user._id;
-      }
-      return false;
-    });
+  const { noti, dispatch } = useNotiContext();
 
   const markAllAsSeen = async () => {
     try {
@@ -60,41 +50,56 @@ export const NotiDropDown = ({ user, userType }) => {
         {totalUnseenLength}
       </Badge>
 
-      {noti && (
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="outline" size="icon">
-              <Bell className="w-5 h-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[25rem] grid gap-2">
-            <DropdownMenuLabel className="flex flex-row justify-between items-center">
-             <h3 className="text-lg">Notifications</h3>
-              <p
-                onClick={markAllAsSeen}
-                className="font-semibold cursor-pointer text-sm flex flex-row items-center text-blue-400"
-              >
-                <Check className="w-4 h-4"/>
-                Mark all as read
-              </p>
-            </DropdownMenuLabel>
-            <div className="flex flex-row justify-between items-center text-sm px-2">
-              <p>Earlier</p>
-              <p className="font-semibold cursor-pointer">See All</p>
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <ScrollArea className="h-80 grid gap-2 w-full rounded-md border">
-                <div className="grid gap-1">
-                  {noti.map((noti, index) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button variant="outline" size="icon">
+            <Bell className="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-[25rem] grid gap-2">
+          <DropdownMenuLabel className="flex flex-row justify-between items-center">
+            <h3 className="text-lg">Notifications</h3>
+            <p
+              onClick={markAllAsSeen}
+              className="font-semibold cursor-pointer text-sm flex flex-row items-center text-blue-400"
+            >
+              <Check className="w-4 h-4" />
+              Mark all as read
+            </p>
+          </DropdownMenuLabel>
+          <div className="flex flex-row justify-between items-center text-sm px-2">
+            <p>Earlier</p>
+            <Link
+              to={`${
+                userType === "staff"
+                  ? "/staff/notifications"
+                  : userType === "user"
+                  ? "/admin/notificaitons"
+                  : "/"
+              }`}
+              className="font-semibold cursor-pointer"
+            >
+              See All
+            </Link>
+          </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <ScrollArea className="h-80 grid gap-2 w-full rounded-md border">
+              <div className={`${!noti && "grid gap-1"}`}>
+                {noti ? (
+                  noti.map((noti, index) => (
                     <NotiItem key={index} noti={noti} />
-                  ))}
-                </div>
-              </ScrollArea>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+                  ))
+                ) : (
+                  <div className="grid place-items-center justify-center w-full">
+                    <p>You have 0 notifications.</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

@@ -5,9 +5,32 @@ const Task = require("../models/taskModel");
 
 const getNotis = async (req, res) => {
   try {
-    const notifications = await Notification.find().sort({
-      createdAt: -1,
-    });
+    const { user, userId } = req.params;
+
+    // Get the start and end times for today and yesterday
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1); // Start of yesterday
+
+    let notifications = null;
+
+    if (user === "staff") {
+      notifications = await Notification.find({
+        staff: userId,
+        createdAt: { $gte: yesterday, $lt: new Date() },
+      }).sort({ createdAt: -1 });
+    } else if (user === "user") {
+      notifications = await Notification.find({
+        user: userId,
+        createdAt: { $gte: yesterday, $lt: new Date() },
+      }).sort({ createdAt: -1 });
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user type" });
+    }
+
     return res.status(200).json({ success: true, notifications });
   } catch (error) {
     console.error("Error fetching notifications:", error);
@@ -28,11 +51,24 @@ const sendNotificationAllStaff = async (req, title, message, link) => {
         message,
         link,
       });
+
       await notification.save();
-      req.io.emit("notiCreated", notification);
+
+      const staffIdString = staff._id.toString();
+      const socketId = req.staffSockets[staffIdString];
+      if (socketId) {
+        req.io.to(socketId).emit("notiCreated", notification);
+      } else {
+        console.log(
+          `Socket ID not found for staff member with ID: ${staff._id}`
+        );
+      }
     }
+
+    return { success: true, message: "Notifications sent successfully" };
   } catch (error) {
     console.log("Error sending notification:", error);
+    return { success: false, error: "Internal server error" };
   }
 };
 
@@ -73,7 +109,15 @@ const sendNotification = async (req, title, message, link, recipient, id) => {
         link,
       });
       await notification.save();
-      req.io.emit("notiCreated", notification);
+
+      const staffIdString = id.toString(); // Convert staff._id to string
+      const socketId = req.staffSockets[staffIdString]; // Use the converted string
+      if (socketId) {
+        // Emit the notification to the specific staff member's socket ID
+        req.io.to(socketId).emit("notiCreated", notification);
+      } else {
+        console.log(`Socket ID not found for staff member with ID: ${id}`);
+      }
     }
     if (recipient === "admin") {
       const notification = new Notification({
@@ -82,7 +126,15 @@ const sendNotification = async (req, title, message, link, recipient, id) => {
         message,
       });
       await notification.save();
-      req.io.emit("notiCreated", notification);
+
+      const staffIdString = id.toString(); // Convert staff._id to string
+      const socketId = req.staffSockets[staffIdString]; // Use the converted string
+      if (socketId) {
+        req.io.to(socketId).emit("notiCreated", notification);
+      } else {
+        console.log(`Socket ID not found for staff member with ID: ${id}`);
+      }
+
       console.log(`Notification sent to admin`);
     }
 
@@ -103,7 +155,10 @@ const sendNotificationToAdmins = async (req, title, message) => {
         message,
       });
       await notification.save();
-      req.io.emit("notiCreated", notification);
+      const AdminIdString = adminUser._id.toString();
+      const socketId = req.userSockets[AdminIdString];
+
+      req.io.to(socketId).emit("notiCreated", notification);
     }
   } catch (error) {
     console.error("Error sending notification:", error);
@@ -134,8 +189,6 @@ const markSeen = async (req, res) => {
       { $set: { seen: true } },
       { new: true }
     );
-
-    req.io.emit("notiSeen", updatedNoti);
 
     return res.status(200).json({
       success: true,

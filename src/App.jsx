@@ -7,19 +7,6 @@ import { socket } from "./socket";
 import { useStaffAuthContext } from "./hooks/useStaffAuth";
 
 function App() {
-  const { staff } = useStaffAuthContext();
-  useEffect(() => {
-    socket.connect();
-    socket.emit("test", "hello!");
-  }, []);
-
-  useEffect(() => {
-    if (staff) {
-      const staffId = staff._id;
-      socket.emit("login", {staffId});
-    }
-  }, [staff]);
-
   return (
     <>
       <BrowserRouter>

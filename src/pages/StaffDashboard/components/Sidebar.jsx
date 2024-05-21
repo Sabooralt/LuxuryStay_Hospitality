@@ -1,16 +1,4 @@
-import {
-  Bell,
-  BellElectricIcon,
-  ClipboardList,
-  Home,
-  LineChart,
-  Package,
-  Package2,
-  Settings,
-  ShoppingCart,
-  Users,
-  Warehouse,
-} from "lucide-react";
+import { Package2, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,32 +17,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { StaffItems } from "@/utils/staffNavItems";
 
 export function StaffSidebar() {
   const { staff } = useStaffAuthContext();
 
-  const navItems = [
-    {
-      name: "Dashboard",
-      icon: <Home className="h-4 w-4" />,
-      link: "/staff",
-    },
-    {
-      name: "Tasks",
-      icon: <ClipboardList className="h-4 w-4" />,
-      link: "/staff/tasks",
-    },
-    {
-      name: "Notifications",
-      icon: <BellElectricIcon className="h-4 w-4" />,
-      link: "/staff/notifications",
-    },
-    {
-      name: "Rooms",
-      icon: <Warehouse className="h-5 w-5" />,
-      link: "/staff/rooms",
-    },
-  ];
+  const roleAccess = {
+    Housekeeper: ["Dashboard", "Rooms", "Tasks", "Notifications"],
+  };
+  const accessibleItems = StaffItems.filter((item) =>
+    roleAccess[staff.role]?.includes(item.name)
+  );
+
   return (
     <div className="hidden border-r bg-muted/40 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -69,7 +43,7 @@ export function StaffSidebar() {
         </div>
         <div className="flex-1">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-            {navItems.map((item, index) => (
+            {accessibleItems.map((item, index) => (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

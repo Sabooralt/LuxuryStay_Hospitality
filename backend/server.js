@@ -4,14 +4,14 @@ const cors = require("cors");
 const express = require("express");
 const app = express();
 const http = require("http");
-const {Server} = require("socket.io");
+const { Server } = require("socket.io");
 
 const server = http.createServer(app);
-const io = new Server(server,{
+const io = new Server(server, {
   cors: {
-    origin : "http://localhost:5173",
-    methods: ["GET","POST"]
-  }
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
 });
 
 // Routes initialization
@@ -20,16 +20,19 @@ const staffRoutes = require("./routes/staffRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const roomTypeRoutes = require("./routes/roomTypeRoutes");
 const taskRoutes = require("./routes/taskRoutes");
-const notiRoutes = require("./routes/notiRoutes")
+const notiRoutes = require("./routes/notiRoutes");
 
 // Sockets initialization
-const taskSocket = require("./sockets/taskSocket");
-const notiSocket = require("./sockets/notificationSocket")
+
+const staffSockets = {};
+const userSockets = {};
 
 app.use(express.json());
 app.use(cors());
 app.use((req, res, next) => {
   req.io = io;
+  req.staffSockets = staffSockets;
+  req.userSockets = userSockets;
   console.log(req.path, req.method);
   next();
 });
@@ -40,12 +43,7 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/roomType", roomTypeRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/task", taskRoutes);
-app.use("/api/notis",notiRoutes)
-
-//Sockets
-taskSocket(io);
-notiSocket(io)
-
+app.use("/api/notis", notiRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -59,21 +57,34 @@ mongoose
     console.log(error);
   });
 
-  const socketUserMap = {};
 
-  io.on("connection", (socket) => {
-    console.log("A client connected:", socket.id);
 
-    socket.on("login", ({ userId, staffId }) => {
-         const id = userId || staffId;
-         socketUserMap[socket.id] = { id };
-         console.log(`User/Staff ${id} logged in with socket ${socket.id}`);
-    });
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
-    socket.on("disconnect", () => {
-      delete socketUserMap[socket.id];
-      console.log("A client disconnected:", socket.id);
-    });
+  socket.on("register", ({ role, userId }) => {
+    if (role === "staff") {
+      staffSockets[userId] = socket.id;
+      console.log("a user connected to staff",staffSockets)
+    } else if (role === "user") {
+      console.log("a user connected to user",userSockets)
+
+      userSockets[userId] = socket.id;
+    }
+  });
+
+  socket.on("disconnect", () => {
+    for (const userId in staffSockets) {
+      if (staffSockets[userId] === socket.id) {
+        delete staffSockets[userId];
+        break;
+      }
+    }
+    for (const userId in userSockets) {
+      if (userSockets[userId] === socket.id) {
+        delete userSockets[userId];
+        break;
+      }
+    }
+  });
 });
-
-

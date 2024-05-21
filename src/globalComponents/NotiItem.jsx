@@ -4,23 +4,24 @@ import { Dot } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useNotiContext } from "@/hooks/useNotiContext";
 
 export const NotiItem = ({ noti }) => {
+  const {dispatch} = useNotiContext();
+  const handleNotiSeen = async (id) => {
+    try {
+      const response = await axios.patch(`/api/notis/markSeen/${id}`);
 
-    const handleNotiSeen = async (id) => {
-        try {
-          const response = await axios.patch(`/api/notis/markSeen/${id}`);
-    
-          if (response.status === 200) {
-            console.log("success noti updated as seen");
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      };
+      if (response.status === 200) {
+        dispatch({ type: "SET_NOTI_SEEN", payload: response.data });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
-    <motion.div key={noti._id} onClick={()=>handleNotiSeen(noti._id)}>
-      <Link to={noti.link ? noti.link : "#"}>
+    <motion.div key={noti._id} onClick={() => handleNotiSeen(noti._id)}>
+     
         <DropdownMenuItem
           onClick={() => handleNotiSeen(noti._id)}
           key={noti._id}
@@ -42,7 +43,6 @@ export const NotiItem = ({ noti }) => {
             </div>
           </div>
         </DropdownMenuItem>
-      </Link>
     </motion.div>
   );
 };

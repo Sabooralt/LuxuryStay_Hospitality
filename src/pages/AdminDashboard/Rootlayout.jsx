@@ -2,8 +2,38 @@ import { Outlet } from "react-router-dom";
 import { AddProduct } from "./components/AddProduct";
 import { AdminHeader } from "./components/Header";
 import { AdminSidebar } from "./components/SideHeader";
+import { useEffect } from "react";
+import { useNotiContext } from "@/hooks/useNotiContext";
+import { useAuthContextProvider } from "@/hooks/useAuthContext";
+import axios from "axios";
+import { socket } from "@/socket";
 
 export function Dashboard() {
+  const { dispatch } = useNotiContext();
+  const { user } = useAuthContextProvider();
+
+  useEffect(() => {
+    const fetchAdminNoti = async () => {
+      dispatch({ type: "CLEAR_NOTIS" });
+      try {
+        const response = await axios(`/api/notis/user/${user._id}`);
+
+        if (response.status === 200) {
+          dispatch({ type: "SET_NOTIS", payload: response.data.notifications });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchAdminNoti();
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      const userId = user._id;
+      socket.emit("register", { role: "user", userId });
+    }
+  }, [user]);
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <AdminSidebar />

@@ -8,7 +8,7 @@ export const StaffRooms = () => {
     <>
 
       <div className="grid grid-cols-2 flex-wrap items-center justify-center">
-        {room && room.map((room) => <RoomCard room={room} />)}
+        {room && room.map((room) => <RoomCard key={room._id} room={room} />)}
       </div>
     </>
   );
