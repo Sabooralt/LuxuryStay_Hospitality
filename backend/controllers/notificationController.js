@@ -6,7 +6,7 @@ const Task = require("../models/taskModel");
 const getNotis = async (req, res) => {
   try {
     const notifications = await Notification.find().sort({
-      timestamp: -1,
+      createdAt: -1,
     });
     return res.status(200).json({ success: true, notifications });
   } catch (error) {
@@ -196,6 +196,7 @@ const markAllNotificationsAsSeen = async (req, res) => {
 module.exports = {
   getNotis,
   sendNotificationToAdmins,
+  sendNotification,
   markSeen,
   sendNotificationAllStaff,
   sendNotificationToStaff,

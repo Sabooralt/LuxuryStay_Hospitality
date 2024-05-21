@@ -1,6 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge, LineChart, Menu, Package,Package2,Home,CircleUser, Search, ShoppingCart, Users, Settings } from "lucide-react";
+import {
+  Badge,
+  LineChart,
+  Menu,
+  Package,
+  Package2,
+  Home,
+  CircleUser,
+  Search,
+  ShoppingCart,
+  Users,
+  Settings,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,19 +21,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 
 export const StaffHeader = () => {
-    const {staffLogout} = useStaffAuthContext();
+  const { LogoutStaff } = useStaffAuthContext();
+
+  const handleLogout = () => {
+    LogoutStaff();
+  };
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -80,8 +96,9 @@ export const StaffHeader = () => {
             </Link>
           </nav>
           <div className="mt-auto">
-          <Button size="icon" variant="outline"><Settings className="w-4 h-4"/></Button>
-
+            <Button size="icon" variant="outline">
+              <Settings className="w-4 h-4" />
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
@@ -110,7 +127,7 @@ export const StaffHeader = () => {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={staffLogout}>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

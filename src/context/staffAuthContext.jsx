@@ -22,8 +22,9 @@ export const StaffAuthContextProvider = ({ children }) => {
     staff: null,
   });
 
-  const StaffLogout = () => {
-    localStorage.removeItem('staff'); // Clear staff data from local storage
+  const LogoutStaff = () => {
+    localStorage.removeItem('staff'); 
+    console.log("staff logged out")// Clear staff data from local storage
     dispatch({ type: "LOGOUT" }); // Dispatch logout action
   };
 
@@ -40,7 +41,7 @@ export const StaffAuthContextProvider = ({ children }) => {
 
   console.log("StafAuthContext state: ", state);
   return (
-    <StaffAuthContext.Provider value={{ ...state, dispatch,StaffLogout }}>
+    <StaffAuthContext.Provider value={{ ...state, dispatch,LogoutStaff }}>
       {children}
     </StaffAuthContext.Provider>
   );

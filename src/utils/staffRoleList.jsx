@@ -1,2 +1,2 @@
-const staffRole = ["Manager", "Receptionist", "Housekeeper"];
-export default staffRole
+const staffRole = ["Receptionist", "Housekeeper"];
+export default staffRole;

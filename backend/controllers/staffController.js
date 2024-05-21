@@ -3,6 +3,7 @@ const Staff = require("../models/staffModel");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { sendNotification } = require("./notificationController");
 
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "15d" });
@@ -48,7 +49,7 @@ const updateStaffDetails = async (req, res) => {
       updateData.password = hashedPassword;
     }
 
-    staff = await Staff.findByIdAndUpdate(id, {...updateData}, { new: true });
+    staff = await Staff.findByIdAndUpdate(id, { ...updateData }, { new: true });
 
     return res.status(200).json({ message: "Staff details updated!", staff });
   } catch (err) {
@@ -69,6 +70,15 @@ const updateStaffRole = async (req, res) => {
 
     staff.role = req.body.role;
     await staff.save();
+
+    await sendNotification(
+      req,
+      "Role updated!",
+      `Your role has been updated successfully to ${staff.role}`,
+      "/staff",
+      "staff",
+      staff._id
+    );
 
     res.status(200).json({
       message: "Staff role updated successfully",
@@ -102,9 +112,10 @@ const loginStaff = async (req, res) => {
 
 const signupStaff = async (req, res) => {
   const { username, password, role } = req.body;
+  const image = req.file ? req.file.filename : null;
 
   try {
-    const staff = await Staff.signup(username, password, role);
+    const staff = await Staff.signup(username, password, role, image);
 
     const token = createToken(staff._id);
     const fullStaff = await Staff.findById(staff._id);

@@ -2,34 +2,40 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Schema = mongoose.Schema;
 
-const staffSchema = new Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    enum: ["Receptionist", "Housekeeper"],
-    required: true,
-  },
-  status: {
-    type: String,
-    required: true,
-    default: "Active"
+const staffSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
 
-  }
- 
-},{timestamps: true});
+    role: {
+      type: String,
+      enum: ["Receptionist", "Housekeeper"],
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      default: "Active",
+    },
+  },
+  { timestamps: true }
+);
 
-staffSchema.statics.signup = async function (username, password, role) {
+staffSchema.statics.signup = async function (username, password, role, image) {
   const exists = await this.findOne({ username });
   //validation
-  if (!username || !password || !role ) {
+  if (!username || !password || !role || !image) {
     throw Error("All fields must be filled ");
   }
 
@@ -40,7 +46,12 @@ staffSchema.statics.signup = async function (username, password, role) {
   const salt = await bcrypt.genSalt(3);
   const hash = await bcrypt.hash(password, salt);
 
-  const staff = await this.create({ username, password: hash, role, });
+  const staff = await this.create({
+    username: username,
+    image: image,
+    role: role,
+    password: hash,
+  });
 
   return staff;
 };
@@ -55,11 +66,11 @@ staffSchema.statics.login = async function (username, password) {
     throw Error("Incorrect username");
   }
 
-  const match = await bcrypt.compare(password, staff.password)
-  if(!match){
-    throw Error('Incorrect password')
+  const match = await bcrypt.compare(password, staff.password);
+  if (!match) {
+    throw Error("Incorrect password");
   }
-return staff
+  return staff;
 };
 
 module.exports = mongoose.model("Staff", staffSchema);
