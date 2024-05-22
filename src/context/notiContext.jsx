@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 import { socket } from "@/socket";
+import { toast } from "sonner";
 import axios from "axios";
 import { useEffect, useState, useReducer, createContext } from "react";
 
@@ -59,26 +60,10 @@ export const NotiContextProvider = ({ children }) => {
     noti: null,
   });
 
-  /*  useEffect(() => {
-    const fetchNotis = async () => {
-      try {
-        const response = await axios(`/api/notis`);
-
-        if (response.status === 200) {
-          dispatch({ type: "SET_NOTIS", payload: response.data.notifications });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchNotis();
-  }, [staff]); */
-
   useEffect(() => {
-   
-
     const newNoti = (data) => {
       dispatch({ type: "NEW_NOTI", payload: data });
+      toast("You have a new notification!")
     };
 
     socket.on("notiCreated", newNoti);

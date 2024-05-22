@@ -1,56 +1,17 @@
-import {
-  Bell,
-  CircleUser,
-  Home,
-  LineChart,
-  Menu,
-  Package,
-  Package2,
-  Search,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Link,
-  Outlet,
-  useLocation,
-  useOutlet,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { StaffSidebar } from "../Sidebar";
 import { StaffHeader } from "../Header";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
-import { TaskCard } from "@/pages/AdminDashboard/components/task/TaskCard";
-import { useTaskContext } from "@/hooks/useTaskContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { useNotiContext } from "@/hooks/useNotiContext";
 import { socket } from "@/socket";
+import { useTaskContext } from "@/hooks/useTaskContext";
 
 export function StaffDashboard() {
   const { staff } = useStaffAuthContext();
   const { dispatch } = useNotiContext();
-
+  const { dispatch: taskDispatch } = useTaskContext();
   const location = useLocation();
 
   const getHeading = (path) => {
@@ -69,6 +30,38 @@ export function StaffDashboard() {
   const heading = getHeading(location.pathname);
 
   useEffect(() => {
+    taskDispatch({ type: "CLEAR_TASKS" });
+    const fetchTasks = async () => {
+      try {
+        if (!staff) {
+          return null;
+        }
+        const response = await axios.get(
+          `/api/task/get_staff_tasks/${staff._id}`
+        );
+
+        if (response.status === 200) {
+          taskDispatch({ type: "SET_TASK", payload: response.data });
+        }
+      } catch (err) {
+        console.log("Error fetching tasks:", err);
+      }
+    };
+
+    fetchTasks();
+
+    console.log("staff", staff);
+  }, [staff, dispatch]);
+
+  useEffect(() => {
+    socket.connect();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchStaffNoti = async () => {
       dispatch({ type: "CLEAR_NOTIS" });
       try {
@@ -83,13 +76,7 @@ export function StaffDashboard() {
     };
     fetchStaffNoti();
   }, [staff]);
-  useEffect(() => {
-    socket.connect();
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
   useEffect(() => {
     if (staff) {
       const userId = staff._id;

@@ -35,11 +35,19 @@ export const taskReducer = (state, action) => {
       return {
         task: state.task.filter((w) => w._id !== action.payload._id),
       };
+    case "CLEAR_TASK":
+      return {
+        task: null,
+      };
 
     case "MARK_COMPLETED":
       const updateStatus = state.task.map((task) => {
         if (task._id === action.payload.taskId) {
-          return { ...task, status: action.payload.status, completedBy: action.payload.completedBy };
+          return {
+            ...task,
+            status: action.payload.status,
+            completedBy: action.payload.completedBy,
+          };
         }
         return task;
       });
@@ -57,66 +65,39 @@ export const TaskContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(taskReducer, {
     task: null,
   });
-  const { staff,loading } = useStaffAuthContext();
+  const { staff, loading } = useStaffAuthContext();
   const { user } = useAuthContextProvider();
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        if (!staff) {
-          console.log("No user found");
-          return null;
-        }
-        const response = await axios.get(
-          `/api/task/get_staff_tasks/${staff._id}`
-        );
-
-        if (response.status === 200) {
-          dispatch({ type: "SET_TASK", payload: response.data });
-        }
-      } catch (err) {
-        console.log("Error fetching tasks:", err);
-      }
-    };
-
-    if(!loading){
-      fetchTasks();
-
-    }
-
-    console.log("staff", staff);
-  }, [staff, dispatch,loading]);
-
+  
   useEffect(() => {
     const handleCreateTask = (newTask) => {
-      if (staff && newTask && newTask.assignedTo !== undefined) {
-        const loggedInStaffId = staff._id;
-        if (
-          newTask.assignedAll ||
-          newTask.assignedTo.includes(loggedInStaffId)
-        ) {
-          dispatch({ type: "CREATE_TASK", payload: newTask });
-        } else if (newTask.assignedAll) {
-          dispatch({ type: "CREATE_TASK", payload: newTask });
-        }
-      }
+      dispatch({ type: "CREATE_TASK", payload: newTask });
     };
 
+    socket.on("createTask", handleCreateTask);
+
+    return () => {
+      socket.off("createTask", handleCreateTask);
+    };
+  }, [socket, dispatch]);
+
+  useEffect(() => {
     const updateSeenByContext = (seenBy) => {
       console.log(seenBy);
       dispatch({ type: "SET_SEENBY", payload: seenBy });
     };
 
-    const handleCompleted = (taskState)=>{
-      dispatch({type: "MARK_COMPLETED",payload: taskState})
-    }
+    const handleCompleted = (taskState) => {
+      dispatch({ type: "MARK_COMPLETED", payload: taskState });
+    };
 
-    socket.on("taskCompleted",handleCompleted)
-
-    socket.on("createTask", handleCreateTask);
-
+    socket.on("taskCompleted", handleCompleted);
     socket.on("taskMarkedAsSeen", updateSeenByContext);
-  }, [staff]);
+
+    return () => {
+      socket.off("taskCompleted", handleCompleted);
+      socket.off("taskMarkedAsSeen", updateSeenByContext);
+    };
+  }, [socket, staff, dispatch]);
 
   console.log("TaskContext state: ", state);
 

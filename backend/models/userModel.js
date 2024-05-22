@@ -3,32 +3,40 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-  first_name: {
-    type: String,
-    required: true
+const userSchema = new Schema(
+  {
+    first_name: {
+      type: String,
+      required: true,
+    },
+    last_name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  last_name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  role:{
-type: String,
-enum : ['admin','user'],
-default: "user"
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-},{timestamps: true});
+  { timestamps: true }
+);
 
-userSchema.statics.signup = async function (first_name, last_name, email, password) {
+userSchema.statics.signup = async function (
+  first_name,
+  last_name,
+  email,
+  password
+) {
   const exists = await this.findOne({ email });
   //validation
   if (!first_name || !last_name || !email || !password) {
@@ -48,7 +56,12 @@ userSchema.statics.signup = async function (first_name, last_name, email, passwo
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
-  const user = await this.create({ first_name, last_name, email, password: hash });
+  const user = await this.create({
+    first_name,
+    last_name,
+    email,
+    password: hash,
+  });
 
   return user;
 };
@@ -63,10 +76,10 @@ userSchema.statics.login = async function (email, password) {
     throw Error("Incorrect email");
   }
 
-  const match = await bcrypt.compare(password, user.password)
-  if(!match){
-    throw Error('Incorrect password')
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    throw Error("Incorrect password");
   }
-return user
+  return user;
 };
 module.exports = mongoose.model("User", userSchema);

@@ -7,10 +7,30 @@ import { useNotiContext } from "@/hooks/useNotiContext";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import axios from "axios";
 import { socket } from "@/socket";
+import { useTaskContext } from "@/hooks/useTaskContext";
 
 export function Dashboard() {
   const { dispatch } = useNotiContext();
   const { user } = useAuthContextProvider();
+  const { dispatch: taskDispatch } = useTaskContext();
+
+  useEffect(() => {
+    taskDispatch({ type: "CLEAR_TASK" });
+    const fetchAdminTasks = async () => {
+      try {
+        const response = await axios.get(
+          `/api/task/get_admin_tasks/${user._id}`
+        );
+
+        if (response.status === 200) {
+          taskDispatch({ type: "SET_TASK", payload: response.data });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchAdminTasks();
+  }, []);
 
   useEffect(() => {
     const fetchAdminNoti = async () => {

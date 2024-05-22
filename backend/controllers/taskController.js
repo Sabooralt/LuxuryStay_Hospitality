@@ -19,8 +19,6 @@ const createTask = async (req, res) => {
     );
     task.createdBy = createdByUser;
 
-    req.io.emit("createTask", task);
-
     if (task.assignedAll) {
       await sendNotificationAllStaff(
         req,
@@ -34,6 +32,7 @@ const createTask = async (req, res) => {
         "A Task has been assigned to All the staff",
         task.description
       );
+      req.io.emit("createTask", task);
     }
 
     if (task.assignedTo && task.assignedTo.length > 0) {
@@ -41,18 +40,35 @@ const createTask = async (req, res) => {
         .map((staff) => staff.username)
         .join(", ");
 
+      for (const staff of task.assignedTo) {
+        const StaffIdString = staff._id.toString();
+        const socketId = req.staffSockets[StaffIdString];
+        if (socketId) {
+          req.io.to(socketId).emit("createTask", task);
+        }
+      }
+
+      for (const adminId in req.adminSockets) {
+        const AdminIdString = adminId.toString();
+        const adminSocketId = req.adminSockets[AdminIdString];
+        req.io.to(adminSocketId).emit("createTask", task);
+      }
+
       await sendNotificationToAdmins(
         req,
         `A Task has been assigned to ${assignedToUsernames}`,
         task.description
       );
-      await sendNotificationToStaff(
-        req,
-        `A Task has been assigned to you from ${createdByUser.first_name}`,
-        task.description,
-        task._id,
-        task._id
-      );
+
+      for (const staff of task.assignedTo) {
+        await sendNotificationToStaff(
+          req,
+          `A Task has been assigned to you from ${createdByUser.first_name}`,
+          task.description,
+          staff._id,
+          task._id
+        );
+      }
     }
 
     return res
@@ -63,6 +79,43 @@ const createTask = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });
+  }
+};
+
+const getAllTask = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+
+    const admin = await User.findById(adminId);
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "No user found with the id provided!",
+      });
+    }
+
+    if (admin.role !== "admin") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+
+    const tasks = await Task.find()
+      .sort({ createdAt: -1 })
+      .populate([
+        { path: "createdBy", select: ["first_name", "last_name"] },
+        { path: "seenBy", select: "username" },
+        { path: "completedBy", select: "username" },
+      ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Tasks fetched successfully!",
+      tasks,
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -197,4 +250,11 @@ const deleteTask = async (req, res) => {
   }
 };
 
-module.exports = { createTask, getTask, deleteTask, viewBy, markAsCompleted };
+module.exports = {
+  createTask,
+  getTask,
+  getAllTask,
+  deleteTask,
+  viewBy,
+  markAsCompleted,
+};

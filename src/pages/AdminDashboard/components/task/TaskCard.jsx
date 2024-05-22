@@ -33,7 +33,6 @@ export const TaskCard = ({ task, admin }) => {
 
   const { user } = useAuthContextProvider();
 
-  const staffId = staff._id;
   const taskId = task._id;
 
   let bgColorClass;
@@ -80,7 +79,7 @@ export const TaskCard = ({ task, admin }) => {
         return null;
       }
       const response = await axios.post(
-        `/api/task/${taskId}/seenBy/${staffId}`
+        `/api/task/${taskId}/seenBy/${staff._id}`
       );
       if (response.status === 200) {
         console.log("Task Seen!");
@@ -97,7 +96,7 @@ export const TaskCard = ({ task, admin }) => {
       }
 
       const response = await axios.patch(
-        `/api/task/${taskId}/mark_as_completed/${staffId}`
+        `/api/task/${taskId}/mark_as_completed/${staff._id}`
       );
 
       if (response.status === 200) {
