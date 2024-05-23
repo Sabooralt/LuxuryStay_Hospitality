@@ -1,25 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Badge,
-  LineChart,
-  Menu,
-  Package,
-  Package2,
-  Home,
-  CircleUser,
-  Search,
-  ShoppingCart,
-  Users,
-  Settings,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Menu, CircleUser, Search, Settings } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +14,8 @@ import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 import { StaffItems } from "../../../utils/staffNavItems";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/getInitials";
 
 export const StaffHeader = () => {
   const { staff, LogoutStaff } = useStaffAuthContext();
@@ -88,12 +72,16 @@ export const StaffHeader = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            <CircleUser className="h-5 w-5" />
+            <Avatar>
+              <AvatarImage src={`StaffPfps/${staff.image}`} alt="@shadcn" />
+              <AvatarFallback>{getInitials(staff.username)}</AvatarFallback>
+            </Avatar>
+
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel className="capitalize">{staff.username}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>

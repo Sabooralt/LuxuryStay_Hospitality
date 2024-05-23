@@ -2,7 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 import { socket } from "@/socket";
-import { toast } from "sonner";
+
 import axios from "axios";
 import { useEffect, useState, useReducer, createContext } from "react";
 
@@ -60,10 +60,14 @@ export const NotiContextProvider = ({ children }) => {
     noti: null,
   });
 
+  const {toast} = useToast();
+
   useEffect(() => {
     const newNoti = (data) => {
       dispatch({ type: "NEW_NOTI", payload: data });
-      toast("You have a new notification!")
+      toast({
+        title: "You have a new notification!",
+      })
     };
 
     socket.on("notiCreated", newNoti);

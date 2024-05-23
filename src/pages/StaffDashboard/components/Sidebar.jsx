@@ -24,6 +24,7 @@ export function StaffSidebar() {
 
   const roleAccess = {
     Housekeeper: ["Dashboard", "Rooms", "Tasks", "Notifications"],
+    Receptionist: ["Dashboard", "Rooms", "Tasks", "Notifications", "Bookings"],
   };
   const accessibleItems = StaffItems.filter((item) =>
     roleAccess[staff.role]?.includes(item.name)
@@ -44,7 +45,7 @@ export function StaffSidebar() {
         <div className="flex-1">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             {accessibleItems.map((item, index) => (
-              <TooltipProvider>
+              <TooltipProvider key={index}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Link

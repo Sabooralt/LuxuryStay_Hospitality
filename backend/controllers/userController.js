@@ -7,6 +7,17 @@ const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "15d" });
 };
 
+const getMembers = async (req, res) => {
+  const members = await User.find({ role: "member" }).sort({ createdAt: -1 });
+
+  if (members.length === 0) {
+    return res
+      .status(404)
+      .json({ success: false, message: "No member found!" });
+  }
+
+  res.status(200).json({ success: true, members });
+};
 const getUsers = async (req, res) => {
   const user = await User.find({}).sort({ createdAt: -1 });
 
@@ -48,4 +59,4 @@ const signupUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, signupUser, getUsers };
+module.exports = { loginUser, signupUser, getUsers, getMembers };

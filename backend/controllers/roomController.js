@@ -4,7 +4,7 @@ const { sendNotificationToAdmins } = require("./notificationController");
 
 const getRooms = async (req, res) => {
   try {
-    const rooms = await Room.find();
+    const rooms = await Room.find().populate('type');
 
     if (!rooms) {
       return res.status(404).json({ message: "No Rooms available" });

@@ -21,6 +21,7 @@ const roomRoutes = require("./routes/roomRoutes");
 const roomTypeRoutes = require("./routes/roomTypeRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const notiRoutes = require("./routes/notiRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 // Sockets initialization
 
@@ -44,6 +45,7 @@ app.use("/api/roomType", roomTypeRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/task", taskRoutes);
 app.use("/api/notis", notiRoutes);
+app.use("/api/booking", bookingRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -57,17 +59,15 @@ mongoose
     console.log(error);
   });
 
-
-
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
   socket.on("register", ({ role, userId }) => {
     if (role === "staff") {
       staffSockets[userId] = socket.id;
-      console.log("a user connected to staff",staffSockets)
+      console.log("a user connected to staff", staffSockets);
     } else if (role === "user") {
-      console.log("a user connected to user",userSockets)
+      console.log("a user connected to user", userSockets);
 
       userSockets[userId] = socket.id;
     }

@@ -1,7 +1,4 @@
-import { BellIcon, CheckIcon } from "@radix-ui/react-icons";
-
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,14 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import {
   Select,
@@ -37,7 +31,7 @@ export function RoomCard({ className, room, ...props }) {
   const [error, setError] = useState(null);
   const [responseG, setResponseG] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const {staff} = useStaffAuthContext();
+  const { staff } = useStaffAuthContext();
   const { toast } = useToast();
   const roomStatus =
     room.status === "occupied"
@@ -113,12 +107,12 @@ export function RoomCard({ className, room, ...props }) {
               room.images.length > 0 &&
               room.images.map((img) => (
                 <CarouselItem key={img._id}>
-                  <div className="p-1">
+                  <div className="p-0">
                     <Card>
                       <CardContent className="flex w-100 items-center justify-center p-1">
                         <img
                           src={`/RoomImages/${img.filepath}`}
-                          className="rounded-md object-fill w-[300px] h-[300px]"
+                          className="rounded-md object-fill"
                           alt=""
                         />
                       </CardContent>
@@ -148,8 +142,10 @@ export function RoomCard({ className, room, ...props }) {
             </p>
           </div>
           <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-          <div className="space-y-1 max flex flex-row items-center gap-4">
-            <p className="text-sm font-medium leading-none ">Room Status</p>
+          <div className="space-y-1 max grid grid-col-2 gap-1">
+            <p className="text-sm grid font-medium leading-none ">
+              Room Status
+            </p>
             <Select
               onValueChange={(value) =>
                 updateRoomStatus({
@@ -159,7 +155,7 @@ export function RoomCard({ className, room, ...props }) {
               defaultValue={room.status}
             >
               <SelectTrigger className="w-100">
-                <SelectValue placeholder={room.status} />
+                <SelectValue className="bg-black" placeholder={room.status} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -176,7 +172,6 @@ export function RoomCard({ className, room, ...props }) {
           </div>
         </div>
       </CardContent>
-      <CardFooter></CardFooter>
     </Card>
   );
 }

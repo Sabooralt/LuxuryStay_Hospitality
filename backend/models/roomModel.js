@@ -15,7 +15,7 @@ const roomSchema = new Schema(
     },
     type: {
       type: Schema.Types.ObjectId,
-      ref: "roomType",
+      ref: "RoomType",
       required: true,
     },
     description: {
@@ -24,12 +24,12 @@ const roomSchema = new Schema(
     },
     availibility: {
       type: String,
-      enum: ["Available", "Not available"],
-      default: "Available",
+      enum: ["available", "not available"],
+      default: "available",
     },
     status: {
       type: String,
-      enum: ["cleaning,", "occupied", "maintenance", "vacant"],
+      enum: ["cleaning", "occupied", "maintenance", "vacant"],
       default: "occupied",
     },
     capacity: {
@@ -50,8 +50,12 @@ const roomSchema = new Schema(
         },
       },
     ],
+    bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
   },
+
   { timestamps: true }
 );
+
+
 
 module.exports = mongoose.model("Room", roomSchema);

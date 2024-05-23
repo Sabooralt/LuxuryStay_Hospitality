@@ -2,21 +2,12 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { useNotiContext } from "@/hooks/useNotiContext";
 import { formatDistanceToNow } from "date-fns";
 import axios from "axios";
+import { useNotiMarkAsSeen } from "@/hooks/useNotiMarkAsSeen";
 
 export const StaffNotifications = () => {
   const { noti } = useNotiContext();
 
-  const handleNotiSeen = async (id) => {
-    try {
-      const response = await axios.patch(`/api/notis/markSeen/${id}`);
-
-      if (response.status === 200) {
-        console.log("success noti updated as seen");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const { handleNotiSeen } = useNotiMarkAsSeen();
 
   return (
     <>

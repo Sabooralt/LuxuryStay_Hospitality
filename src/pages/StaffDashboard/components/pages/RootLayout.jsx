@@ -7,11 +7,13 @@ import axios from "axios";
 import { useNotiContext } from "@/hooks/useNotiContext";
 import { socket } from "@/socket";
 import { useTaskContext } from "@/hooks/useTaskContext";
+import { useMemberContext } from "@/hooks/useMemberContext";
 
 export function StaffDashboard() {
   const { staff } = useStaffAuthContext();
   const { dispatch } = useNotiContext();
   const { dispatch: taskDispatch } = useTaskContext();
+  const { members, dispatch: memberDispatch } = useMemberContext();
   const location = useLocation();
 
   const getHeading = (path) => {
@@ -83,6 +85,20 @@ export function StaffDashboard() {
       socket.emit("register", { role: "staff", userId });
     }
   }, [staff]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get("/api/user/members");
+        if (response.status === 200) {
+          memberDispatch({ type: "SET_MEMBER", payload: response.data });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchMembers();
+  }, []);
 
   return (
     <div className="grid h-screen overflow-hidden w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
