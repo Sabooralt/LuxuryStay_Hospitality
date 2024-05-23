@@ -1,3 +1,4 @@
+import { socket } from "@/socket";
 import axios from "axios";
 import { useEffect, createContext, useReducer } from "react";
 
@@ -7,11 +8,13 @@ export const BookingReducer = (state, action) => {
   switch (action.type) {
     case "SET_BOOKINGS":
       return {
-        booking: action.payload,
+        booking: action.payload.bookings,
       };
-    case "CREATE_BOOKING":
+    case "NEW_BOOKING":
       return {
-        booking: [action.payload.booking, ...state.booking],
+        booking: state.booking
+          ? [action.payload, ...state.booking]
+          : [action.payload],
       };
     case "CLEAR_BOOKING":
       return {
@@ -40,6 +43,17 @@ export const BookingContextProvider = ({ children }) => {
     };
     fetchBooking();
   }, []);
+
+  useEffect(() => {
+    const newBooking = (booking) => {
+      dispatch({ type: "NEW_BOOKING", payload: booking });
+    };
+    socket.on("newBooking", newBooking);
+
+    return () => {
+      socket.off("newBooking", newBooking);
+    };
+  }, [socket, dispatch]);
 
   console.log("BookingContext state: ", state);
   return (

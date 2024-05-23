@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,11 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useRoomContext } from "@/hooks/useRoomContext";
 
 export function RoomCombobox({ onSelectedRoomChange, disabled }) {
@@ -21,16 +17,11 @@ export function RoomCombobox({ onSelectedRoomChange, disabled }) {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [open, setOpen] = useState(false);
 
-  const handleSelection = (roomId) => {
-    setSelectedRoom((prevSelectedRoom) =>
-      prevSelectedRoom === roomId ? null : roomId
-    );
+  const handleRoomSelect = (roomId) => {
+    setSelectedRoom(roomId);
+    onSelectedRoomChange(roomId);
     setOpen(false);
   };
-
-  useEffect(() => {
-    onSelectedRoomChange(selectedRoom);
-  }, [selectedRoom, onSelectedRoomChange]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -43,7 +34,7 @@ export function RoomCombobox({ onSelectedRoomChange, disabled }) {
           disabled={disabled}
         >
           {selectedRoom
-            ? room.find((room) => room._id === selectedRoom)?.roomNumber
+            ? room.find((room) => room._id === selectedRoom).roomNumber
             : "Select room..."}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -54,23 +45,20 @@ export function RoomCombobox({ onSelectedRoomChange, disabled }) {
           <CommandEmpty>No room found.</CommandEmpty>
           <CommandGroup>
             <CommandList>
-              {room &&
-                room.map((room) => (
-                  <CommandItem
-                    key={room._id}
-                    value={room.roomNumber}
-                    onSelect={() => {
-                      handleSelection(room._id);
-                    }}
-                  >
-                    Room {room.roomNumber} ({room.type.type})
-                    <CheckIcon
-                      className={`ml-auto h-4 w-4 ${
-                        selectedRoom === room._id ? "opacity-100" : "opacity-0"
-                      }`}
-                    />
-                  </CommandItem>
-                ))}
+              {room && room.map((room) => (
+                <CommandItem
+                  key={room._id}
+                  value={room.roomNumber}
+                  onSelect={() => handleRoomSelect(room._id)}
+                >
+                 Room {room.roomNumber} ({room.type.type})
+                  <CheckIcon
+                    className={`ml-auto h-4 w-4 ${
+                      selectedRoom === room._id ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                </CommandItem>
+              ))}
             </CommandList>
           </CommandGroup>
         </Command>

@@ -114,10 +114,10 @@ export function StaffDashboard() {
             </p>
           </div>
           <div
-            className="flex flex-1 overflow-y-scroll overflow-x-hidden max-h-[80vh] rounded-lg border border-dashed shadow-sm"
+            className="flex flex-1 items-start overflow-y-scroll overflow-x-hidden max-h-[80vh] rounded-lg border border-dashed shadow-sm"
             x-chunk="dashboard-02-chunk-1"
           >
-            <div className="flex flex-col w-full gap-1 ">
+            <div className="grid items-start w-full gap-1 ">
               <Outlet />
             </div>
           </div>

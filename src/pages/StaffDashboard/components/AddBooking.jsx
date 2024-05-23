@@ -16,14 +16,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { RoomCombobox } from "@/components/ui/roomCombobox";
+import { useToast } from "@/components/ui/use-toast";
 import { useAddBooking } from "@/hooks/useAddBooking";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useFormik } from "formik";
 import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 export function AddBooking() {
@@ -32,34 +31,21 @@ export function AddBooking() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
   const { isLoading, responseG, error, SubmitBooking } = useAddBooking();
-
-  /*    const handleSelectedMemberChange = (memberId) => {
-    setSelectedMember(memberId);
-    formik.setFieldValue("member", memberId);
-  };
-  const handleSelectedRoomChange = (roomId) => {
-    setSelectedRoom(roomId);
-    formik.setFieldValue("room", roomId);
-  }; */
-  const handleCheckIn = (selectedDate) => {
-    setCheckIn(selectedDate);
-    formik.setFieldValue("checkIn", selectedDate);
-  };
-  const handleCheckOut = (selectedDate) => {
-    setCheckOut(selectedDate);
-    formik.setFieldValue("checkOut", selectedDate);
-  };
+  const { toast } = useToast();
 
   const formik = useFormik({
     initialValues: {
-      room: selectedRoom,
-      member: selectedMember,
-      checkIn: checkIn,
-      checkOut: checkOut,
+      room: "",
+      member: "",
+      checkIn: null,
+      checkOut: null,
     },
 
     validationSchema: Yup.object({
       room: Yup.string().trim().required("Room is required!"),
+      member: Yup.string().trim().required("Member is required!"),
+      checkIn: Yup.date().required("Check-in date is required!"),
+      checkOut: Yup.date().required("Check-out date is required!"),
     }),
 
     onSubmit: (values) => {
@@ -68,18 +54,45 @@ export function AddBooking() {
     },
   });
 
+  const handleCheckIn = (selectedDate) => {
+    setCheckIn(selectedDate);
+    formik.setFieldValue("checkIn", selectedDate);
+  };
+
+  const handleCheckOut = (selectedDate) => {
+    setCheckOut(selectedDate);
+    formik.setFieldValue("checkOut", selectedDate);
+  };
+
+  useEffect(() => {
+    if (responseG) {
+      toast({
+        title: "Booking created successfully!",
+        description: responseG,
+      });
+    }
+  }, [responseG]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Oops something went wrong",
+        description: error,
+        variant: "destructive",
+      });
+    }
+  }, [error]);
+
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Create a booking</CardTitle>
         <CardDescription>
           Enter the booking details below to book a room for a member.
         </CardDescription>
-
-     
       </CardHeader>
       <CardContent>
-        <form className="grid gap-5">
+        <form onSubmit={formik.handleSubmit} className="grid gap-5">
           <div className="grid gap-2">
             <Label>Select Room</Label>
             <RoomCombobox
@@ -91,7 +104,6 @@ export function AddBooking() {
           </div>
           <div className="grid gap-2">
             <Label>Select Member</Label>
-
             <MemberCombobox
               onSelectedMemberChange={(memberId) => {
                 setSelectedMember(memberId);
@@ -99,7 +111,6 @@ export function AddBooking() {
               }}
             />
           </div>
-
           <div className="grid gap-2">
             <Label>Check In Date:</Label>
             <Popover className="w-full">
@@ -127,7 +138,6 @@ export function AddBooking() {
           </div>
           <div className="grid gap-2">
             <Label>Check Out Date:</Label>
-
             <Popover className="w-full">
               <PopoverTrigger asChild>
                 <Button
@@ -154,10 +164,16 @@ export function AddBooking() {
                 />
               </PopoverContent>
             </Popover>
-            <Button type="submit" className="w-full">
-              Submit
-            </Button>
           </div>
+          <div>
+            <p className="text-sm text-muted-foreground">
+              Access key will be provided to you and the member after the
+              booking is complete.
+            </p>
+          </div>
+          <Button type="submit" className="w-full">
+            Submit
+          </Button>
         </form>
       </CardContent>
     </Card>
