@@ -5,6 +5,12 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
+const cron = require("node-cron");
+
+// Models
+const Task = require("./models/taskModel");
+const Booking = require("./models/bookingModel");
+const Room = require("./models/roomModel");
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -62,6 +68,8 @@ mongoose
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
+  io.emit("clientCount", io.engine.clientsCount);
+
   socket.on("register", ({ role, userId }) => {
     if (role === "staff") {
       staffSockets[userId] = socket.id;
@@ -86,5 +94,56 @@ io.on("connection", (socket) => {
         break;
       }
     }
+    io.emit("clientCount", io.engine.clientsCount);
   });
+});
+
+//Schedule Tasks
+
+cron.schedule("0 0 * * *", async () => {
+  try {
+    const now = new Date();
+
+    const pastBookings = await Booking.find({
+      checkOutDate: { $lt: now },
+      status: "active",
+    });
+
+    for (const booking of pastBookings) {
+      booking.status = "checkedOut";
+      await booking.save();
+
+      const room = await Room.findById(booking.room);
+      room.status = "maintenance";
+      room.availibility = "available";
+      await room.save();
+    }
+
+    console.log(`Checked and updated ${pastBookings.length} past bookings.`);
+  } catch (error) {
+    console.error("Error updating bookings after checkout:", error);
+  }
+});
+
+cron.schedule("0 * * * *", async () => {
+  try {
+    const tenHoursAgo = new Date();
+    tenHoursAgo.setHours(tenHoursAgo.getHours() - 10);
+
+    const expiredTasks = await Task.find({
+      $expr: {
+        $lt: [
+          { $concat: ["$deadlineDate", "T", "$deadlineTime"] },
+          tenHoursAgo.toISOString(),
+        ],
+      },
+    });
+
+    for (const task of expiredTasks) {
+      await task.remove();
+      console.log(`Task deleted: ${task._id}`);
+    }
+  } catch (error) {
+    console.error("Error deleting expired tasks:", error);
+  }
 });

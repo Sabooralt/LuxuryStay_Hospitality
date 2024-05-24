@@ -117,8 +117,8 @@ export const TaskCard = ({ task, admin }) => {
     >
       <CardHeader className="grid p-0">
         <div className="justify-between grid items-center grid-cols-2 gap-1">
-          <p className="font-semibold capitalize">
-            {task.createdBy.first_name} {task.createdBy.last_name}{" "}
+          <p className="font-semibold text-lg capitalize">
+            {task.createdBy.fullName}
           </p>
           <p
             className={` ${
@@ -129,7 +129,7 @@ export const TaskCard = ({ task, admin }) => {
               addSuffix: true,
             })}
           </p>
-          <p className="m-0 font-medium text-xs capitalize space-y-0-0">
+          <p className="m-0 font-medium  text-md capitalize space-y-0-0">
             {task.title}
           </p>
         </div>

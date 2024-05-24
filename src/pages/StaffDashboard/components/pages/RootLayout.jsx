@@ -24,6 +24,8 @@ export function StaffDashboard() {
         return "Tasks";
       case "/staff/notifications":
         return "Notifications";
+        case "/staff/Bookings":
+          return "Bookings"
       default:
         return "Dashboard";
     }

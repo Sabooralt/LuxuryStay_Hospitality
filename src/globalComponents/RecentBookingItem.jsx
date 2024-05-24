@@ -15,8 +15,9 @@ export const RecentBookingItem = ({ booking }) => {
       <HoverCardTrigger asChild>
         <div
           key={booking._id}
-          className="flex relative cursor-pointer flex-row justify-between items-center gap-4 flex-wrap"
+          className="flex relative cursor-pointer flex-col gap-4 flex-wrap"
         >
+            <div className="flex flex-row items-center gap-4 justify-between"> 
           <Avatar>
             <AvatarImage
               src={`/UserPfps/${booking.member._id}`}
@@ -36,16 +37,20 @@ export const RecentBookingItem = ({ booking }) => {
           </div>
 
           <p className="font-semibold">+Rs.{booking.totalCost}</p>
-          <p className="text-muted-foreground ml-1 text-xs text-center">
+          </div>
+          <div className="flex flex-row justify-between items-center">
+
+          <p className="text-muted-foreground mx-auto text-xs text-center">
             {booking.description}
           </p>
           {booking.createdAt && (
-            <p className="absolute bottom-0 text-muted-foreground text-xs font-semibold right-0">
+              <p className="absolute bottom-0 text-muted-foreground text-xs font-semibold right-0">
               {formatDistanceToNow(new Date(booking.createdAt), {
                 addSuffix: true,
               })}
             </p>
           )}
+          </div>
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-fit">
@@ -62,14 +67,14 @@ export const RecentBookingItem = ({ booking }) => {
                 <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
                 <span className="text-xs text-muted-foreground flex flex-row gap-1">
                   <span className="font-semibold">Check In Date:</span>
-                  <span>{formatDate(booking.checkInDate, "mm/dd/yyy")}</span>
+                  <span>{formatDate(booking.checkInDate, "MM/dd/yyyy")}</span>
                 </span>
               </div>
               <div className="flex flex-row ">
                 <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
                 <span className="text-xs text-muted-foreground flex flex-row gap-1">
                   <span className="font-semibold">Check Out Date:</span>
-                  <span>{formatDate(booking.checkOutDate, "mm/dd/yyy")}</span>
+                  <span>{formatDate(booking.checkOutDate, "MM/dd/yyyy")}</span>
                 </span>
               </div>
               <div className="flex flex-row ">
