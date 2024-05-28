@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const useSignup = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [responseG, setResponseG] = useState(null);
+  const navigate = useNavigate();
 
   const signup = async (data) => {
     setIsLoading(true);
@@ -19,9 +21,13 @@ export const useSignup = () => {
         password: data.password,
       });
 
-      setResponseG(response.data);
+      if (response.status === 200) {
+        setResponseG(response.data);
 
-
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
     } catch (err) {
       if (err.response) {
         if (err.response.status === 400) {
@@ -30,7 +36,9 @@ export const useSignup = () => {
           setError("An error occurred. Please try again later.");
         }
       } else if (err.request) {
-        setError("No response received. Please check your internet connection.");
+        setError(
+          "No response received. Please check your internet connection."
+        );
       } else {
         setError("An error occurred. Please try again later.");
       }

@@ -9,7 +9,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useMemberContext } from "@/hooks/useMemberContext";
 
 export function MemberCombobox({ onSelectedMemberChange, disabled }) {
@@ -45,20 +49,27 @@ export function MemberCombobox({ onSelectedMemberChange, disabled }) {
           <CommandEmpty>No member found.</CommandEmpty>
           <CommandGroup>
             <CommandList>
-              {members && members.map((member) => (
-                <CommandItem
-                  key={member._id}
-                  value={member.fullName}
-                  onSelect={() => handleMemberSelect(member._id)}
-                >
-                  {member.fullName}
-                  <CheckIcon
-                    className={`ml-auto h-4 w-4 ${
-                      selectedMember === member._id ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                </CommandItem>
-              ))}
+              {members &&
+                members.map((member) => (
+                  <CommandItem
+                    key={member._id}
+                    value={member.fullName}
+                    onSelect={() => handleMemberSelect(member._id)}
+                  >
+                    <div className="flex flex-col">
+                      <div>{member.fullName}</div>
+
+                      <p className="text-muted-foreground">{member.email} </p>
+                    </div>
+                    <CheckIcon
+                      className={`ml-auto h-4 w-4 ${
+                        selectedMember === member._id
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                    />
+                  </CommandItem>
+                ))}
             </CommandList>
           </CommandGroup>
         </Command>

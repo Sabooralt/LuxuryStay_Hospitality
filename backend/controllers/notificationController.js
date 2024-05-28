@@ -110,11 +110,10 @@ const sendNotification = async (req, title, message, link, recipient, id) => {
       });
       await notification.save();
 
-      const staffIdString = id.toString(); // Convert staff._id to string
-      const socketId = req.staffSockets[staffIdString]; // Use the converted string
+      const staffIdString = id.toString(); 
+      const socketId = req.staffSockets[staffIdString]; 
       if (socketId) {
-        // Emit the notification to the specific staff member's socket ID
-        req.io.to(socketId).emit("notiCreated", notification);
+      req.io.to(socketId).emit("notiCreated", notification);
       } else {
         console.log(`Socket ID not found for staff member with ID: ${id}`);
       }

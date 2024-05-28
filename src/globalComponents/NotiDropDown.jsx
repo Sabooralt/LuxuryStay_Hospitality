@@ -46,14 +46,14 @@ export const NotiDropDown = ({ user, userType }) => {
 
   return (
     <div className="grid gap-2 relative">
-      <Badge className="absolute rounded-full w-[17px] h-[17px] p-0 bottom-[-2px] right-[-2px] grid items-center justify-center">
-        {totalUnseenLength}
+      <Badge className="absolute font-light rounded-full w-[17px] h-[17px] p-0 bottom-[-2px] right-[-2px] grid items-center justify-center">
+        {totalUnseenLength ? totalUnseenLength : 0}
       </Badge>
 
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <Button variant="outline" size="icon">
-            <Bell className="w-5 h-5" />
+          <Button variant="secondary" size="icon">
+            <Bell className="w-5 h-5 " />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[25rem] grid gap-2">

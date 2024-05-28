@@ -2,6 +2,7 @@ const generateUniqueKey = require("../utils/generateUniqueKey");
 const Booking = require("../models/bookingModel");
 const Room = require("../models/roomModel");
 const User = require("../models/userModel");
+const Staff = require("../models/staffModel");
 const { sendNotificationToAdmins } = require("./notificationController");
 
 const bookRoom = async (req, res) => {
@@ -71,8 +72,7 @@ const bookRoom = async (req, res) => {
     room.bookings.push(newBooking._id);
     await room.save();
 
-    const populatedBooking = await Booking
-      .findById(newBooking._id)
+    const populatedBooking = await Booking.findById(newBooking._id)
       .populate("room")
       .populate("member")
       .populate("bookedBy", ["username", "role"]);
@@ -128,4 +128,50 @@ const getAllBookings = async (req, res) => {
   }
 };
 
-module.exports = { bookRoom, getAllBookings };
+const deleteBooking = async (req, res) => {
+  try {
+    const { staffId } = req.params;
+
+    const { bookingIds } = req.body;
+
+    const staff = (await Staff.findById(staffId)).username;
+
+    const result = await Booking.deleteMany({ _id: { $in: bookingIds } });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No booking found with the id provided!",
+      });
+    }
+
+    if (result.deletedCount === 1) {
+      await sendNotificationToAdmins(
+        req,
+        "Booking deleted!",
+        `${staff} deleted a booking!`
+      );
+    }
+
+    await sendNotificationToAdmins(
+      req,
+      "Multiple bookings deleted!",
+      `${staff} deleted multiple bookings!`
+    );
+
+    req.io.emit("bookingDelete", bookingIds);
+
+    return res.status(200).json({
+      success: true,
+      message: `Selected booking(s) deleted: ${result.deletedCount}.`,
+      description: "Admins Notified!"
+    });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error: err });
+  }
+};
+
+module.exports = { bookRoom, getAllBookings, deleteBooking };

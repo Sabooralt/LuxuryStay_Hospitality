@@ -101,6 +101,11 @@ export function AddBooking() {
                 formik.setFieldValue("room", roomId);
               }}
             />
+            <p className="text-muted-foreground text-xs">
+              Note: You can assign the room to a guest even if it's not
+              available. However, you cannot assign the room if it is booked for
+              the selected check-in and check-out dates.
+            </p>
           </div>
           <div className="grid gap-2">
             <Label>Select Member</Label>

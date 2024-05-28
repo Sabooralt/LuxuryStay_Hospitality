@@ -12,6 +12,8 @@ import { TaskContextProvider } from "./context/TaskContext.jsx";
 import { NotiContextProvider } from "./context/notiContext.jsx";
 import { BookingContextProvider } from "./context/bookingContext.jsx";
 import { MemberContextProvider } from "./context/memberContext.jsx";
+import "@fontsource-variable/rubik";
+import { ThemeProvider } from "./ThemeProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

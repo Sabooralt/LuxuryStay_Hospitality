@@ -4,6 +4,7 @@ const {
   loginUser,
   signupUser,
   getUsers,
+  updateUserDetails,
   getMembers,
 } = require("../controllers/userController");
 
@@ -18,5 +19,6 @@ router.post("/login", loginUser);
 
 //Signup
 router.post("/signup", signupUser);
+router.patch("/updateUserDetails/:userId", updateUserDetails);
 
 module.exports = router;

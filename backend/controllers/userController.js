@@ -37,6 +37,7 @@ const loginUser = async (req, res) => {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
+      fullName: user.fullName,
       role: user.role,
       token,
     });
@@ -59,4 +60,41 @@ const signupUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, signupUser, getUsers, getMembers };
+const updateUserDetails = async (req, res) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+    const { userId } = req.params;
+
+    let user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.first_name = firstName || user.first_name;
+    user.last_name = lastName || user.last_name;
+    user.email = email || user.email;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "User details updated successfully",
+      user: {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  loginUser,
+  updateUserDetails,
+  signupUser,
+  getUsers,
+  getMembers,
+};

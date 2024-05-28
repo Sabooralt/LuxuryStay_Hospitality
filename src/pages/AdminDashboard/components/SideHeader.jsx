@@ -1,4 +1,5 @@
 import {
+  BookKey,
   ChevronLeft,
   ClipboardList,
   Home,
@@ -29,7 +30,21 @@ const sideItems = [
     name: "Dashboard",
     link: "/admin",
     icon: <Home className="h-5 w-5" />,
-
+  },
+  {
+    name: "Bookings",
+    link: "/admin/bookings",
+    icon: <BookKey className="h-5 w-5" />,
+  },
+  {
+    name: "Rooms",
+    link: "/admin/rooms",
+    icon: <Warehouse className="h-5 w-5" />,
+  },
+  {
+    name: "Tasks",
+    link: "/admin/tasks",
+    icon: <ClipboardList className="h-5 w-5" />,
   },
   {
     name: "Staffs",
@@ -41,49 +56,36 @@ const sideItems = [
     link: "/admin/guests",
     icon: <Users className="h-5 w-5" />,
   },
-  {
-    name : "Rooms",
-    link: "/admin/rooms",
-    icon: <Warehouse className="h-5 w-5"/>
-  },
-  {
-    name: "Tasks",
-    link: "/admin/tasks",
-    icon: <ClipboardList className="h-5 w-5" />
-  }
 ];
 
 export const AdminSidebar = () => {
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 py-4">
+        {sideItems.map((item, index) => (
+          <TooltipProvider key={index}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to={item.link}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                >
+                  {item.icon}
 
-        {sideItems.map((item,index)=>(
-
-        <TooltipProvider key={index}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                to={item.link}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                {item.icon}
-
-                <span className="sr-only">{item.name}</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">{item.name}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+                  <span className="sr-only">{item.name}</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">{item.name}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ))}
-       
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-4">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                to='/admin/settings'
+                to="/admin/settings"
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               >
                 <Settings className="h-5 w-5" />

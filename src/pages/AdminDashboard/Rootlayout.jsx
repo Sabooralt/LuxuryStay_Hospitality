@@ -8,11 +8,13 @@ import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import axios from "axios";
 import { socket } from "@/socket";
 import { useTaskContext } from "@/hooks/useTaskContext";
+import { useBookingContext } from "@/hooks/useBookingContext";
 
 export function Dashboard() {
   const { dispatch } = useNotiContext();
   const { user } = useAuthContextProvider();
   const { dispatch: taskDispatch } = useTaskContext();
+  const { dispatch: bookingDispatch } = useBookingContext();
 
   useEffect(() => {
     taskDispatch({ type: "CLEAR_TASK" });
@@ -53,6 +55,22 @@ export function Dashboard() {
       const userId = user._id;
       socket.emit("register", { role: "user", userId });
     }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchBooking = async () => {
+      bookingDispatch({ type: "CLEAR_BOOKING" });
+      try {
+        const response = await axios.get("/api/booking");
+
+        if (response.status === 200) {
+          bookingDispatch({ type: "SET_BOOKINGS", payload: response.data });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchBooking();
   }, [user]);
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">

@@ -8,12 +8,14 @@ import { useNotiContext } from "@/hooks/useNotiContext";
 import { socket } from "@/socket";
 import { useTaskContext } from "@/hooks/useTaskContext";
 import { useMemberContext } from "@/hooks/useMemberContext";
+import { useBookingContext } from "@/hooks/useBookingContext";
 
 export function StaffDashboard() {
   const { staff } = useStaffAuthContext();
   const { dispatch } = useNotiContext();
   const { dispatch: taskDispatch } = useTaskContext();
   const { members, dispatch: memberDispatch } = useMemberContext();
+  const { dispatch: bookingDispatch } = useBookingContext();
   const location = useLocation();
 
   const getHeading = (path) => {
@@ -24,8 +26,8 @@ export function StaffDashboard() {
         return "Tasks";
       case "/staff/notifications":
         return "Notifications";
-        case "/staff/Bookings":
-          return "Bookings"
+      case "/staff/Bookings":
+        return "Bookings";
       default:
         return "Dashboard";
     }
@@ -101,6 +103,25 @@ export function StaffDashboard() {
     };
     fetchMembers();
   }, []);
+
+  useEffect(() => {
+    const fetchBooking = async () => {
+      bookingDispatch({ type: "CLEAR_BOOKING" });
+      try {
+        if (staff.role !== "receptionist") {
+          return null;
+        }
+        const response = await axios.get("/api/booking");
+
+        if (response.status === 200) {
+          bookingDispatch({ type: "SET_BOOKINGS", payload: response.data });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchBooking();
+  }, [staff]);
 
   return (
     <div className="grid h-screen overflow-hidden w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

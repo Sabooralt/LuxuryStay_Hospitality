@@ -9,7 +9,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useRoomContext } from "@/hooks/useRoomContext";
 
 export function RoomCombobox({ onSelectedRoomChange, disabled }) {
@@ -45,20 +49,38 @@ export function RoomCombobox({ onSelectedRoomChange, disabled }) {
           <CommandEmpty>No room found.</CommandEmpty>
           <CommandGroup>
             <CommandList>
-              {room && room.map((room) => (
-                <CommandItem
-                  key={room._id}
-                  value={room.roomNumber}
-                  onSelect={() => handleRoomSelect(room._id)}
-                >
-                 Room {room.roomNumber} ({room.type.type})
-                  <CheckIcon
-                    className={`ml-auto h-4 w-4 ${
-                      selectedRoom === room._id ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                </CommandItem>
-              ))}
+              {room &&
+                room.map((room) => (
+                  <CommandItem
+                    key={room._id}
+                    value={room.roomNumber}
+                    onSelect={() => handleRoomSelect(room._id)}
+                  >
+                    <div className="flex flex-col flex-wrap gap-1 capitalize">
+                      <div>
+                        Room {room.roomNumber} ({room.type.type})
+                      </div>
+
+                      <div className="flex flex-row flex-wrap gap-1">
+                        <p>
+                          Status:
+                          <span className="font-semibold"> {room.status}</span>
+                        </p>
+                        <p>
+                          Availibility:{" "}
+                          <span className="font-semibold">
+                            {room.availibility}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <CheckIcon
+                      className={`ml-auto h-4 w-4 ${
+                        selectedRoom === room._id ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  </CommandItem>
+                ))}
             </CommandList>
           </CommandGroup>
         </Command>

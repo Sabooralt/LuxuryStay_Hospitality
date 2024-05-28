@@ -28,6 +28,10 @@ const roomTypeRoutes = require("./routes/roomTypeRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const notiRoutes = require("./routes/notiRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const {
+  sendNotificationToAdmins,
+  sendNotificationToAllStaff,
+} = require("./controllers/notificationController");
 
 // Sockets initialization
 
@@ -116,7 +120,18 @@ cron.schedule("0 0 * * *", async () => {
       const room = await Room.findById(booking.room);
       room.status = "maintenance";
       room.availibility = "available";
-      await room.save();
+      const newRoom = await room.save();
+
+      await sendNotificationToAdmins(
+        req,
+        `A Member checked out of ${room.roomNumber}.`,
+        `room status is updated to ${newRoom.status}!`
+      );
+      await sendNotificationToAllStaff(
+        req,
+        `A Member checked out of ${room.roomNumber}.`,
+        `Room ${newRoom.roomNumber} is ${newRoom.availibility} now and room status is updated to ${newRoom.status}!`
+      );
     }
 
     console.log(`Checked and updated ${pastBookings.length} past bookings.`);

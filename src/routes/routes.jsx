@@ -4,7 +4,6 @@ import { AddProduct } from "@/pages/AdminDashboard/components/AddProduct";
 import { Staff } from "@/pages/AdminDashboard/pages/Staff";
 import { SignupForm } from "@/pages/Client/Login/components/signup";
 import { Rootlayout } from "@/pages/Client/Rootlayout";
-import { Home } from "@/pages/Client/componenets/home";
 import { LoginForm } from "@/pages/Client/Login/components/Login";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Guests } from "@/pages/AdminDashboard/pages/Guests";
@@ -20,6 +19,16 @@ import { StaffTasks } from "@/pages/StaffDashboard/components/pages/Tasks";
 import { StaffNotifications } from "@/pages/StaffDashboard/components/pages/Notifications";
 import { StaffRooms } from "@/pages/StaffDashboard/components/pages/Rooms";
 import { StaffBookings } from "@/pages/StaffDashboard/components/pages/Bookings";
+import { AdminBookings } from "@/pages/AdminDashboard/pages/Bookings";
+import { Home } from "@/pages/Client/pages/Home";
+import { Not_Found } from "@/404";
+import { Blog } from "@/pages/Client/pages/Blog";
+import { About } from "@/pages/Client/pages/About";
+import { ContactUs } from "@/pages/Client/pages/Contact";
+import { ClientRooms } from "@/pages/Client/pages/Rooms";
+import { Profile } from "@/pages/Client/pages/Profile";
+import { ProfileSettings } from "@/pages/Client/componenets/ProfileSettings";
+import { ProfileHome } from "@/pages/Client/componenets/ProfileHome";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -28,6 +37,18 @@ export const AdminRoutes = () => {
     <Routes>
       <Route path="/" element={<Rootlayout />}>
         <Route index element={user ? <Home /> : <Navigate to="/signup" />} />
+
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/rooms" element={<ClientRooms />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route
+          path="/profile"
+          element={user ? <Profile /> : <Navigate to="/signup" />}
+        >
+          <Route index element={<ProfileHome />} />
+          <Route path="/profile/settings" element={<ProfileSettings />} />
+        </Route>
         <Route
           path="/signup"
           element={user ? <Navigate to="/" /> : <SignupForm />}
@@ -48,6 +69,8 @@ export const AdminRoutes = () => {
           path="/StaffLogin"
           element={staff ? <Navigate to="/staff" /> : <StaffLogin />}
         />
+
+        <Route path="*" element={<Not_Found />} />
       </Route>
 
       {/*  Admin Routes */}
@@ -64,6 +87,7 @@ export const AdminRoutes = () => {
         <Route path="/admin/rooms" element={<Rooms />} />
         <Route path="/admin/tasks" element={<Tasks />} />
         <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/admin/bookings" element={<AdminBookings />} />
       </Route>
 
       {/* Staff Routes */}
