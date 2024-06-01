@@ -14,6 +14,7 @@ import { BookingContextProvider } from "./context/bookingContext.jsx";
 import { MemberContextProvider } from "./context/memberContext.jsx";
 import "@fontsource-variable/rubik";
 import { ThemeProvider } from "./ThemeProvider.jsx";
+import { ServiceContextProvider } from "./context/serviceContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -26,7 +27,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 <NotiContextProvider>
                   <BookingContextProvider>
                     <MemberContextProvider>
+                      <ServiceContextProvider>
+                        
                       <App />
+                      </ServiceContextProvider>
                     </MemberContextProvider>
                   </BookingContextProvider>
                 </NotiContextProvider>

@@ -122,6 +122,19 @@ export const Navbar = () => {
                 <DropdownMenuContent className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+
+                  {user && user.role === "admin" && (
+                    <>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Link className="font-semibold" to="/admin">
+                            Admin Panel
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   <DropdownMenuGroup>
                     <Link to="/profile">
                       <DropdownMenuItem>Profile</DropdownMenuItem>

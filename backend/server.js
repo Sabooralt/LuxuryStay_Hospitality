@@ -32,11 +32,14 @@ const {
   sendNotificationToAdmins,
   sendNotificationToAllStaff,
 } = require("./controllers/notificationController");
+const serviceRoutes = require("./routes/serviceRoutes");
+const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
 
 // Sockets initialization
 
 const staffSockets = {};
 const userSockets = {};
+const guestSockets = {};
 
 app.use(express.json());
 app.use(cors());
@@ -44,6 +47,7 @@ app.use((req, res, next) => {
   req.io = io;
   req.staffSockets = staffSockets;
   req.userSockets = userSockets;
+  req.guestSockets = guestSockets;
   console.log(req.path, req.method);
   next();
 });
@@ -56,6 +60,8 @@ app.use("/api/room", roomRoutes);
 app.use("/api/task", taskRoutes);
 app.use("/api/notis", notiRoutes);
 app.use("/api/booking", bookingRoutes);
+app.use("/api/service", serviceRoutes);
+app.use("/api/serviceCategory", serviceCategoryRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -79,9 +85,11 @@ io.on("connection", (socket) => {
       staffSockets[userId] = socket.id;
       console.log("a user connected to staff", staffSockets);
     } else if (role === "user") {
-      console.log("a user connected to user", userSockets);
-
       userSockets[userId] = socket.id;
+      console.log("a user connected to user", userSockets);
+    } else if (role === "guest") {
+      guestSockets[userId] = socket.id;
+      console.log("a user connected to guest", guestSockets);
     }
   });
 
@@ -95,6 +103,12 @@ io.on("connection", (socket) => {
     for (const userId in userSockets) {
       if (userSockets[userId] === socket.id) {
         delete userSockets[userId];
+        break;
+      }
+    }
+    for (const userId in guestSockets) {
+      if (guestSockets[userId] === socket.id) {
+        delete guestSockets[userId];
         break;
       }
     }
@@ -142,16 +156,11 @@ cron.schedule("0 0 * * *", async () => {
 
 cron.schedule("0 * * * *", async () => {
   try {
-    const tenHoursAgo = new Date();
-    tenHoursAgo.setHours(tenHoursAgo.getHours() - 10);
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
     const expiredTasks = await Task.find({
-      $expr: {
-        $lt: [
-          { $concat: ["$deadlineDate", "T", "$deadlineTime"] },
-          tenHoursAgo.toISOString(),
-        ],
-      },
+      deadlineDate: { $lte: twoDaysAgo },
     });
 
     for (const task of expiredTasks) {

@@ -22,8 +22,8 @@ export const Profile = () => {
   return (
     <div className="p-24 grid place-items-start gap-10 bg-slate-50">
       <div className="text-3xl font-semibold">Profile</div>
-      <div className="grid grid-cols-4 ">
-        <div className="grid col-span-1 place-content-start">
+      <div className="grid grid-cols-12 w-full ">
+        <div className="grid col-span-2 place-content-start">
           <nav className="grid gap-4 text-sm text-muted-foreground">
             {profileNavItems.map((item, index) => (
               <NavLink
@@ -37,9 +37,9 @@ export const Profile = () => {
             ))}
           </nav>
         </div>
-        <div className="grid col-span-2">
-          <Outlet />
-        </div>
+      <div className="grid col-span-10">
+        <Outlet />
+      </div>
       </div>
     </div>
   );

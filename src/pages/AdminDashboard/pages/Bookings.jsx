@@ -9,11 +9,11 @@ export const AdminBookings = () => {
       <TopBar>Bookings</TopBar>
       <div className="p-10 grid gap-10">
         <div className="grid items-start lg:grid-cols-2 gap-5">
-          <AddBooking />
+          <AddBooking userType='admin'/>
           <RecentBookings />
         </div>
         <div className="grid w-full ">
-          <AllBookings />
+          <AllBookings user={'admin'}/>
         </div>
       </div>
     </>

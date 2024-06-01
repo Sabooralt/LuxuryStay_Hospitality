@@ -9,10 +9,12 @@ import axios from "axios";
 import { socket } from "@/socket";
 import { useTaskContext } from "@/hooks/useTaskContext";
 import { useBookingContext } from "@/hooks/useBookingContext";
+import { useMemberContext } from "@/hooks/useMemberContext";
 
 export function Dashboard() {
   const { dispatch } = useNotiContext();
   const { user } = useAuthContextProvider();
+  const { member, dispatch: memberDispatch } = useMemberContext();
   const { dispatch: taskDispatch } = useTaskContext();
   const { dispatch: bookingDispatch } = useBookingContext();
 
@@ -51,6 +53,14 @@ export function Dashboard() {
   }, [user]);
 
   useEffect(() => {
+    socket.connect();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     if (user) {
       const userId = user._id;
       socket.emit("register", { role: "user", userId });
@@ -64,7 +74,7 @@ export function Dashboard() {
         const response = await axios.get("/api/booking");
 
         if (response.status === 200) {
-          bookingDispatch({ type: "SET_BOOKINGS", payload: response.data });
+          bookingDispatch({ type: "SET_BOOKINGS", payload: response.data.bookings });
         }
       } catch (err) {
         console.log(err);
@@ -72,6 +82,20 @@ export function Dashboard() {
     };
     fetchBooking();
   }, [user]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get("/api/user/members");
+        if (response.status === 200) {
+          memberDispatch({ type: "SET_MEMBER", payload: response.data });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchMembers();
+  }, [member]);
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <AdminSidebar />

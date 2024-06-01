@@ -45,24 +45,7 @@ const sendNotificationAllStaff = async (req, title, message, link) => {
     const staffs = await Staff.find();
 
     for (const staff of staffs) {
-      const notification = new Notification({
-        staff: staff._id,
-        title,
-        message,
-        link,
-      });
-
-      await notification.save();
-
-      const staffIdString = staff._id.toString();
-      const socketId = req.staffSockets[staffIdString];
-      if (socketId) {
-        req.io.to(socketId).emit("notiCreated", notification);
-      } else {
-        console.log(
-          `Socket ID not found for staff member with ID: ${staff._id}`
-        );
-      }
+      await sendNotification(req, title, message, link, "staff", staff._id);
     }
 
     return { success: true, message: "Notifications sent successfully" };
@@ -72,6 +55,67 @@ const sendNotificationAllStaff = async (req, title, message, link) => {
   }
 };
 
+
+const sendNotification = async (req, title, message, link, recipient, id) => {
+  try {
+    if (recipient === "staff") {
+      const notification = new Notification({
+        staff: id,
+        title,
+        message,
+        link,
+      });
+      await notification.save();
+
+      const staffIdString = id.toString();
+      const socketId = req.staffSockets[staffIdString];
+      if (socketId) {
+        req.io.to(socketId).emit("notiCreated", notification);
+      } else {
+        console.log(`Socket ID not found for staff member with ID: ${id}`);
+      }
+    } else if (recipient === "admin") {
+      const notification = new Notification({
+        user: id,
+        title,
+        message,
+      });
+      await notification.save();
+
+      const adminIdString = id.toString(); // Convert staff._id to string
+      const socketId = req.userSockets[adminIdString]; // Use the converted string
+      if (socketId) {
+        req.io.to(socketId).emit("notiCreated", notification);
+      } else {
+        console.log(`Socket ID not found for admin with ID: ${id}`);
+      }
+
+      console.log(`Notification sent to admin`);
+    } else if (recipient === "member") {
+      const notification = new Notification({
+        user: id,
+        title,
+        message,
+        link,
+      });
+      await notification.save();
+
+      const guestIdString = id.toString(); // Convert staff._id to string
+      const socketId = req.guestSockets[guestIdString]; // Use the converted string
+      if (socketId) {
+        req.io.to(socketId).emit("notiCreated", notification);
+      } else {
+        console.log(`Socket ID not found for guest with ID: ${id}`);
+      }
+
+      console.log(`Notification sent to Guests`);
+    }
+    
+    console.log(`Notification sent to ${recipient}`);
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
 const sendNotificationToStaff = async (req, title, message, link, taskId) => {
   try {
     const task = await Task.findById(taskId);
@@ -99,65 +143,24 @@ const sendNotificationToStaff = async (req, title, message, link, taskId) => {
   }
 };
 
-const sendNotification = async (req, title, message, link, recipient, id) => {
+const sendNotificationToAdmins = async (req, title, message, link) => {
   try {
-    if (recipient === "staff") {
-      const notification = new Notification({
-        staff: id,
-        title,
-        message,
-        link,
-      });
-      await notification.save();
-
-      const staffIdString = id.toString(); 
-      const socketId = req.staffSockets[staffIdString]; 
-      if (socketId) {
-      req.io.to(socketId).emit("notiCreated", notification);
-      } else {
-        console.log(`Socket ID not found for staff member with ID: ${id}`);
-      }
+    const adminUsers = await User.find({ role: "admin" });
+    
+    for (const adminUser of adminUsers) {
+      await sendNotification(req, title, message, link, "admin", adminUser._id);
     }
-    if (recipient === "admin") {
-      const notification = new Notification({
-        user: id,
-        title,
-        message,
-      });
-      await notification.save();
-
-      const staffIdString = id.toString(); // Convert staff._id to string
-      const socketId = req.staffSockets[staffIdString]; // Use the converted string
-      if (socketId) {
-        req.io.to(socketId).emit("notiCreated", notification);
-      } else {
-        console.log(`Socket ID not found for staff member with ID: ${id}`);
-      }
-
-      console.log(`Notification sent to admin`);
-    }
-
-    console.log(`Notification sent to ${recipient}`);
   } catch (error) {
     console.error("Error sending notification:", error);
   }
 };
 
-const sendNotificationToAdmins = async (req, title, message) => {
+const sendNotificationToAllGuests = async (req, title, message, link) => {
   try {
-    const adminUsers = await User.find({ role: "admin" });
+    const Guests = await User.find({ role: "member" }).sort({ createdAt: -1 });
 
-    for (const adminUser of adminUsers) {
-      const notification = new Notification({
-        user: adminUser._id,
-        title,
-        message,
-      });
-      await notification.save();
-      const AdminIdString = adminUser._id.toString();
-      const socketId = req.userSockets[AdminIdString];
-
-      req.io.to(socketId).emit("notiCreated", notification);
+    for (const guest of Guests) {
+      await sendNotification(req, title, message, link, "member", guest._id);
     }
   } catch (error) {
     console.error("Error sending notification:", error);
@@ -253,4 +256,5 @@ module.exports = {
   sendNotificationAllStaff,
   sendNotificationToStaff,
   markAllNotificationsAsSeen,
+  sendNotificationToAllGuests,
 };

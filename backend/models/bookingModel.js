@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
   {
+    bookingId: {
+      type: "String",
+      unique: true,
+      required: true,
+    },
     room: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Room",
@@ -35,12 +40,21 @@ const bookingSchema = new mongoose.Schema(
     },
     bookedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Staff",
+      refPath: "bookedByModel",
+    },
+    bookedByModel: {
+      type: String,
+      required: true,
+      enum: ["Staff", "User"],
     },
     totalCost: {
       type: Number,
       required: true,
     },
+    serviceOrders: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "ServiceOrder" },
+    ],
+    serviceCost: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

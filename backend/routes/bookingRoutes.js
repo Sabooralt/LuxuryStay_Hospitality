@@ -1,14 +1,16 @@
 const {
   bookRoom,
   getAllBookings,
-  deleteBooking
+  deleteBooking,
+  getGuestBooking,
 } = require("../controllers/bookingController");
 const express = require("express");
 
 const router = express.Router();
 
-router.post("/", bookRoom);
+router.post("/:userType/:userId", bookRoom);
 router.get("/", getAllBookings);
-router.post("/:staffId/deleteBooking",deleteBooking)
+router.get("/:guestId", getGuestBooking);
+router.post("/:userType/:userId/deleteBooking", deleteBooking);
 
 module.exports = router;

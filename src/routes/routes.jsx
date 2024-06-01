@@ -29,6 +29,9 @@ import { ClientRooms } from "@/pages/Client/pages/Rooms";
 import { Profile } from "@/pages/Client/pages/Profile";
 import { ProfileSettings } from "@/pages/Client/componenets/ProfileSettings";
 import { ProfileHome } from "@/pages/Client/componenets/ProfileHome";
+import { GuestBookings } from "@/pages/Client/componenets/ClientBookings";
+import { Services } from "@/pages/AdminDashboard/pages/Services";
+import { Transactions } from "@/pages/AdminDashboard/pages/Transactions";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -47,6 +50,7 @@ export const AdminRoutes = () => {
           element={user ? <Profile /> : <Navigate to="/signup" />}
         >
           <Route index element={<ProfileHome />} />
+          <Route path="/profile/bookings" element={<GuestBookings />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
         </Route>
         <Route
@@ -88,6 +92,8 @@ export const AdminRoutes = () => {
         <Route path="/admin/tasks" element={<Tasks />} />
         <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
+        <Route path="/admin/services" element={<Services />} />
+        <Route path="/admin/services" element={<Transactions />} />
       </Route>
 
       {/* Staff Routes */}

@@ -29,7 +29,7 @@ export const columnDef = [
   },
 
   {
-    accessorKey: "_id",
+    accessorKey: "bookingId",
     id: "Booking Id",
     header: "Booking Id",
   },

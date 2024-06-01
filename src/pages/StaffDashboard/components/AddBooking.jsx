@@ -25,12 +25,12 @@ import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
-export function AddBooking() {
+export function AddBooking({userType}) {
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
-  const { isLoading, responseG, error, SubmitBooking } = useAddBooking();
+  const { isLoading, responseG, error, SubmitBooking } = useAddBooking({userType});
   const { toast } = useToast();
 
   const formik = useFormik({

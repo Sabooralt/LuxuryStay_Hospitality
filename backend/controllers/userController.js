@@ -52,7 +52,7 @@ const signupUser = async (req, res) => {
   try {
     const user = await User.signup(first_name, last_name, email, password);
 
-    const token = createToken(User._id);
+    const token = createToken(user._id);
 
     res.status(200).json({ first_name, last_name, email, token });
   } catch (err) {
@@ -90,10 +90,23 @@ const updateUserDetails = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const updatePassword = async (req, res) => {
+  const { password, newPassword } = req.body;
+  const { userId } = req.params;
+  try {
+    const user = await User.updatePassword(password, newPassword, userId);
 
+    return res
+      .status(200)
+      .json({ success: true, message: "Password updated!" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err });
+  }
+};
 module.exports = {
   loginUser,
   updateUserDetails,
+  updatePassword,
   signupUser,
   getUsers,
   getMembers,

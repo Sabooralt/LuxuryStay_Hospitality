@@ -1,6 +1,6 @@
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import RecentTransactions from "../components/main/Transactions";
+import RecentTransactions from "../components/transactions/RecentTransactions";
 import { RecentBookings } from "../components/main/RecentBookings";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket";

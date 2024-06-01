@@ -1,7 +1,7 @@
 import { useBookingContext } from "@/hooks/useBookingContext";
 import { BookingTable } from "./BookingTable";
 
-export const AllBookings = () => {
+export const AllBookings = ({user}) => {
   const { booking } = useBookingContext();
   return (
     <div className="grid gap-5 rounded-md border border-slate-100 shadow-sm p-5 overflow-x-auto">
@@ -12,7 +12,7 @@ export const AllBookings = () => {
         </p>
       </div>
 
-      {booking && <BookingTable />}
+      {booking && <BookingTable user={user} />}
     </div>
   );
 };

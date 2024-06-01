@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Home,
   LineChart,
+  Microwave,
   Package,
   Package2,
   PanelLeft,
@@ -55,6 +56,11 @@ const sideItems = [
     name: "Guests",
     link: "/admin/guests",
     icon: <Users className="h-5 w-5" />,
+  },
+  {
+    name: "Services",
+    link: "/admin/services",
+    icon: <Microwave className="h-5 w-5" />,
   },
 ];
 

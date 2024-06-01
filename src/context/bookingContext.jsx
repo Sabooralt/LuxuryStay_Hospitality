@@ -8,15 +8,16 @@ export const BookingContext = createContext();
 export const BookingReducer = (state, action) => {
   switch (action.type) {
     case "SET_BOOKINGS":
-      const todayBookings = action.payload.bookings.filter((booking) =>
-        isToday(new Date(booking.checkInDate))
+      const todayBookings = action.payload.filter((booking) =>
+        isToday(new Date(booking.createdAt))
       );
       return {
-        booking: action.payload.bookings,
+        booking: action.payload,
         recentBookings: todayBookings,
+        selectedBooking: action.payload.length > 0 ? action.payload[0] : null,
       };
     case "NEW_BOOKING":
-      const isTodayBooking = isToday(new Date(action.payload.checkInDate));
+      const isTodayBooking = isToday(new Date(action.payload.createdAt));
       return {
         booking: state.booking
           ? [action.payload, ...state.booking]
@@ -41,6 +42,11 @@ export const BookingReducer = (state, action) => {
       return {
         booking: null,
       };
+    case "SELECT_BOOKING":
+      return {
+        ...state,
+        selectedBooking: action.payload,
+      };
     default:
       return state;
   }
@@ -49,7 +55,15 @@ export const BookingContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(BookingReducer, {
     booking: null,
     recentBookings: null,
+    selectedBooking: null,
   });
+
+  const selectBooking = (bookingId) => {
+    const selectedBooking = state.booking.find(
+      (b) => b.bookingId === bookingId
+    );
+    dispatch({ type: "SELECT_BOOKING", payload: selectedBooking });
+  };
 
   useEffect(() => {
     const newBooking = (booking) => {
@@ -71,7 +85,7 @@ export const BookingContextProvider = ({ children }) => {
 
   console.log("BookingContext state: ", state);
   return (
-    <BookingContext.Provider value={{ ...state, dispatch }}>
+    <BookingContext.Provider value={{ ...state, dispatch, selectBooking }}>
       {children}
     </BookingContext.Provider>
   );

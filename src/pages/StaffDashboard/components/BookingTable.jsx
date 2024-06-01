@@ -29,14 +29,16 @@ import { Filter, Trash, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
+import { useAuthContextProvider } from "@/hooks/useAuthContext";
 
-export const BookingTable = () => {
+export const BookingTable = ({ user }) => {
   const { booking } = useBookingContext();
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const { staff } = useStaffAuthContext();
+  const { user: admin } = useAuthContextProvider();
   const { toast } = useToast();
 
   const tableInstance = useReactTable({
@@ -61,13 +63,20 @@ export const BookingTable = () => {
 
   const deleteSelectedBooking = async (selectedKeys) => {
     try {
+      let userId;
       let bookingIds;
       bookingIds = Object.keys(selectedKeys);
 
-      console.log(bookingIds);
+      if (user === "admin") {
+        userId = admin._id;
+      } else if (user === "staff") {
+        userId = staff._id;
+      }
+
+    
 
       const response = await axios.post(
-        `/api/booking/${staff._id}/deleteBooking`,
+        `/api/booking/${user}/${userId}/deleteBooking`,
         {
           bookingIds: bookingIds,
         }
@@ -76,7 +85,7 @@ export const BookingTable = () => {
       if (response.status === 200) {
         toast({
           title: response.data.message,
-          description: response.data.description
+          description: response.data.description,
         });
       }
     } catch (err) {
@@ -84,7 +93,6 @@ export const BookingTable = () => {
       // Handle error
     }
   };
-
 
   return (
     <div>

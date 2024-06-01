@@ -73,6 +73,34 @@ userSchema.statics.signup = async function (
   return user;
 };
 
+userSchema.statics.updatePassword = async function (
+  password,
+  newPassword,
+  userId
+) {
+  if (!password || !newPassword) {
+    throw new Error("All fields must be filled");
+  }
+
+  const user = await this.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    throw new Error("Incorrect password");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+  user.password = hashedNewPassword;
+  await user.save();
+
+  return user;
+};
+
 userSchema.statics.login = async function (email, password) {
   if (!email || !password) {
     throw Error("All fields must be filled ");

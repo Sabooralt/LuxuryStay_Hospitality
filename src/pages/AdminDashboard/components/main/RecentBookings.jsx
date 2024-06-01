@@ -5,22 +5,22 @@ import { RecentBookingItem } from "@/globalComponents/RecentBookingItem";
 import { useBookingContext } from "@/hooks/useBookingContext";
 
 export const RecentBookings = () => {
-  const { booking } = useBookingContext();
+  const { booking,recentBookings } = useBookingContext();
   return (
-    <Card x-chunk="dashboard-01-chunk-5">
+    <Card className="max-w-[500px] h-fit">
       <CardHeader>
         <CardTitle>Recent Bookings</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-8">
-        {booking ? (
-          booking.map((booking) => (
+        {recentBookings && recentBookings.length > 0 ? (
+          recentBookings.map((booking) => (
             <>
               <RecentBookingItem booking={booking} />
               <Separator className="my-2" />
             </>
           ))
         ) : (
-          <div>No recent bookings</div>
+          <div className="font-semibold size-full">No recent bookings.</div>
         )}
       </CardContent>
     </Card>

@@ -6,6 +6,7 @@ const {
   getUsers,
   updateUserDetails,
   getMembers,
+  updatePassword,
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.post("/login", loginUser);
 //Signup
 router.post("/signup", signupUser);
 router.patch("/updateUserDetails/:userId", updateUserDetails);
+router.patch("/updatePassword/:userId", updatePassword);
 
 module.exports = router;
