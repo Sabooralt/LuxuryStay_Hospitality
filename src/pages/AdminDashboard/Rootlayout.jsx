@@ -10,6 +10,7 @@ import { socket } from "@/socket";
 import { useTaskContext } from "@/hooks/useTaskContext";
 import { useBookingContext } from "@/hooks/useBookingContext";
 import { useMemberContext } from "@/hooks/useMemberContext";
+import { useTransactionContext } from "@/context/transactionContext";
 
 export function Dashboard() {
   const { dispatch } = useNotiContext();
@@ -17,6 +18,7 @@ export function Dashboard() {
   const { member, dispatch: memberDispatch } = useMemberContext();
   const { dispatch: taskDispatch } = useTaskContext();
   const { dispatch: bookingDispatch } = useBookingContext();
+  const { dispatch: transactionDispatch } = useTransactionContext();
 
   useEffect(() => {
     taskDispatch({ type: "CLEAR_TASK" });
@@ -74,7 +76,10 @@ export function Dashboard() {
         const response = await axios.get("/api/booking");
 
         if (response.status === 200) {
-          bookingDispatch({ type: "SET_BOOKINGS", payload: response.data.bookings });
+          bookingDispatch({
+            type: "SET_BOOKINGS",
+            payload: response.data.bookings,
+          });
         }
       } catch (err) {
         console.log(err);
@@ -96,6 +101,23 @@ export function Dashboard() {
     };
     fetchMembers();
   }, [member]);
+  useEffect(() => {
+    const fetchTransaction = async () => {
+      try {
+        const response = await axios.get("/api/orderService/GetOrderServices");
+
+        if (response.status === 200) {
+          transactionDispatch({
+            type: "SET_TRANSACTIONS",
+            payload: response.data.ServiceOrders,
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchTransaction();
+  }, []);
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <AdminSidebar />

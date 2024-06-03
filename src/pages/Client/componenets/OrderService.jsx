@@ -1,0 +1,329 @@
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useServiceContext } from "@/context/serviceContext";
+import { useEffect, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Separator } from "@/components/ui/separator";
+import axios from "axios";
+import { useAuthContextProvider } from "@/hooks/useAuthContext";
+import { useBookingContext } from "@/hooks/useBookingContext";
+import { useToast } from "@/components/ui/use-toast";
+
+export const OrderService = () => {
+  const { service: services } = useServiceContext();
+  const { selectedBooking } = useBookingContext();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [ellipsisClicked, setEllipsisClicked] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [quantities, setQuantities] = useState({});
+  const { user } = useAuthContextProvider();
+  const { toast } = useToast();
+
+  const filteredServices = services.filter((service) =>
+    selectedServices.includes(service._id)
+  );
+
+  const handleEllipsisClick = (index) => {
+    setEllipsisClicked((e) => !e);
+    setActiveIndex(index);
+  };
+  const handleQuantityChange = (id, value) => {
+    setQuantities({
+      ...quantities,
+      [id]: value,
+    });
+  };
+  const calculateSubtotal = (service) => {
+    const quantity = quantities[service._id] || 1;
+    return quantity * service.price;
+  };
+
+  const calculateTotalPrice = () => {
+    let totalWithoutTax = 0;
+    let totalWithTax = 0;
+    selectedServices.forEach((serviceId) => {
+      const service = services.find((service) => service._id === serviceId);
+      if (service) {
+        const subtotal = calculateSubtotal(service);
+        totalWithoutTax += subtotal;
+        totalWithTax += subtotal * 1.12;
+      }
+    });
+    return { totalWithoutTax, totalWithTax };
+  };
+  const { totalWithoutTax, totalWithTax } = calculateTotalPrice();
+
+  const removeItem = (id) => {
+    setSelectedServices(selectedServices.filter((_id) => _id !== id));
+  };
+  const servicesByCategory = services.reduce((acc, service) => {
+    const category = service.category.name;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(service);
+    return acc;
+  }, {});
+
+  useEffect(()=>{
+console.log(quantities)
+  },[quantities])
+
+  useEffect(() => {
+    if (selectedServices.length > 0) {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [selectedServices, open]);
+
+  const handleOrder = async () => {
+    try {
+      if (!user) {
+        return null;
+      }
+
+      const response = await axios.post(
+        `/api/orderService/order-service/${user._id}/${selectedBooking._id}`,
+        {
+          serviceIds: selectedServices,
+          quantities: quantities,
+        }
+      );
+      if (response.status === 200) {
+        toast({
+          title: "Services ordered successfully",
+        });
+        setSelectedServices([]);
+      }
+    } catch (error) {
+      toast({
+        title: "Oops something went wrong!",
+        description: "Error ordering services. Please try again later!",
+        variant: "destructive",
+      });
+    }
+  };
+  return (
+    <>
+      <div className="grid w-full">
+        <h1 className="font-semibold text-4xl">Room Service</h1>
+
+        {Object.entries(servicesByCategory).map(
+          ([category, categoryServices]) => (
+            <Carousel
+              key={category}
+              opts={{
+                align: "start",
+              }}
+              className="w-full grid gap-2 max-w-6xl p-7 bg-slate-50 rounded-lg"
+            >
+              <h3 className="font-semibold  text-2xl">{category}</h3>
+              <CarouselContent>
+                {categoryServices.map((service, index) => (
+                  <CarouselItem
+                    onClick={(e) => {
+                      if (selectedServices.includes(service._id)) {
+                        setSelectedServices(
+                          selectedServices.filter((id) => id !== service._id)
+                        );
+                      } else {
+                        setSelectedServices([...selectedServices, service._id]);
+                      }
+                    }}
+                    key={service._id}
+                    className="md:basis-1/2 lg:basis-1/3 cursor-pointer"
+                  >
+                    <div className="p-1">
+                      <Card className="relative">
+                        <CardHeader className="size-fit pt-5 pb-0 px-4">
+                          <h4 className="font-medium text-xl line-clamp-1">
+                            {service.name}
+                          </h4>
+                        </CardHeader>
+                        <CardContent className="flex p-3 overflow-hidden justify-center items-center">
+                          <img
+                            src={`/ServiceImages/${service.image}`}
+                            className="object-cover h-[250px] w-[250px]"
+                          />
+                        </CardContent>
+
+                        <CardFooter className="grid gap-4">
+                          <p
+                            onClick={() => handleEllipsisClick(index)}
+                            className={`${
+                              ellipsisClicked && activeIndex === index
+                                ? ""
+                                : "line-clamp-2"
+                            } cursor-pointer`}
+                          >
+                            {service.description}
+                          </p>
+                          <p className="mx-auto">
+                            Price:{" "}
+                            <span className="font-semibold">
+                              {" "}
+                              {service.price}{" "}
+                            </span>
+                          </p>
+                        </CardFooter>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )
+        )}
+
+        <Sheet modal={false} open={open} className="overflow-visible">
+          <SheetContent className="p-0">
+            <SheetHeader className="p-5">
+              <SheetTitle>Selected Services</SheetTitle>
+              <SheetDescription>
+                Make changes to your selected services here. Click order when
+                you're done.
+              </SheetDescription>
+            </SheetHeader>
+
+            <ScrollArea className="max-h-[500px]overflow-auto w-full">
+              <div className="grid gap-4 p-5">
+                {selectedServices &&
+                  filteredServices.map((service, index) => {
+                    return (
+                      <>
+                        <div className="flex flex-row justify-between items-center">
+                          <h1 className="font-semibold text-md">
+                            {service.name}
+                          </h1>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Cross2Icon
+                                  className="cursor-pointer"
+                                  onClick={() => removeItem(service._id)}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Remove Item</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                        <div
+                          className="flex flex-row justify-between gap-3 items-center"
+                          key={service._id}
+                        >
+                          <img
+                            className="w-[50px] h-[50px] object-cover rounded-xl"
+                            src={`/ServiceImages/${service.image}`}
+                            alt={service.name}
+                          />
+
+                          <Label>Quantity:</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            className="w-fit"
+                            value={quantities[service._id] || 1}
+                            onChange={(e) =>
+                              handleQuantityChange(service._id, e.target.value)
+                            }
+                          />
+                        </div>
+                      </>
+                    );
+                  })}
+
+                <div className="grid gap-3">
+                  <div className="font-semibold">Service Details</div>
+                  <ul className="grid gap-3">
+                    {selectedServices &&
+                      filteredServices.map((service, index) => {
+                        const subtotal = calculateSubtotal(service);
+
+                        return (
+                          <li className="flex items-center justify-between">
+                            <span className="text-muted-foreground">
+                              {service.name} x{" "}
+                              <span className="font-semibold">
+                                {quantities[service._id] || 1}
+                              </span>
+                            </span>
+                            <span>Rs.{subtotal}</span>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                  <Separator className="my-2" />
+                  <ul className="grid gap-3">
+                    <li className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span className="font-semibold">
+                        Rs.{totalWithoutTax}
+                      </span>
+                    </li>
+
+                    <li className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Tax</span>
+                      <span className="font-semibold">12% on each item</span>
+                    </li>
+                    <li className="flex items-center justify-between font-semibold">
+                      <span className="text-muted-foreground">Total</span>
+                      <span>Rs. {totalWithTax.toFixed(2)}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </ScrollArea>
+
+            <SheetFooter className="p-5">
+              <Button
+                onClick={handleOrder}
+                disabled={!selectedServices.length > 0}
+                type="submit"
+                className="w-full"
+              >
+                Order
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </>
+  );
+};

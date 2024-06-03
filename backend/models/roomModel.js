@@ -8,6 +8,10 @@ const roomSchema = new Schema(
       ref: "user",
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     roomNumber: {
       type: Number,
       required: true,
@@ -30,7 +34,7 @@ const roomSchema = new Schema(
     status: {
       type: String,
       enum: ["cleaning", "occupied", "maintenance", "vacant"],
-      default: "occupied",
+      default: "vacant",
     },
     capacity: {
       type: Number,
@@ -55,7 +59,5 @@ const roomSchema = new Schema(
 
   { timestamps: true }
 );
-
-
 
 module.exports = mongoose.model("Room", roomSchema);

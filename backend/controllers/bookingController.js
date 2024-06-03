@@ -3,8 +3,10 @@ const Booking = require("../models/bookingModel");
 const Room = require("../models/roomModel");
 const User = require("../models/userModel");
 const Staff = require("../models/staffModel");
-const { sendNotificationToAdmins } = require("./notificationController");
+const { sendNotificationToAdmins, sendNotification } = require("./notificationController");
 const generateBookingId = require("../utils/generateBookingId");
+const { sendEmail } = require("./emailController");
+const { htmlContent } = require("../utils/emailTemplate");
 
 const bookRoom = async (req, res) => {
   try {
@@ -106,6 +108,22 @@ const bookRoom = async (req, res) => {
       await sendNotificationToAdmins(req, "New Room Booking!", description);
     }
 
+    await sendNotification(
+      req,
+      `Booking Confirmation!`,
+      `Your booking has been successfully confirmed. We're thrilled to have you with us! Please keep an eye on your email for all the exciting details. Have a wonderful day!`,
+      `/profile/booking/${populatedBooking._id}`,
+      "member",
+      memberId
+    );
+
+    await sendEmail(
+      member.email,
+      "Booking Confirmation!",
+      `Booking Details: \n BookingId: ${populatedBooking.bookingId} `,
+      htmlContent
+    );
+
     Object.values(req.staffSockets).forEach((socketId) => {
       req.io.to(socketId).emit("newBooking", populatedBooking);
     });
@@ -142,7 +160,7 @@ const getGuestBooking = async (req, res) => {
     const bookings = await Booking.find({ member: guestId })
       .populate("room")
       .populate("member")
-      .populate("bookedBy", ["username", "role"]);
+      .populate("bookedBy");
 
     if (!bookings) {
       return res
@@ -239,4 +257,27 @@ const deleteBooking = async (req, res) => {
   }
 };
 
-module.exports = { bookRoom, getAllBookings, deleteBooking, getGuestBooking };
+const calculateTotalRevenue = async (req, res) => {
+  try {
+    const bookings = await Booking.find();
+    let totalRevenue = 0;
+
+    bookings.forEach((booking) => {
+      totalRevenue += booking.totalCost;
+    });
+
+    res.status(200).json({ success: true, totalRevenue });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error });
+  }
+};
+
+module.exports = {
+  bookRoom,
+  getAllBookings,
+  deleteBooking,
+  getGuestBooking,
+  calculateTotalRevenue,
+};

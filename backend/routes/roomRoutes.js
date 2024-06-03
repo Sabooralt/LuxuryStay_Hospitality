@@ -1,8 +1,14 @@
-const { createRoom, getRooms,checkRoomNumber,updateStatus } = require("../controllers/roomController");
+const {
+  createRoom,
+  getRooms,
+  checkRoomNumber,
+  updateStatus,
+  deleteRoom,
+} = require("../controllers/roomController");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
 
@@ -17,20 +23,19 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
-  onError: function(err, next) {
+  onError: function (err, next) {
     console.error("Multer error:", err);
     next(err);
-  }
+  },
 });
 
-router.get("/",getRooms)
+router.get("/", getRooms);
 
 router.post("/add", upload.array("images"), createRoom);
 
-router.post("/check_room_number",checkRoomNumber)
-router.patch("/:staffId/update_status/:id",updateStatus)
-
-
+router.post("/check_room_number", checkRoomNumber);
+router.patch("/:staffId/update_status/:id", updateStatus);
+router.post("/deleteRoom/:userId",deleteRoom)
 module.exports = router;

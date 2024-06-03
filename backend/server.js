@@ -6,6 +6,7 @@ const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
 const cron = require("node-cron");
+const { sendEmail } = require("./controllers/emailController");
 
 // Models
 const Task = require("./models/taskModel");
@@ -34,7 +35,7 @@ const {
 } = require("./controllers/notificationController");
 const serviceRoutes = require("./routes/serviceRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
-
+const orderServiceRoutes = require("./routes/serviceOrderRoutes");
 // Sockets initialization
 
 const staffSockets = {};
@@ -62,6 +63,7 @@ app.use("/api/notis", notiRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/service", serviceRoutes);
 app.use("/api/serviceCategory", serviceCategoryRoutes);
+app.use("/api/orderService", orderServiceRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -74,6 +76,7 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
+
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -124,7 +127,6 @@ cron.schedule("0 0 * * *", async () => {
 
     const pastBookings = await Booking.find({
       checkOutDate: { $lt: now },
-      status: "active",
     });
 
     for (const booking of pastBookings) {
@@ -139,12 +141,15 @@ cron.schedule("0 0 * * *", async () => {
       await sendNotificationToAdmins(
         req,
         `A Member checked out of ${room.roomNumber}.`,
-        `room status is updated to ${newRoom.status}!`
+        `room status is updated to ${newRoom.status}!`,
+        ""
       );
+      req, title, message, link, recipient, id;
       await sendNotificationToAllStaff(
         req,
         `A Member checked out of ${room.roomNumber}.`,
-        `Room ${newRoom.roomNumber} is ${newRoom.availibility} now and room status is updated to ${newRoom.status}!`
+        `Room ${newRoom.roomNumber} is ${newRoom.availibility} now and room status is updated to ${newRoom.status}!`,
+        " "
       );
     }
 

@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarOff, Upload } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 import {
@@ -20,17 +20,51 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { OrderService } from "./OrderService";
+import { OrderedServices } from "./OrderedServices";
+import { useServiceContext } from "@/context/serviceContext";
+import { useEffect } from "react";
+import { useTransactionContext } from "@/context/transactionContext";
+import { useAuthContextProvider } from "@/hooks/useAuthContext";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export const GuestBookings = () => {
   const { booking, selectedBooking, selectBooking } = useBookingContext();
+  const { dispatch, transaction } = useTransactionContext();
+  const { user } = useAuthContextProvider();
 
-  return (
+  useEffect(() => {
+    const fetchOrderedServices = async () => {
+      try {
+        const response = await axios(
+          `/api/orderService/get-your-services/${user._id}`
+        );
+
+        if (response.status === 200) {
+          dispatch({
+            type: "SET_TRANSACTIONS",
+            payload: response.data.ServiceOrders,
+          });
+        }
+      } catch (err) {}
+    };
+    if (selectedBooking && user) {
+      fetchOrderedServices();
+    }
+  }, [user, selectedBooking]);
+  return selectedBooking ? (
     <div className="h-full w-full grid gap-5">
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl font-semibold">Bookings</h1>
         <div>
           <Select
-            defaultValue={`${selectedBooking ? selectedBooking.bookingId : ""}`}
+            defaultValue={`${
+              selectedBooking
+                ? selectedBooking.bookingId
+                : "You have no bookings"
+            }`}
             onValueChange={selectBooking}
           >
             <SelectTrigger className="w-[180px] bg-white">
@@ -56,44 +90,8 @@ export const GuestBookings = () => {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        <div className="grid col-span-1 mr-auto"></div>
-
-        <div className="grid col-span-1">
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle>Booking Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="status">Status</Label>
-                  <Select defaultValue={selectedBooking.status}>
-                    <SelectTrigger id="status" aria-label="Select status">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        disabled={
-                          selectedBooking.status === "checkedOut" ||
-                          selectedBooking.status === "checkedIn"
-                        }
-                        value="booked"
-                      >
-                        Booked
-                      </SelectItem>
-                      <SelectItem
-                        disabled={selectedBooking.status === "checkedOut"}
-                        value="checkedIn"
-                      >
-                        Checked In
-                      </SelectItem>
-                      <SelectItem value="checkedOut">Checked Out</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid col-span-2">
+          <OrderedServices />
         </div>
 
         <div className="grid col-span-1 gap-5 ml-auto">
@@ -132,6 +130,26 @@ export const GuestBookings = () => {
           </Card>
         </div>
       </div>
+      <div className="grid w-full">
+        <OrderService />
+      </div>
+    </div>
+  ) : (
+    <div className="flex gap-2 flex-col items-center px-20">
+      <CalendarOff className="size-10 text-gray-500" />
+      <h1 className="text-2xl font-medium">You Have No Bookings Yet!</h1>
+      <p className="">
+        It looks like you haven't made any bookings yet. Why not explore our
+        options and make your first booking today? We're here to help you with
+        any questions you might have. Happy exploring!
+      </p>
+
+      <Link to="/rooms">
+        <Button className="bg-indigo-600 hover:bg-indigo-700">
+          <ArrowUpRight className="size-5" />
+          Explore Rooms
+        </Button>
+      </Link>
     </div>
   );
 };

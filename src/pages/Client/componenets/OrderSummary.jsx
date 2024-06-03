@@ -30,10 +30,12 @@ import { useBookingContext } from "@/hooks/useBookingContext";
 import { formatDate } from "date-fns";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import { useTransactionContext } from "@/context/transactionContext";
 
 export default function OrderSummary() {
   const { selectedBooking } = useBookingContext();
   const receiptRef = useRef();
+  const { transaction } = useTransactionContext();
 
   const handlePrint = useReactToPrint({
     content: () => receiptRef.current,
@@ -55,7 +57,6 @@ export default function OrderSummary() {
             </Button>
           </CardTitle>
           <CardDescription>
-            
             {formatDate(new Date(selectedBooking.createdAt), "MM/dd/yyyy")}
           </CardDescription>
         </div>
@@ -85,7 +86,7 @@ export default function OrderSummary() {
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">
-                Glimmer Lamps x <span>2</span>
+               {selectedBooking.room.type.type} x <span>2</span>
               </span>
               <span>$250.00</span>
             </li>

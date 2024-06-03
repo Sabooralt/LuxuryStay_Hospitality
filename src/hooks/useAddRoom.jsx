@@ -19,6 +19,7 @@ export const useAddRoom = () => {
     formData.append("capacity", data.capacity);
     formData.append("description", data.description);
     formData.append("pricePerNight", data.pricePerNight);
+    formData.append("multipleRooms",data.multipleRooms)
     data.images.forEach((image) => {
       formData.append("images", image);
     });
@@ -34,7 +35,7 @@ export const useAddRoom = () => {
         setResponseG(response.data.message)
       }
     } catch (err) {
-      setError(err.response.data.error);
+      setError(err.response.data.message);
       setIsLoading(false);
     }
   };

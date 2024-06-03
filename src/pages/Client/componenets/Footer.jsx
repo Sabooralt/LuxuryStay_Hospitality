@@ -28,7 +28,7 @@ export const Footer = () => {
     },
   ];
   return (
-    <footer className="p-20 bg-gray-200 mt-20 flex flex-col gap-10">
+    <footer className="p-20 bg-gray-200 flex flex-col gap-10">
       <div className="flex flex-row gap-5 justify-between">
         <div className="flex flex-col gap-5">
           <h1 className="text-gray-400">PHONE SUPPORT</h1>

@@ -26,21 +26,57 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
+import { Button } from "@/components/ui/button";
+import { TrashIcon } from "lucide-react";
+import { useAuthContextProvider } from "@/hooks/useAuthContext";
 
 export function RoomCard({ className, room, ...props }) {
   const [error, setError] = useState(null);
   const [responseG, setResponseG] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { staff } = useStaffAuthContext();
+  const { user } = useAuthContextProvider();
   const { toast } = useToast();
-  const roomStatus =
-    room.status === "occupied"
-      ? "secondary"
-      : room.status === "available"
-      ? "primary"
-      : room.status === "cleaning"
-      ? "outline"
-      : "";
+
+  const deleteRoom = async () => {
+    setError(null);
+    setResponseG(null);
+    setIsLoading(true);
+    try {
+      if (user.role !== "admin") {
+        toast({
+          title: "Unauthorized!",
+          variant: "destructive",
+        });
+        return null;
+      }
+      const response = await axios.delete(
+        `/api/room/${room._id}/deleteRoom/${user._id}`
+      );
+
+      if (response.status === 200) {
+        toast({
+          title: "Room Deleted Successfully!",
+        });
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 400) {
+          setError(err.response.data.error);
+        } else {
+          setError("An error occurred. Please try again later.");
+        }
+      } else if (err.request) {
+        setError(
+          "No response received. Please check your internet connection."
+        );
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
+
+      setIsLoading(false);
+    }
+  };
   const updateRoomStatus = async ({ data }) => {
     setError(null);
     setResponseG(null);
@@ -91,88 +127,97 @@ export function RoomCard({ className, room, ...props }) {
     }
   }, [responseG]);
   return (
-    <Card className={cn("w-[380px]", className)} {...props}>
-      <CardHeader className="p-5 pb-2">
-        <CardTitle className="text-2xl">Room: {room.roomNumber}</CardTitle>
-        <CardDescription>
-          <Badge variant={roomStatus} className="uppercase font-bold">
-            {room.status}
-          </Badge>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4">
-        <Carousel className="w-full">
-          <CarouselContent>
-            {room.images &&
-              room.images.length > 0 &&
-              room.images.map((img) => (
-                <CarouselItem key={img._id}>
-                  <div className="p-0">
-                    <Card>
-                      <CardContent className="flex w-100 items-center justify-center p-1">
-                        <img
-                          src={`/RoomImages/${img.filepath}`}
-                          className="rounded-md object-fill"
-                          alt=""
-                        />
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CarouselItem>
-              ))}
-          </CarouselContent>
-        </Carousel>
+    room && (
+      <Card className={cn("w-[380px]", className)} {...props}>
+        <CardHeader className="p-5 pb-2">
+          <CardTitle className="text-2xl">Room: {room.name}</CardTitle>
+          <CardDescription>
+            <Badge className="uppercase font-bold">{room.status}</Badge>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {room.images &&
+                room.images.length > 0 &&
+                room.images.map((img) => (
+                  <CarouselItem key={img._id}>
+                    <div className="p-0">
+                      <Card>
+                        <CardContent className="flex w-100 items-center justify-center p-1">
+                          <img
+                            src={`/RoomImages/${img.filepath}`}
+                            className="rounded-md object-fill"
+                            alt=""
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+            </CarouselContent>
+          </Carousel>
 
-        <div
-          style={{ rowGap: "0.5rem" }}
-          className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
-        >
-          <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-          <div className="space-y-1 max">
-            <p className="text-sm font-medium leading-none">Room description</p>
-            <p className="text-sm text-muted-foreground max-h-[10rem] line-clamp-[3] text-ellipsis overflow-hidden">
-              {room.description}
-            </p>
-          </div>
-          <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-          <div className="space-y-1 max">
-            <p className="text-sm font-medium leading-none ">Room Capacity</p>
-            <p className="text-sm text-muted-foreground max-h-[10rem] line-clamp-[3] text-ellipsis overflow-hidden">
-              {room.capacity}
-            </p>
-          </div>
-          <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-          <div className="space-y-1 max grid grid-col-2 gap-1">
-            <p className="text-sm grid font-medium leading-none ">
-              Room Status
-            </p>
-            <Select
-              onValueChange={(value) =>
-                updateRoomStatus({
-                  data: { id: room._id, status: value },
-                })
-              }
-              defaultValue={room.status}
-            >
-              <SelectTrigger className="w-100">
-                <SelectValue className="bg-black" placeholder={room.status} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Roles</SelectLabel>
+          <div
+            style={{ rowGap: "0.5rem" }}
+            className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
+          >
+            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div className="space-y-1 max">
+              <p className="text-sm font-medium leading-none">
+                Room description
+              </p>
+              <p className="text-sm text-muted-foreground max-h-[10rem] line-clamp-[3] text-ellipsis overflow-hidden">
+                {room.description}
+              </p>
+            </div>
+            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div className="space-y-1 max">
+              <p className="text-sm font-medium leading-none ">Room Capacity</p>
+              <p className="text-sm text-muted-foreground max-h-[10rem] line-clamp-[3] text-ellipsis overflow-hidden">
+                {room.capacity}
+              </p>
+            </div>
+            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+            <div className="space-y-1 max grid grid-col-2 gap-1">
+              <p className="text-sm grid font-medium leading-none ">
+                Room Status
+              </p>
+              <Select
+                onValueChange={(value) =>
+                  updateRoomStatus({
+                    data: { id: room._id, status: value },
+                  })
+                }
+                defaultValue={room.status}
+              >
+                <SelectTrigger className="w-100">
+                  <SelectValue className="bg-black" placeholder={room.status} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Roles</SelectLabel>
 
-                  {statusRoom.map((role, index) => (
-                    <SelectItem key={index} value={role}>
-                      {role}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                    {statusRoom.map((role, index) => (
+                      <SelectItem key={index} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+        {user && user.role === "admin" && (
+          <CardFooter>
+            <Button onClick={deleteRoom} size="icon">
+              <TrashIcon className="size-3" />
+            </Button>
+          </CardFooter>
+        )}
+      </Card>
+    )
   );
 }
 

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export const Not_Found = () => {
   return (
-    <main class="grid min-h-[100vh] bg-[url('/ClientImages/404.jpg')] bg-no-repeat bg-cover place-items-center  px-6 py-24 sm:py-36 lg:px-8">
+    <main class="grid min-h-screen bg-[url('/ClientImages/404.jpg')] bg-no-repeat bg-cover place-items-center  px-6 py-24 sm:py-36 lg:px-8">
       <div className="absolute bg-overlay inset-0"></div>
       <div class="text-center z-30">
         <p class="text-base font-semibold text-white">404</p>

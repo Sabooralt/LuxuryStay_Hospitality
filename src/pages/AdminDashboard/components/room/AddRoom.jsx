@@ -39,6 +39,7 @@ export const AddRoom = () => {
   const [roomNumberStatus, setRoomNumberStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [roomNumber, setRoomNumber] = useState(null);
+  const [multipleRooms,setMultipleRooms] = useState(0);
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
   const [capacity, setCapacity] = useState(null);
@@ -53,6 +54,7 @@ export const AddRoom = () => {
     type,
     capacity,
     pricePerNight,
+    multipleRooms,
     amenities,
     images,
   });
@@ -63,6 +65,7 @@ export const AddRoom = () => {
       type,
       capacity,
       pricePerNight,
+      multipleRooms,
       amenities,
       images,
     });
@@ -72,6 +75,7 @@ export const AddRoom = () => {
     type,
     capacity,
     pricePerNight,
+    multipleRooms,
     amenities,
     images,
   ]);
@@ -110,10 +114,10 @@ export const AddRoom = () => {
     const selectedFiles = Array.from(e.target.files);
     setImages(selectedFiles);
   };
-  const handleRoomNumber = (e)=>{
+  const handleRoomNumber = (e) => {
     setRoomNumber(e.target.value);
-    setRoomNumberStatus(null)
-  }
+    setRoomNumberStatus(null);
+  };
 
   useEffect(() => {
     if (responseG) {
@@ -150,7 +154,7 @@ export const AddRoom = () => {
             <Label>Room Number</Label>
             <Input
               required
-              type="number"
+              type="tel"
               placeholder="401"
               value={roomNumber}
               onChange={(e) => handleRoomNumber(e)}
@@ -163,7 +167,13 @@ export const AddRoom = () => {
                 type="button"
                 onClick={checkAvail}
                 className={`text-xs text-white p-[0.3rem] ${
-                  loading ? "bg-gray-400" : roomNumberStatus ? (roomNumberStatus.success ? "bg-green-500" : "bg-red-500") : ""
+                  loading
+                    ? "bg-gray-400"
+                    : roomNumberStatus
+                    ? roomNumberStatus.success
+                      ? "bg-green-500"
+                      : "bg-red-500"
+                    : ""
                 }`}
                 disabled={loading || roomNumberStatus || !roomNumber}
               >
@@ -175,12 +185,12 @@ export const AddRoom = () => {
                 ) : roomNumberStatus ? (
                   roomNumberStatus.success ? (
                     <>
-                      <Check  className="h-4 w-4"/>
+                      <Check className="h-4 w-4" />
                       Room Number Available
                     </>
                   ) : (
                     <>
-                      <X  className="h-4 w-4"/>
+                      <X className="h-4 w-4" />
                       Room Number not available
                     </>
                   )
@@ -222,7 +232,7 @@ export const AddRoom = () => {
             <Label>Room Capacity</Label>
             <Input
               required
-              type="number"
+              type="tel"
               onChange={(e) => setCapacity(e.target.value)}
             />
           </div>
@@ -230,7 +240,7 @@ export const AddRoom = () => {
             <Label>Room Price per night</Label>
             <Input
               required
-              type="number"
+              type="tel"
               onChange={(e) => setPricePerNight(e.target.value)}
             />
           </div>
@@ -259,6 +269,18 @@ export const AddRoom = () => {
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
             )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label>Create Multiple Rooms:</Label>
+            <Input type='number' value={multipleRooms} onChange={(e)=>setMultipleRooms(e.target.value)} />
+            <p className="text-muted-foreground text-sm">
+              If you want to create multiple rooms, please enter the number of
+              rooms you wish to create. Rooms will be created starting from the
+              specified room number up to the number of rooms entered.
+              Otherwise, leave the number of rooms field blank to create a
+              single room.
+            </p>
           </div>
         </CardContent>
         <CardFooter>
