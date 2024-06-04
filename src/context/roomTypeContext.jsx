@@ -26,7 +26,7 @@ export const roomTypesReducer = (state, action) => {
 
 export const RoomTypeContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(roomTypesReducer, {
-    roomTypes: null,
+    roomTypes: [],
   });
 
   useEffect(() => {

@@ -104,7 +104,27 @@ export function StaffDashboard() {
     fetchMembers();
   }, []);
 
-  
+  useEffect(() => {
+    const fetchGuestTasks = async () => {
+      try {
+        if (staff.role !== "Housekeeper") {
+          return null;
+        }
+
+        const response = await axios.get("/api/guestReq/get");
+
+        if (response.status === 200) {
+          taskDispatch({
+            type: "SET_GUEST_TASKS",
+            payload: response.data.guestRequests,
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchGuestTasks();
+  }, [staff]);
 
   return (
     <div className="grid h-screen overflow-hidden w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

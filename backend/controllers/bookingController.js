@@ -3,7 +3,10 @@ const Booking = require("../models/bookingModel");
 const Room = require("../models/roomModel");
 const User = require("../models/userModel");
 const Staff = require("../models/staffModel");
-const { sendNotificationToAdmins, sendNotification } = require("./notificationController");
+const {
+  sendNotificationToAdmins,
+  sendNotification,
+} = require("./notificationController");
 const generateBookingId = require("../utils/generateBookingId");
 const { sendEmail } = require("./emailController");
 const { htmlContent } = require("../utils/emailTemplate");
@@ -67,6 +70,7 @@ const bookRoom = async (req, res) => {
     const booking = new Booking({
       bookingId,
       room: roomId,
+      stay: numberOfNights,
       member: memberId,
       description,
       uniqueKey,
@@ -117,13 +121,13 @@ const bookRoom = async (req, res) => {
       memberId
     );
 
-    await sendEmail(
-      member.email,
-      "Booking Confirmation!",
-      `Booking Details: \n BookingId: ${populatedBooking.bookingId} `,
-      htmlContent
-    );
-
+    const guestIdString = memberId.toString();
+    const socketId = req.guestSockets[guestIdString];
+    if (socketId) {
+      req.io.to(socketId).emit("newBooking", populatedBooking);
+    } else {
+      console.log(`Socket ID not found for guest with ID: ${memberId}`);
+    }
     Object.values(req.staffSockets).forEach((socketId) => {
       req.io.to(socketId).emit("newBooking", populatedBooking);
     });
@@ -132,10 +136,36 @@ const bookRoom = async (req, res) => {
       req.io.to(socketId).emit("newBooking", populatedBooking);
     });
 
-    return res.status(201).json({
+    setImmediate(async () => {
+      const htmlContent = `
+        <h1>Booking Confirmation</h1>
+        <p>Booking Details:</p>
+        <ul>
+          <li>BookingId: ${populatedBooking.bookingId}</li>
+          <li>Room Number: ${room.roomNumber}</li>
+          <li>Check-In Date: ${checkInDate}</li>
+          <li>Check-Out Date: ${checkOutDate}</li>
+          <li>Total Cost: Rs.${totalBookingCost.toLocaleString()}</li>
+        </ul>
+        <p>Thank you for booking with us!</p>
+      `;
+
+      try {
+        await sendEmail(
+          member.email,
+          "Booking Confirmation!",
+          `Booking Details: \n BookingId: ${populatedBooking.bookingId} `,
+          htmlContent
+        );
+      } catch (error) {
+        console.error("Error sending booking confirmation email:", error);
+      }
+    });
+    res.status(201).json({
       success: true,
       message: `Booking created successfully, the key to access the room is ${populatedBooking.uniqueKey}`,
     });
+
   } catch (error) {
     console.error("Error booking room:", error);
     return res
@@ -208,7 +238,6 @@ const deleteBooking = async (req, res) => {
   try {
     let user;
     const { userId, userType } = req.params;
-
     const { bookingIds } = req.body;
 
     if (userType === "staff") {
@@ -219,14 +248,24 @@ const deleteBooking = async (req, res) => {
       user = (await User.findById(userId)).first_name;
     }
 
-    const result = await Booking.deleteMany({ _id: { $in: bookingIds } });
+    const bookings = await Booking.find({ _id: { $in: bookingIds } });
 
-    if (result.deletedCount === 0) {
+    if (bookings.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No booking found with the id provided!",
       });
     }
+
+    const roomIds = bookings.map((booking) => booking.roomId);
+
+    // Delete the bookings
+    const result = await Booking.deleteMany({ _id: { $in: bookingIds } });
+
+    const updateRoomResult = await Room.updateMany(
+      { _id: { $in: roomIds } },
+      { $set: { availability: "available", status: "cleaning" } }
+    );
 
     if (result.deletedCount === 1) {
       await sendNotificationToAdmins(
@@ -246,7 +285,7 @@ const deleteBooking = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `Selected booking(s) deleted: ${result.deletedCount}.`,
+      message: `Selected booking(s) deleted: ${result.deletedCount}. Rooms updated: ${updateRoomResult.modifiedCount}.`,
       description: "Admins Notified!",
     });
   } catch (err) {

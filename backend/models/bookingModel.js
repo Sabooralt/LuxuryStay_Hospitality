@@ -12,6 +12,11 @@ const bookingSchema = new mongoose.Schema(
       ref: "Room",
       required: true,
     },
+    stay: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
     member: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

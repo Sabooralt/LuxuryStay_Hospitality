@@ -61,6 +61,7 @@ const OrderService = async (req, res) => {
       Object.values(req.userSockets).forEach((socketId) => {
         req.io.to(socketId).emit("newTransaction", populatedServices);
       });
+
       serviceOrders.push(serviceOrder._id);
     }
 
@@ -68,7 +69,15 @@ const OrderService = async (req, res) => {
     booking.serviceCost += totalServiceCost;
     booking.totalCost += totalServiceCost;
 
-    await booking.save();
+    const UpdatedBooking = await booking.save();
+    const guestIdString = userId.toString();
+    const socketId = req.guestSockets[guestIdString];
+    if (socketId) {
+      req.io.to(socketId).emit("newTransaction", UpdatedBooking);
+      req.io.to(socketId).emit("updateBookingService", booking);
+    } else {
+      console.log(`Socket ID not found for guest with ID: ${userId}`);
+    }
     await sendNotification(
       req,
       "Your Service Order Has Been Successfully Placed",
@@ -132,9 +141,11 @@ const getGuestOrderedServices = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const ServiceOrders = await ServiceOrder.find({ user: userId }).populate("service");
+    const ServiceOrders = await ServiceOrder.find({ user: userId }).populate(
+      "service"
+    );
 
-    return res.status(200).json({success: true,ServiceOrders});
+    return res.status(200).json({ success: true, ServiceOrders });
   } catch (err) {
     return res
       .status(500)
@@ -142,4 +153,4 @@ const getGuestOrderedServices = async (req, res) => {
   }
 };
 
-module.exports = { OrderService, GetOrderServices,getGuestOrderedServices };
+module.exports = { OrderService, GetOrderServices, getGuestOrderedServices };

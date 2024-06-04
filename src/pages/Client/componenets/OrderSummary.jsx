@@ -31,18 +31,21 @@ import { formatDate } from "date-fns";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useTransactionContext } from "@/context/transactionContext";
+import { useRoomTypeContext } from "@/hooks/useRoomTypeContext";
+import { formatPrice } from "@/utils/seperatePrice";
 
 export default function OrderSummary() {
   const { selectedBooking } = useBookingContext();
   const receiptRef = useRef();
   const { transaction } = useTransactionContext();
+  const { roomTypes } = useRoomTypeContext();
 
   const handlePrint = useReactToPrint({
     content: () => receiptRef.current,
   });
 
   return (
-    <Card ref={receiptRef} className="overflow-hidden">
+    <Card ref={receiptRef} className="overflow-hidden size-fit">
       <CardHeader className="flex flex-row gap-10  items-start bg-gray-50">
         <div className="grid gap-0.5">
           <CardTitle className="group flex items-center gap-2 text-lg">
@@ -86,31 +89,54 @@ export default function OrderSummary() {
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">
-               {selectedBooking.room.type.type} x <span>2</span>
+                {selectedBooking.room.name} x{" "}
+                <span>{selectedBooking.stay}</span>
               </span>
-              <span>$250.00</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">
-                Aqua Filters x <span>1</span>
+              <span>
+                Rs.{selectedBooking.room.pricePerNight * selectedBooking.stay}
               </span>
-              <span>$49.00</span>
             </li>
           </ul>
-          <Separator className="my-2" />
+          <Separator />
+
+          {selectedBooking.serviceOrders.length > 0 && (
+            <>
+              <div className="font-semibold">Services</div>
+              <ul className="grid gap-3">
+                {transaction
+                  .filter((t) => selectedBooking.serviceOrders.includes(t._id))
+                  .map((transaction) => (
+                    <li className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
+                        <span>
+                          {transaction.service.name} x {transaction.quantity}{" "}
+                        </span>
+                      </span>
+
+                      <span>
+                        Rs.
+                        {formatPrice(transaction.cost)}
+                      </span>
+                    </li>
+                  ))}{" "}
+              </ul>
+              <Separator className="my-2" />
+            </>
+          )}
+
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>$299.00</span>
+              <span>Rs.{formatPrice(selectedBooking.totalCost)}</span>
             </li>
 
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Tax</span>
-              <span>$25.00</span>
+              <span>12%</span>
             </li>
             <li className="flex items-center justify-between font-semibold">
               <span className="text-muted-foreground">Total</span>
-              <span>Rs.{selectedBooking.totalCost}</span>
+              <span>Rs.{formatPrice(selectedBooking.totalCost * 1.12)}</span>
             </li>
           </ul>
         </div>

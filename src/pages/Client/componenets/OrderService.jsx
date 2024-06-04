@@ -1,8 +1,10 @@
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
   Carousel,
@@ -97,9 +99,9 @@ export const OrderService = () => {
     return acc;
   }, {});
 
-  useEffect(()=>{
-console.log(quantities)
-  },[quantities])
+  useEffect(() => {
+    console.log(quantities);
+  }, [quantities]);
 
   useEffect(() => {
     if (selectedServices.length > 0) {
@@ -138,77 +140,88 @@ console.log(quantities)
   };
   return (
     <>
-      <div className="grid w-full">
-        <h1 className="font-semibold text-4xl">Room Service</h1>
+      <Card className="grid w-full">
+        <CardHeader>
+          <CardTitle className="text-2xl">Room Service</CardTitle>
+          <CardDescription>Order room services from here.</CardDescription>
+        </CardHeader>
 
-        {Object.entries(servicesByCategory).map(
-          ([category, categoryServices]) => (
-            <Carousel
-              key={category}
-              opts={{
-                align: "start",
-              }}
-              className="w-full grid gap-2 max-w-6xl p-7 bg-slate-50 rounded-lg"
-            >
-              <h3 className="font-semibold  text-2xl">{category}</h3>
-              <CarouselContent>
-                {categoryServices.map((service, index) => (
-                  <CarouselItem
-                    onClick={(e) => {
-                      if (selectedServices.includes(service._id)) {
-                        setSelectedServices(
-                          selectedServices.filter((id) => id !== service._id)
-                        );
-                      } else {
-                        setSelectedServices([...selectedServices, service._id]);
-                      }
-                    }}
-                    key={service._id}
-                    className="md:basis-1/2 lg:basis-1/3 cursor-pointer"
-                  >
-                    <div className="p-1">
-                      <Card className="relative">
-                        <CardHeader className="size-fit pt-5 pb-0 px-4">
-                          <h4 className="font-medium text-xl line-clamp-1">
-                            {service.name}
-                          </h4>
-                        </CardHeader>
-                        <CardContent className="flex p-3 overflow-hidden justify-center items-center">
-                          <img
-                            src={`/ServiceImages/${service.image}`}
-                            className="object-cover h-[250px] w-[250px]"
-                          />
-                        </CardContent>
+        <CardContent className="grid gap-7 px-14">
+          {Object.entries(servicesByCategory).map(
+            ([category, categoryServices]) => (
+              <Carousel
+                key={category}
+                opts={{
+                  align: "start",
+                }}
+                className="w-full grid gap-2 max-w-6xl"
+              >
+                <h3 className="font-semibold  text-2xl">{category}</h3>
+                <CarouselContent>
+                  {categoryServices.map((service, index) => (
+                    <CarouselItem
+                      onClick={(e) => {
+                        if (selectedServices.includes(service._id)) {
+                          setSelectedServices(
+                            selectedServices.filter((id) => id !== service._id)
+                          );
+                        } else {
+                          setSelectedServices([
+                            ...selectedServices,
+                            service._id,
+                          ]);
+                        }
+                      }}
+                      key={service._id}
+                      className="md:basis-1/2 <lg:basis-1/2></lg:basis-1/2> cursor-pointer"
+                    >
+                      <div className="p-1">
+                        <Card className="relative">
+                          <CardHeader className="size-fit pt-5 pb-0 px-4">
+                            <h4 className="font-medium text-xl line-clamp-1">
+                              {service.name}
+                            </h4>
+                          </CardHeader>
+                          <CardContent className="grid place-items-center size-full p-2 relative overflow-hidden">
+                            <div className="group w-fit duration-500 transition-all">
+                              <img
+                                src={`/ServiceImages/${service.image}`}
+                                className="object-cover relative mx-auto h-[200px] w-[200px]"
+                              />
+                              <div className="absolute hidden group-hover:block transition-all duration-1000 inset-0 bg-overlay"></div>
+                            </div>
+                          </CardContent>
 
-                        <CardFooter className="grid gap-4">
-                          <p
-                            onClick={() => handleEllipsisClick(index)}
-                            className={`${
-                              ellipsisClicked && activeIndex === index
-                                ? ""
-                                : "line-clamp-2"
-                            } cursor-pointer`}
-                          >
-                            {service.description}
-                          </p>
-                          <p className="mx-auto">
-                            Price:{" "}
-                            <span className="font-semibold">
-                              {" "}
-                              {service.price}{" "}
-                            </span>
-                          </p>
-                        </CardFooter>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          )
-        )}
+                          <CardFooter className="grid gap-4">
+                            <p
+                              onClick={() => handleEllipsisClick(index)}
+                              className={`${
+                                ellipsisClicked && activeIndex === index
+                                  ? ""
+                                  : "line-clamp-2"
+                              } cursor-pointer`}
+                            >
+                              {service.description}
+                            </p>
+                            <p className="mx-auto">
+                              Price:{" "}
+                              <span className="font-semibold">
+                                {" "}
+                                {service.price}{" "}
+                              </span>
+                            </p>
+                          </CardFooter>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            )
+          )}
+        </CardContent>
 
         <Sheet modal={false} open={open} className="overflow-visible">
           <SheetContent className="p-0">
@@ -323,7 +336,7 @@ console.log(quantities)
             </SheetFooter>
           </SheetContent>
         </Sheet>
-      </div>
+      </Card>
     </>
   );
 };

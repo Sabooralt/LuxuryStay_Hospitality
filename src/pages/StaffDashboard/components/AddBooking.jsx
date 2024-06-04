@@ -19,18 +19,21 @@ import { RoomCombobox } from "@/components/ui/roomCombobox";
 import { useToast } from "@/components/ui/use-toast";
 import { useAddBooking } from "@/hooks/useAddBooking";
 import { cn } from "@/lib/utils";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { useFormik } from "formik";
 import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
-export function AddBooking({userType}) {
+export function AddBooking({ userType }) {
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
-  const { isLoading, responseG, error, SubmitBooking } = useAddBooking({userType});
+  const { isLoading, responseG, error, SubmitBooking } = useAddBooking({
+    userType,
+  });
   const { toast } = useToast();
 
   const formik = useFormik({
@@ -101,6 +104,11 @@ export function AddBooking({userType}) {
                 formik.setFieldValue("room", roomId);
               }}
             />
+            {formik.touched.room && (
+                <p className="text-red-600 text-xs">
+                  {formik.errors.room}
+                </p>
+              )}
             <p className="text-muted-foreground text-xs">
               Note: You can assign the room to a guest even if it's not
               available. However, you cannot assign the room if it is booked for
@@ -114,7 +122,13 @@ export function AddBooking({userType}) {
                 setSelectedMember(memberId);
                 formik.setFieldValue("member", memberId);
               }}
+              
             />
+             {formik.touched.member && (
+                <p className="text-red-600 text-xs">
+                  {formik.errors.member}
+                </p>
+              )}
           </div>
           <div className="grid gap-2">
             <Label>Check In Date:</Label>
@@ -130,6 +144,7 @@ export function AddBooking({userType}) {
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {checkIn ? format(checkIn, "PPP") : <span>Pick a date</span>}
                 </Button>
+                
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
@@ -140,6 +155,11 @@ export function AddBooking({userType}) {
                 />
               </PopoverContent>
             </Popover>
+            {formik.touched.checkIn && (
+                <p className="text-red-600 text-xs">
+                  {formik.errors.checkIn}
+                </p>
+              )}
           </div>
           <div className="grid gap-2">
             <Label>Check Out Date:</Label>
@@ -169,6 +189,11 @@ export function AddBooking({userType}) {
                 />
               </PopoverContent>
             </Popover>
+            {formik.touched.checkOut && (
+                <p className="text-red-600 text-xs">
+                  {formik.errors.checkOut}
+                </p>
+              )}
           </div>
           <div>
             <p className="text-sm text-muted-foreground">
@@ -176,8 +201,15 @@ export function AddBooking({userType}) {
               booking is complete.
             </p>
           </div>
-          <Button type="submit" className="w-full">
-            Submit
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? (
+              <>
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                Please wait...
+              </>
+            ) : (
+              <>Create Booking</>
+            )}
           </Button>
         </form>
       </CardContent>

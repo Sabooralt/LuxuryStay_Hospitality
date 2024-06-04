@@ -12,10 +12,22 @@ export const taskReducer = (state, action) => {
       return {
         task: action.payload.tasks,
       };
+    case "SET_GUEST_TASKS":
+      return {
+        guestTasks: action.payload,
+      };
     case "CREATE_TASK":
       return {
         ...state,
         task: state.task ? [action.payload, ...state.task] : [action.payload],
+      };
+
+    case "NEW_GUEST_TASK":
+      return {
+        ...state,
+        guestTasks: state.guestTasks
+          ? [action.payload, ...state.guestTasks]
+          : [action.payload],
       };
 
     case "SET_SEENBY":
@@ -40,6 +52,37 @@ export const taskReducer = (state, action) => {
         task: null,
       };
 
+    case "MARK_ON_THE_WAY":
+      const updatedMarked = state.guestTasks.map((task) => {
+        if (task._id === action.payload._id) {
+          return {
+            ...task,
+            seen: action.payload.seen,
+          };
+        }
+        return task;
+      });
+
+      return {
+        ...state,
+        guestTasks: updatedMarked,
+      };
+    case "MARK_GUEST_COMPLETED":
+      const updateComplete = state.guestTasks.map((task) => {
+        if (task._id === action.payload._id) {
+          return {
+            ...task,
+            completed: action.payload.completed,
+            completedBy: action.payload.completedBy,
+          };
+        }
+        return task;
+      });
+
+      return {
+        ...state,
+        guestTasks: updateComplete,
+      };
     case "MARK_COMPLETED":
       const updateStatus = state.task.map((task) => {
         if (task._id === action.payload.taskId) {
@@ -63,11 +106,12 @@ export const taskReducer = (state, action) => {
 
 export const TaskContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(taskReducer, {
-    task: null,
+    task: [],
+    guestTasks: [],
   });
   const { staff, loading } = useStaffAuthContext();
   const { user } = useAuthContextProvider();
-  
+
   useEffect(() => {
     const handleCreateTask = (newTask) => {
       dispatch({ type: "CREATE_TASK", payload: newTask });
@@ -90,12 +134,28 @@ export const TaskContextProvider = ({ children }) => {
       dispatch({ type: "MARK_COMPLETED", payload: taskState });
     };
 
-    socket.on("taskCompleted", handleCompleted);
-    socket.on("taskMarkedAsSeen", updateSeenByContext);
+    const newGuestTask = (task) => {
+      dispatch({ type: "NEW_GUEST_TASK", payload: task });
+    };
+    const markOnTheWay = (task) => {
+      dispatch({ type: "MARK_ON_THE_WAY", payload: task });
+    };
+    const markGuestTaskCompleted = (task) => {
+      dispatch({ type: "MARK_GUEST_COMPLETED", payload: task });
+    };
 
+    socket.on("taskCompleted", handleCompleted);
+    socket.on("newGuestTask", newGuestTask);
+    socket.on("taskMarkedAsSeen", updateSeenByContext);
+    socket.on("markGuestTaskOTW", markOnTheWay);
+    socket.on("markGuestTaskCompleted", markGuestTaskCompleted);
+    
     return () => {
+      socket.off("markGuestTaskCompleted", markGuestTaskCompleted);
       socket.off("taskCompleted", handleCompleted);
       socket.off("taskMarkedAsSeen", updateSeenByContext);
+      socket.off("newGuestTask", newGuestTask);
+      socket.off("markGuestTaskOTW", markOnTheWay);
     };
   }, [socket, staff, dispatch]);
 

@@ -27,6 +27,77 @@ export const BookingReducer = (state, action) => {
             ? [action.payload, ...state.recentBookings]
             : [action.payload]
           : state.recentBookings,
+        selectedBooking: action.payload,
+      };
+    case "UPDATE_BOOKING_STATUS":
+      const updatedStatus = state.booking.map((booking) => {
+        if (booking._id === action.payload._id) {
+          return {
+            ...booking,
+            status: action.payload.status,
+          };
+        }
+        return booking;
+      });
+      const updatedRecentBookingStatus = state.recentBookings.map((booking) => {
+        if (booking._id === action.payload._id) {
+          return {
+            ...booking,
+            status: action.payload.status,
+          };
+        }
+        return booking;
+      });
+      return {
+        ...state,
+        booking: updatedStatus,
+        recentBookings: updatedRecentBookingStatus,
+        selectedBooking:
+          state.selectedBooking?._id === action.payload._id
+            ? {
+                ...state.selectedBooking,
+                status: action.payload.status,
+              }
+            : state.selectedBooking,
+      };
+    case "UPDATE_BOOKING_SERVICE_ORDERS":
+      const updatedBookings = state.booking.map((booking) => {
+        if (booking._id === action.payload._id) {
+          return {
+            ...booking,
+            serviceOrders: action.payload.serviceOrders,
+            serviceCost: action.payload.serviceCost,
+            totalCost: action.payload.totalCost,
+          };
+        }
+        return booking;
+      });
+
+      const updatedRecentBookings = state.recentBookings.map((booking) => {
+        if (booking._id === action.payload._id) {
+          return {
+            ...booking,
+            serviceOrders: action.payload.serviceOrders,
+            serviceCost: action.payload.serviceCost,
+            totalCost: action.payload.totalCost,
+          };
+        }
+        return booking;
+      });
+
+      return {
+        ...state,
+        booking: updatedBookings,
+        recentBookings: updatedRecentBookings,
+        selectedBooking:
+          state.selectedBooking?._id === action.payload._id
+            ? {
+                ...state.selectedBooking,
+                serviceOrders: action.payload.serviceOrders,
+                serviceCost: action.payload.serviceCost,
+                totalCost: action.payload.totalCost,
+              }
+            : state.selectedBooking,
       };
     case "DELETE_BOOKING":
       return {
@@ -74,12 +145,24 @@ export const BookingContextProvider = ({ children }) => {
       dispatch({ type: "DELETE_BOOKING", payload: booking });
       console.log("booking delete", booking);
     };
+    const updateBookingServices = (booking) => {
+      dispatch({ type: "UPDATE_BOOKING_SERVICE_ORDERS", payload: booking });
+    };
+
+    const bookingStatus = (booking) => {
+      dispatch({ type: "UPDATE_BOOKING_STATUS", payload: booking });
+    };
+
+    socket.on("bookingStatus", bookingStatus);
     socket.on("newBooking", newBooking);
     socket.on("bookingDelete", deleteBooking);
+    socket.on("updateBookingService", updateBookingServices);
 
     return () => {
       socket.off("newBooking", newBooking);
       socket.off("bookingDelete", deleteBooking);
+      socket.off("updateBookingService", updateBookingServices);
+      socket.off("bookingStatus", bookingStatus);
     };
   }, [socket, dispatch]);
 

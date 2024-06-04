@@ -14,11 +14,12 @@ const taskSchema = new Schema(
     seenBy: [{ type: Schema.Types.ObjectId, ref: "Staff" }],
     deadlineDate: {
       type: Date,
-      required: true,
     },
     deadlineTime: {
       type: String,
-      required: true,
+    },
+    preferredTime: {
+      type: String,
     },
     assignedTo: [
       {

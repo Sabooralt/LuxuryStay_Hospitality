@@ -12,6 +12,7 @@ export const NotiItem = ({ noti }) => {
   const { handleNotiSeen } = useNotiMarkAsSeen();
   return (
     <DropdownMenuItem
+      onClick={() => handleNotiSeen(noti._id)}
       key={noti._id}
       className={`px-0   ${!noti.seen ? "bg-gray-50 font-semibold" : "px-4"} ${
         noti.link && "cursor-pointer"

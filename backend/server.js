@@ -6,12 +6,10 @@ const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
 const cron = require("node-cron");
-const { sendEmail } = require("./controllers/emailController");
 
 // Models
 const Task = require("./models/taskModel");
-const Booking = require("./models/bookingModel");
-const Room = require("./models/roomModel");
+
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -29,13 +27,15 @@ const roomTypeRoutes = require("./routes/roomTypeRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const notiRoutes = require("./routes/notiRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
-const {
-  sendNotificationToAdmins,
-  sendNotificationToAllStaff,
-} = require("./controllers/notificationController");
+const guestReqRoutes = require("./routes/guestRequestRoutes");
+
 const serviceRoutes = require("./routes/serviceRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
 const orderServiceRoutes = require("./routes/serviceOrderRoutes");
+const {
+  checkInBookings,
+  checkOutBookings,
+} = require("./utils/scheduleBookings");
 // Sockets initialization
 
 const staffSockets = {};
@@ -64,6 +64,7 @@ app.use("/api/booking", bookingRoutes);
 app.use("/api/service", serviceRoutes);
 app.use("/api/serviceCategory", serviceCategoryRoutes);
 app.use("/api/orderService", orderServiceRoutes);
+app.use("/api/guestReq", guestReqRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -76,7 +77,6 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
-
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -119,47 +119,32 @@ io.on("connection", (socket) => {
   });
 });
 
+const createMockReq = () => {
+  return {
+    // Add properties and methods required by your notification functions
+    user: { id: "system" },
+    io, // Assuming you need access to socket.io
+    guestSockets,
+    staffSockets,
+    userSockets,
+    // Add other necessary properties or methods
+  };
+};
+
 //Schedule Tasks
 
-cron.schedule("0 0 * * *", async () => {
-  try {
-    const now = new Date();
-
-    const pastBookings = await Booking.find({
-      checkOutDate: { $lt: now },
-    });
-
-    for (const booking of pastBookings) {
-      booking.status = "checkedOut";
-      await booking.save();
-
-      const room = await Room.findById(booking.room);
-      room.status = "maintenance";
-      room.availibility = "available";
-      const newRoom = await room.save();
-
-      await sendNotificationToAdmins(
-        req,
-        `A Member checked out of ${room.roomNumber}.`,
-        `room status is updated to ${newRoom.status}!`,
-        ""
-      );
-      req, title, message, link, recipient, id;
-      await sendNotificationToAllStaff(
-        req,
-        `A Member checked out of ${room.roomNumber}.`,
-        `Room ${newRoom.roomNumber} is ${newRoom.availibility} now and room status is updated to ${newRoom.status}!`,
-        " "
-      );
-    }
-
-    console.log(`Checked and updated ${pastBookings.length} past bookings.`);
-  } catch (error) {
-    console.error("Error updating bookings after checkout:", error);
-  }
+cron.schedule("* * * * * *", () => {
+  const req = createMockReq();
+  checkInBookings(req);
 });
 
-cron.schedule("0 * * * *", async () => {
+cron.schedule(" * * * * *", () => {
+  const req = createMockReq();
+  checkOutBookings(req);
+});
+
+
+cron.schedule("* * * * * *", async (req, res) => {
   try {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
@@ -169,7 +154,7 @@ cron.schedule("0 * * * *", async () => {
     });
 
     for (const task of expiredTasks) {
-      await task.remove();
+      await task.deleteOne();
       console.log(`Task deleted: ${task._id}`);
     }
   } catch (error) {

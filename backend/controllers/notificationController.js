@@ -55,7 +55,6 @@ const sendNotificationAllStaff = async (req, title, message, link) => {
   }
 };
 
-
 const sendNotification = async (req, title, message, link, recipient, id) => {
   try {
     if (recipient === "staff") {
@@ -110,21 +109,35 @@ const sendNotification = async (req, title, message, link, recipient, id) => {
 
       console.log(`Notification sent to Guests`);
     }
-    
+
     console.log(`Notification sent to ${recipient}`);
   } catch (error) {
     console.error("Error sending notification:", error);
   }
 };
-const sendNotificationToStaff = async (req, title, message, link, taskId) => {
+const sendNotificationToHousekeepers = async (req, title, message, link) => {
   try {
-    const task = await Task.findById(taskId);
+    const staffMembers = await Staff.find({ role: "Housekeeper" });
 
-    if (!task) {
-      throw new Error("Task not found");
+    for (const staffMember of staffMembers) {
+      await sendNotification(
+        req,
+        title,
+        message,
+        link,
+        "staff",
+        staffMember._id
+      );
     }
 
-    const staffMembers = await Staff.find({ _id: { $in: task.assignedTo } });
+    console.log("Notifications sent to staff members");
+  } catch (error) {
+    console.error("Error sending notifications:", error);
+  }
+};
+const sendNotificationToStaff = async (req, title, message, link) => {
+  try {
+    const staffMembers = await Staff.find();
 
     for (const staffMember of staffMembers) {
       await sendNotification(
@@ -146,7 +159,7 @@ const sendNotificationToStaff = async (req, title, message, link, taskId) => {
 const sendNotificationToAdmins = async (req, title, message, link) => {
   try {
     const adminUsers = await User.find({ role: "admin" });
-    
+
     for (const adminUser of adminUsers) {
       await sendNotification(req, title, message, link, "admin", adminUser._id);
     }
@@ -257,4 +270,5 @@ module.exports = {
   sendNotificationToStaff,
   markAllNotificationsAsSeen,
   sendNotificationToAllGuests,
+  sendNotificationToHousekeepers
 };

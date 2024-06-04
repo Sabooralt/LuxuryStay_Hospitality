@@ -29,6 +29,9 @@ import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { StayDetails } from "./StayDetails";
+import { HouseKeepingService } from "./HousekeepingService";
+import { YourRequest } from "./YourRequests";
 
 export const GuestBookings = () => {
   const { booking, selectedBooking, selectBooking } = useBookingContext();
@@ -55,7 +58,7 @@ export const GuestBookings = () => {
     }
   }, [user, selectedBooking]);
   return selectedBooking ? (
-    <div className="h-full w-full grid gap-5">
+    <div className="h-full w-full grid gap-5 scroll-smooth">
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl font-semibold">Bookings</h1>
         <div>
@@ -90,13 +93,25 @@ export const GuestBookings = () => {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        <div className="grid col-span-2">
+        <div className="grid col-span-3">
+          <div className="grid grid-cols-2 gap-5 justify-items-center">
+            <div className="grid col-span-1 gap-2">
+              <StayDetails booking={selectedBooking} />
+              <YourRequest roomNumber={selectedBooking.room.roomNumber} />
+            </div>
+            <div className="grid col-span-1">
+              <HouseKeepingService booking={selectedBooking} />
+            </div>
+          </div>
+        </div>
+        <div className="grid col-span-2 gap-5 max-h-fit">
           <OrderedServices />
+              <OrderService />
         </div>
 
-        <div className="grid col-span-1 gap-5 ml-auto">
+        <div className="grid size-fit col-span-1 gap-5">
           <OrderSummary />
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden size-fit">
             <CardHeader>
               <CardTitle>Room Images</CardTitle>
               <CardDescription>
@@ -130,8 +145,7 @@ export const GuestBookings = () => {
           </Card>
         </div>
       </div>
-      <div className="grid w-full">
-        <OrderService />
+      <div id="services" className="grid w-full">
       </div>
     </div>
   ) : (
