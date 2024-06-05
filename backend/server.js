@@ -10,7 +10,6 @@ const cron = require("node-cron");
 // Models
 const Task = require("./models/taskModel");
 
-
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -28,6 +27,7 @@ const taskRoutes = require("./routes/taskRoutes");
 const notiRoutes = require("./routes/notiRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const guestReqRoutes = require("./routes/guestRequestRoutes");
+const wakeUpCallRoutes = require("./routes/wakeUpRoutes");
 
 const serviceRoutes = require("./routes/serviceRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
@@ -36,6 +36,7 @@ const {
   checkInBookings,
   checkOutBookings,
 } = require("./utils/scheduleBookings");
+const { scheduleWakeUpCalls } = require("./utils/scheduleWakeUpCalls");
 // Sockets initialization
 
 const staffSockets = {};
@@ -65,6 +66,7 @@ app.use("/api/service", serviceRoutes);
 app.use("/api/serviceCategory", serviceCategoryRoutes);
 app.use("/api/orderService", orderServiceRoutes);
 app.use("/api/guestReq", guestReqRoutes);
+app.use("/api/wakeUp", wakeUpCallRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -121,13 +123,10 @@ io.on("connection", (socket) => {
 
 const createMockReq = () => {
   return {
-    // Add properties and methods required by your notification functions
-    user: { id: "system" },
-    io, // Assuming you need access to socket.io
+    io,
     guestSockets,
     staffSockets,
     userSockets,
-    // Add other necessary properties or methods
   };
 };
 
@@ -143,6 +142,10 @@ cron.schedule(" * * * * *", () => {
   checkOutBookings(req);
 });
 
+cron.schedule(" * * * * *", () => {
+  const req = createMockReq();
+  scheduleWakeUpCalls(req);
+});
 
 cron.schedule("* * * * * *", async (req, res) => {
   try {

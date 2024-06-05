@@ -1,4 +1,5 @@
 import {
+  Bell,
   BookKey,
   ChevronLeft,
   ClipboardList,
@@ -61,6 +62,11 @@ const sideItems = [
     name: "Services",
     link: "/admin/services",
     icon: <Microwave className="h-5 w-5" />,
+  },
+  {
+    name: "Send Notification",
+    link: "/admin/send_notification",
+    icon: <Bell className="h-5 w-5" />,
   },
 ];
 

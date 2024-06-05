@@ -41,6 +41,8 @@ import axios from "axios";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { useBookingContext } from "@/hooks/useBookingContext";
 import { useToast } from "@/components/ui/use-toast";
+import { ArrowUpRight, X } from "lucide-react";
+import { formatPrice } from "@/utils/seperatePrice";
 
 export const OrderService = () => {
   const { service: services } = useServiceContext();
@@ -103,14 +105,6 @@ export const OrderService = () => {
     console.log(quantities);
   }, [quantities]);
 
-  useEffect(() => {
-    if (selectedServices.length > 0) {
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
-  }, [selectedServices, open]);
-
   const handleOrder = async () => {
     try {
       if (!user) {
@@ -165,7 +159,9 @@ export const OrderService = () => {
                           setSelectedServices(
                             selectedServices.filter((id) => id !== service._id)
                           );
+                          setOpen(true);
                         } else {
+                          setOpen(true);
                           setSelectedServices([
                             ...selectedServices,
                             service._id,
@@ -177,18 +173,24 @@ export const OrderService = () => {
                     >
                       <div className="p-1">
                         <Card className="relative">
-                          <CardHeader className="size-fit pt-5 pb-0 px-4">
-                            <h4 className="font-medium text-xl line-clamp-1">
+                          <CardHeader className="size-fit pb-1">
+                            <h4 className="font-medium text-lg line-clamp-1">
                               {service.name}
                             </h4>
                           </CardHeader>
-                          <CardContent className="grid place-items-center size-full p-2 relative overflow-hidden">
-                            <div className="group w-fit duration-500 transition-all">
+                          <Separator/>
+                          <CardContent className="grid group place-items-center size-full p-2 overflow-hidden">
+                            <div className="size-fit duration-500 transition-all">
                               <img
                                 src={`/ServiceImages/${service.image}`}
                                 className="object-cover relative mx-auto h-[200px] w-[200px]"
                               />
-                              <div className="absolute hidden group-hover:block transition-all duration-1000 inset-0 bg-overlay"></div>
+                              <div className="rounded-lg absolute opacity-0 grid place-items-center group-hover:opacity-100 transition-opacity duration-200 inset-0 bg-overlay">
+                                <Button className="bg-indigo-600 px-10 hover:bg-indigo-700">
+                                  <ArrowUpRight className="size-5" />
+                                  Order
+                                </Button>
+                              </div>
                             </div>
                           </CardContent>
 
@@ -203,11 +205,11 @@ export const OrderService = () => {
                             >
                               {service.description}
                             </p>
+                            <Separator/>
                             <p className="mx-auto">
                               Price:{" "}
                               <span className="font-semibold">
-                                {" "}
-                                {service.price}{" "}
+                                {formatPrice(service.price)}
                               </span>
                             </p>
                           </CardFooter>
@@ -226,64 +228,77 @@ export const OrderService = () => {
         <Sheet modal={false} open={open} className="overflow-visible">
           <SheetContent className="p-0">
             <SheetHeader className="p-5">
-              <SheetTitle>Selected Services</SheetTitle>
+              <SheetTitle className="flex flex-row justify-between">
+                Selected Services
+                <X
+                  className="size-5 cursor-pointer"
+                  onClick={() => setOpen(!open)}
+                />
+              </SheetTitle>
               <SheetDescription>
                 Make changes to your selected services here. Click order when
                 you're done.
               </SheetDescription>
             </SheetHeader>
 
-            <ScrollArea className="max-h-[500px]overflow-auto w-full">
-              <div className="grid gap-4 p-5">
-                {selectedServices &&
-                  filteredServices.map((service, index) => {
-                    return (
-                      <>
-                        <div className="flex flex-row justify-between items-center">
-                          <h1 className="font-semibold text-md">
-                            {service.name}
-                          </h1>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Cross2Icon
-                                  className="cursor-pointer"
-                                  onClick={() => removeItem(service._id)}
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Remove Item</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                        <div
-                          className="flex flex-row justify-between gap-3 items-center"
-                          key={service._id}
-                        >
-                          <img
-                            className="w-[50px] h-[50px] object-cover rounded-xl"
-                            src={`/ServiceImages/${service.image}`}
-                            alt={service.name}
-                          />
+            <div className="grid gap-4 p-5">
+              <ScrollArea className="max-h-[200px] w-full">
+                <div className="grid gap-4">
+                  {selectedServices &&
+                    filteredServices.map((service, index) => {
+                      return (
+                        <>
+                          <div className="flex flex-row justify-between items-center">
+                            <h1 className="font-semibold text-md">
+                              {service.name}
+                            </h1>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Cross2Icon
+                                    className="cursor-pointer"
+                                    onClick={() => removeItem(service._id)}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Remove Item</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          <div
+                            className="flex flex-row justify-between gap-3 items-center"
+                            key={service._id}
+                          >
+                            <img
+                              className="w-[50px] h-[50px] object-cover rounded-xl"
+                              src={`/ServiceImages/${service.image}`}
+                              alt={service.name}
+                            />
 
-                          <Label>Quantity:</Label>
-                          <Input
-                            type="number"
-                            min="1"
-                            className="w-fit"
-                            value={quantities[service._id] || 1}
-                            onChange={(e) =>
-                              handleQuantityChange(service._id, e.target.value)
-                            }
-                          />
-                        </div>
-                      </>
-                    );
-                  })}
+                            <Label>Quantity:</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              className="w-fit"
+                              value={quantities[service._id] || 1}
+                              onChange={(e) =>
+                                handleQuantityChange(
+                                  service._id,
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                        </>
+                      );
+                    })}
+                </div>
+              </ScrollArea>
 
-                <div className="grid gap-3">
-                  <div className="font-semibold">Service Details</div>
+              <div className="grid gap-3">
+                <div className="font-semibold">Service Details</div>
+                <ScrollArea className="max-h-[70px] gap-3">
                   <ul className="grid gap-3">
                     {selectedServices &&
                       filteredServices.map((service, index) => {
@@ -302,27 +317,27 @@ export const OrderService = () => {
                         );
                       })}
                   </ul>
-                  <Separator className="my-2" />
-                  <ul className="grid gap-3">
-                    <li className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-semibold">
-                        Rs.{totalWithoutTax}
-                      </span>
-                    </li>
+                </ScrollArea>
+                <Separator className="my-2" />
+                <ul className="grid gap-3">
+                  <li className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="font-semibold">
+                      Rs.{formatPrice(totalWithoutTax)}
+                    </span>
+                  </li>
 
-                    <li className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Tax</span>
-                      <span className="font-semibold">12% on each item</span>
-                    </li>
-                    <li className="flex items-center justify-between font-semibold">
-                      <span className="text-muted-foreground">Total</span>
-                      <span>Rs. {totalWithTax.toFixed(2)}</span>
-                    </li>
-                  </ul>
-                </div>
+                  <li className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Tax</span>
+                    <span className="font-semibold">12% on each item</span>
+                  </li>
+                  <li className="flex items-center justify-between font-semibold">
+                    <span className="text-muted-foreground">Total</span>
+                    <span>Rs. {formatPrice(totalWithTax)}</span>
+                  </li>
+                </ul>
               </div>
-            </ScrollArea>
+            </div>
 
             <SheetFooter className="p-5">
               <Button

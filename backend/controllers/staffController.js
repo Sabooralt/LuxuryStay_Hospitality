@@ -90,6 +90,29 @@ const updateStaffRole = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+const updateStaffStatus = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const staff = await Staff.findById(id);
+
+    if (!staff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
+
+    staff.status = req.body.status;
+    await staff.save();
+
+    res.status(200).json({
+      message: "Staff status updated successfully",
+      _id: staff._id,
+      status: staff.status,
+    });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 const loginStaff = async (req, res) => {
   const { username, password } = req.body;
@@ -133,4 +156,5 @@ module.exports = {
   updateStaffRole,
   deleteStaff,
   updateStaffDetails,
+  updateStaffStatus,
 };

@@ -40,6 +40,10 @@ export const StayDetails = ({ booking }) => {
             <h3 className="font-medium text-md">Room Access Key:</h3>
             <span className="font-semibold">{booking.uniqueKey}</span>
           </li>
+          <li className="flex justify-between">
+            <h3 className="font-medium text-md">Current Booking Status:</h3>
+            <span className="font-semibold">{booking.status}</span>
+          </li>
         </ul>
       </CardContent>
     </Card>

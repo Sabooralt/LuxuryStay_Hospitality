@@ -7,6 +7,10 @@ const taskSchema = new Schema(
       type: String,
       required: true,
     },
+    taskId: {
+      type: String,
+      unique: true
+    },
     description: {
       type: String,
       required: true,
@@ -21,6 +25,10 @@ const taskSchema = new Schema(
     preferredTime: {
       type: String,
     },
+    wakeUpCallId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'WakeUpCall'
+    },
     assignedTo: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +42,6 @@ const taskSchema = new Schema(
     priority: {
       type: String,
       enum: ["Low", "Medium", "High", "Very High"],
-      required: true,
     },
     status: {
       type: String,

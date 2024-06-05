@@ -4,6 +4,7 @@ const {
   loginStaff,
   signupStaff,
   getStaff,
+  updateStaffStatus,
   updateStaffRole,
   deleteStaff,
   updateStaffDetails,
@@ -35,6 +36,7 @@ router.post("/login", loginStaff);
 
 router.patch("/update_role/:id", updateStaffRole);
 
+router.patch("/update_status/:id", updateStaffStatus);
 router.patch("/update_details/:id", updateStaffDetails);
 router.delete("/delete/:id", deleteStaff);
 

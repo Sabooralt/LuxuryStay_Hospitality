@@ -33,16 +33,31 @@ import { useReactToPrint } from "react-to-print";
 import { useTransactionContext } from "@/context/transactionContext";
 import { useRoomTypeContext } from "@/hooks/useRoomTypeContext";
 import { formatPrice } from "@/utils/seperatePrice";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function OrderSummary() {
   const { selectedBooking } = useBookingContext();
   const receiptRef = useRef();
   const { transaction } = useTransactionContext();
   const { roomTypes } = useRoomTypeContext();
+  const { toast } = useToast();
 
   const handlePrint = useReactToPrint({
     content: () => receiptRef.current,
   });
+  const handleCopy = async () => {
+    if (!selectedBooking || !selectedBooking.bookingId) {
+      console.error("No booking ID to copy");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(selectedBooking.bookingId);
+      toast({
+        title: "Booking ID copied to clipboard",
+      });
+    } catch (error) {}
+  };
 
   return (
     <Card ref={receiptRef} className="overflow-hidden size-fit">
@@ -55,7 +70,7 @@ export default function OrderSummary() {
               variant="outline"
               className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
             >
-              <Copy className="h-3 w-3" />
+              <Copy className="h-3 w-3" onClick={handleCopy} />
               <span className="sr-only">Copy Booking ID</span>
             </Button>
           </CardTitle>
@@ -89,12 +104,15 @@ export default function OrderSummary() {
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">
-                {selectedBooking.room.name} x{" "}
-                <span>{selectedBooking.stay}</span>
+                {selectedBooking.room.name}
               </span>
               <span>
                 Rs.{selectedBooking.room.pricePerNight * selectedBooking.stay}
               </span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-muted-foreground">Duration of stay</span>
+              <span>{selectedBooking.stay}</span>
             </li>
           </ul>
           <Separator />

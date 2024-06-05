@@ -259,7 +259,6 @@ const deleteBooking = async (req, res) => {
 
     const roomIds = bookings.map((booking) => booking.roomId);
 
-    // Delete the bookings
     const result = await Booking.deleteMany({ _id: { $in: bookingIds } });
 
     const updateRoomResult = await Room.updateMany(

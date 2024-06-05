@@ -3,15 +3,56 @@ const Notification = require("../models/notificationModel");
 const Staff = require("../models/staffModel");
 const Task = require("../models/taskModel");
 
+const sendNotificationFromAdmin = async (req, res) => {
+  try {
+    const { title, description, sendTo, sendAll, reciever } = req.body;
+    const { adminId } = req.params;
+
+    const message = description;
+    if (!adminId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No adminId found!" });
+    }
+    const link = "";
+
+    if (reciever === "guest") {
+      if (sendAll) {
+        await sendNotificationToAllGuests(req, title, message, link);
+      }
+      if (sendTo && sendTo.length > 0) {
+        for (const guest of sendTo) {
+          await sendNotification(req, title, message, link, "member", guest);
+        }
+      }
+    } else if (reciever === "staff") {
+      if (sendAll) {
+        await sendNotificationAllStaff(req, title, message, link);
+      }
+      for (const staff of sendTo) {
+        await sendNotification(req, title, message, link, "staff", staff);
+      }
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Notifications sent successfully" });
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
 const getNotis = async (req, res) => {
   try {
     const { user, userId } = req.params;
 
-    // Get the start and end times for today and yesterday
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Start of today
+    today.setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1); // Start of yesterday
+    yesterday.setDate(yesterday.getDate() - 1);
 
     let notifications = null;
 
@@ -135,7 +176,7 @@ const sendNotificationToHousekeepers = async (req, title, message, link) => {
     console.error("Error sending notifications:", error);
   }
 };
-const sendNotificationToStaff = async (req, title, message, link) => {
+const sendNotificationToStaff = async (req, title, message, link, sentB) => {
   try {
     const staffMembers = await Staff.find();
 
@@ -270,5 +311,6 @@ module.exports = {
   sendNotificationToStaff,
   markAllNotificationsAsSeen,
   sendNotificationToAllGuests,
-  sendNotificationToHousekeepers
+  sendNotificationToHousekeepers,
+  sendNotificationFromAdmin,
 };

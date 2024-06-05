@@ -24,8 +24,8 @@ export const OrderedServices = () => {
         </CardDescription>
       </CardHeader>
 
-      {selectedBooking && selectedBooking.length > 0 ? (
-        <div className="grid grid-cols-3 gap-5">
+      {selectedBooking.serviceOrders.length > 0 ? (
+        <CardContent className="grid grid-cols-3 gap-5">
           {transaction
             .filter((t) => selectedBooking.serviceOrders.includes(t._id))
             .map((transaction) => (
@@ -44,17 +44,26 @@ export const OrderedServices = () => {
                 </div>
               </div>
             ))}
-        </div>
+        </CardContent>
       ) : (
         <CardContent className="size-full text-center grid gap-2 place-items-center">
           <p className="text-md font-medium">
-            You haven't ordered any services yet.
+            {selectedBooking.status === "checkedOut" &&
+            !selectedBooking.serviceOrders.length > 0 ? (
+              <>Your didn't order any services for this booking.</>
+            ) : (
+              <>You haven't ordered any services yet.</>
+            )}
           </p>
-          <a href="#services" className="scroll-smooth">
-            <Button className="bg-indigo-600 w-fit">Order Service</Button>
-          </a>
 
-          <ArrowDown className="animate-bounce size-4"/>
+          {selectedBooking.status !== "checkedOut" && (
+            <>
+              <a href="#services" className="scroll-smooth">
+                <Button className="bg-indigo-600 w-fit">Order Service</Button>
+              </a>
+              <ArrowDown className="animate-bounce size-4" />
+            </>
+          )}
         </CardContent>
       )}
     </Card>

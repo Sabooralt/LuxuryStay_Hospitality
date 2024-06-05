@@ -32,6 +32,7 @@ import { Link } from "react-router-dom";
 import { StayDetails } from "./StayDetails";
 import { HouseKeepingService } from "./HousekeepingService";
 import { YourRequest } from "./YourRequests";
+import WakeUpCallForm from "./WakeUpCallForm";
 
 export const GuestBookings = () => {
   const { booking, selectedBooking, selectBooking } = useBookingContext();
@@ -57,6 +58,8 @@ export const GuestBookings = () => {
       fetchOrderedServices();
     }
   }, [user, selectedBooking]);
+
+  const checkedOutStatus = selectedBooking.status === "checkedOut";
   return selectedBooking ? (
     <div className="h-full w-full grid gap-5 scroll-smooth">
       <div className="flex flex-row justify-between">
@@ -79,7 +82,12 @@ export const GuestBookings = () => {
                 {booking ? (
                   booking.map((booking) => (
                     <SelectItem value={booking.bookingId}>
-                      {booking.bookingId}
+                      {booking.bookingId}{" "}
+                      {booking.status === "checkedOut" && (
+                        <span className="text-sm font-medium">
+                          ({booking.status}){" "}
+                        </span>
+                      )}
                     </SelectItem>
                   ))
                 ) : (
@@ -92,60 +100,39 @@ export const GuestBookings = () => {
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
-        <div className="grid col-span-3">
-          <div className="grid grid-cols-2 gap-5 justify-items-center">
-            <div className="grid col-span-1 gap-2">
-              <StayDetails booking={selectedBooking} />
-              <YourRequest roomNumber={selectedBooking.room.roomNumber} />
-            </div>
-            <div className="grid col-span-1">
-              <HouseKeepingService booking={selectedBooking} />
-            </div>
-          </div>
-        </div>
-        <div className="grid col-span-2 gap-5 max-h-fit">
+      <div className={`grid  grid-cols-6 gap-3`}>
+        <div className={`grid col-span-4 gap-3 size-fit`}>
+          <StayDetails booking={selectedBooking} />
+          <YourRequest roomNumber={selectedBooking.room.roomNumber} />
           <OrderedServices />
-              <OrderService />
+        </div>
+        <div className={`grid col-span-2 size-fit ml-auto gap-5`}>
+          {!checkedOutStatus ? (
+            <>
+              <HouseKeepingService booking={selectedBooking} />
+
+              <WakeUpCallForm />
+            </>
+          ) : (
+            <div className="size-full grid gap-3">
+              <div className="ml-auto">
+                <OrderSummary />
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="grid size-fit col-span-1 gap-5">
-          <OrderSummary />
-          <Card className="overflow-hidden size-fit">
-            <CardHeader>
-              <CardTitle>Room Images</CardTitle>
-              <CardDescription>
-                Lipsum dolor sit amet, consectetur adipiscing elit
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-2">
-                <img
-                  alt="Product image"
-                  className="aspect-square w-full rounded-md object-cover"
-                  height="300"
-                  src={`/RoomImages/${selectedBooking.room.images[0].filepath}`}
-                  width="300"
-                />
-                <div className="grid grid-cols-3 gap-2">
-                  {selectedBooking.room.images.map((img, index) => (
-                    <button>
-                      <img
-                        alt="Product image"
-                        className="aspect-square w-full rounded-md object-cover"
-                        height="84"
-                        src={`/RoomImages/${img.filepath}`}
-                        width="84"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      <div id="services" className="grid w-full">
+        {!checkedOutStatus && (
+          <div className={`grid col-span-4 gap-5 max-h-fit`}>
+            <OrderService />
+          </div>
+        )}
+
+        {!checkedOutStatus && (
+          <div className="grid size-fit ml-auto col-span-2 gap-5">
+            <OrderSummary />
+          </div>
+        )}
       </div>
     </div>
   ) : (
@@ -165,5 +152,43 @@ export const GuestBookings = () => {
         </Button>
       </Link>
     </div>
+  );
+};
+
+export const RoomImages = () => {
+  const { selectedBooking } = useBookingContext();
+  return (
+    <Card className="overflow-hidden size-fit">
+      <CardHeader>
+        <CardTitle>Room Images</CardTitle>
+        <CardDescription>
+          Lipsum dolor sit amet, consectetur adipiscing elit
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-2">
+          <img
+            alt="Product image"
+            className="aspect-square w-full rounded-md object-cover"
+            height="300"
+            src={`/RoomImages/${selectedBooking.room.images[0].filepath}`}
+            width="300"
+          />
+          <div className="grid grid-cols-3 gap-2">
+            {selectedBooking.room.images.map((img, index) => (
+              <button>
+                <img
+                  alt="Product image"
+                  className="aspect-square w-full rounded-md object-cover"
+                  height="84"
+                  src={`/RoomImages/${img.filepath}`}
+                  width="84"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

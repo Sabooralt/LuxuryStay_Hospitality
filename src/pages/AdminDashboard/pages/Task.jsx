@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { TaskTable } from "../components/task/TaskTable";
 
 export const Tasks = () => {
   const { task } = useTaskContext();
@@ -38,6 +39,9 @@ export const Tasks = () => {
             </div>
           </ScrollArea>
         </div>
+      </div>
+      <div className="p-5 rounded-lg shadow-sm border">
+        <TaskTable />
       </div>
     </>
   );

@@ -58,6 +58,26 @@ export default function StaffList() {
   const { staffs, dispatch } = useStaffContext();
   const { toast } = useToast();
 
+  const updateStaffStatus = async ({ data }) => {
+    setError(null);
+    setResponseG(null);
+    setIsLoading(true);
+    try {
+      const response = await axios.patch(
+        "/api/staff/update_status/" + data.id,
+        {
+          status: data.status,
+        }
+      );
+
+      if (response.status === 200) {
+        dispatch({ type: "UPDATE_STAFF_STATUS", payload: response.data });
+        setResponseG(response.data);
+      }
+    } catch (err) {}
+    setIsLoading(false);
+  };
+
   const updateStaffRole = async ({ data }) => {
     setError(null);
     setResponseG(null);
@@ -136,6 +156,8 @@ export default function StaffList() {
       });
     }
   }, [responseG]);
+
+  const StaffStatus = ["active", "inactive"];
   return (
     <div className="grid gap-2">
       <div className="ml-auto flex items-center gap-2">
@@ -212,14 +234,29 @@ export default function StaffList() {
                       {staff.role}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <Badge
-                        className="text-xs"
-                        variant={
-                          staff.status === "Active" ? "secondary" : "primary"
+                      <Select
+                        onValueChange={(value) =>
+                          updateStaffStatus({
+                            data: { id: staff._id, status: value },
+                          })
                         }
+                        defaultValue={staff.status}
                       >
-                        {staff.status}
-                      </Badge>
+                        <SelectTrigger className="w-100">
+                          <SelectValue placeholder={staff.status} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Statuses</SelectLabel>
+
+                            {StaffStatus.map((status, index) => (
+                              <SelectItem key={index} className="capitalize" value={status}>
+                                {status}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       {format(staff.createdAt, "yyyy-MM-dd")}

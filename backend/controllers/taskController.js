@@ -5,13 +5,18 @@ const {
   sendNotificationToAdmins,
   sendNotificationAllStaff,
   sendNotificationToStaff,
+  sendNotification,
 } = require("./notificationController");
+const generateTaskId = require("../utils/generateTaskId");
 
 const createTask = async (req, res) => {
   try {
     const { createdBy } = req.body;
 
-    const task = await Task.create({ ...req.body });
+    const task = await Task.create({
+      ...req.body,
+      taskId: await generateTaskId(),
+    });
     await task.populate("assignedTo", "username");
 
     const createdByUser = await User.findById(createdBy).select(
@@ -48,9 +53,9 @@ const createTask = async (req, res) => {
         }
       }
 
-      for (const adminId in req.adminSockets) {
+      for (const adminId in req.userSockets) {
         const AdminIdString = adminId.toString();
-        const adminSocketId = req.adminSockets[AdminIdString];
+        const adminSocketId = req.userSockets[AdminIdString];
         req.io.to(adminSocketId).emit("createTask", task);
       }
 
@@ -65,8 +70,7 @@ const createTask = async (req, res) => {
           req,
           `A Task has been assigned to you from ${createdByUser.first_name}`,
           task.description,
-          staff._id,
-          task._id
+          staff._id
         );
       }
     }
@@ -107,6 +111,10 @@ const getAllTask = async (req, res) => {
         { path: "createdBy", select: ["first_name", "last_name"] },
         { path: "seenBy", select: "username" },
         { path: "completedBy", select: "username" },
+        {
+          path: "assignedTo",
+          selected: "username",
+        },
       ]);
 
     return res.status(200).json({
@@ -121,11 +129,10 @@ const getAllTask = async (req, res) => {
 
 const getTask = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
     const tasks = await Task.find({
-      assignedTo: id,
-      assignedAll: true,
+      $or: [{ assignedTo: id }, { assignedAll: true }],
     }).populate([
       { path: "createdBy", select: ["first_name", "last_name"] },
       { path: "seenBy", select: "username" },
@@ -240,13 +247,51 @@ const markAsCompleted = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { taskIds } = req.body;
 
-    const task = await Task.findByIdAndDelete({ _id: id });
+    if (!Array.isArray(taskIds) || taskIds.length === 0) {
+      return res.status(400).json({ error: "No task IDs provided." });
+    }
 
-    return res.status(200).json(task);
+    const deletedTasks = [];
+
+    for (const id of taskIds) {
+      const task = await Task.findByIdAndDelete({ _id: id });
+
+      if (!task) {
+        continue;
+      }
+
+      deletedTasks.push(task);
+
+      if (task.assignedTo && task.assignedTo.length > 0) {
+        for (const staff of task.assignedTo) {
+          await sendNotification(
+            req,
+            `Task Deleted!`,
+            `'${task.title}' you were assigned to is now deleted!`,
+            " ",
+            "staff",
+            staff
+          );
+        }
+        req.io.emit("deleteTask", task);
+      } else if (task.assignedAll) {
+        req.io.emit("deleteTask", task);
+        await sendNotificationToStaff(
+          req,
+          `Task Deleted!`,
+          `'${task.title}' you were assigned to is now deleted!`
+        );
+      }
+    }
+
+    return res.status(200).json({ deletedTasks });
   } catch (err) {
     console.log(err);
+    return res
+      .status(500)
+      .json({ error: "An error occurred while deleting tasks." });
   }
 };
 

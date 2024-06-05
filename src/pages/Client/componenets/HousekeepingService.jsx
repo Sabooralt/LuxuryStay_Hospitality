@@ -50,8 +50,7 @@ export const HouseKeepingService = ({ booking }) => {
         .required("Preffered time is required!"),
       priority: Yup.string().trim().required("Priorty is required!"),
     }),
-    onSubmit: async (values) => {
-      console.log(values);
+    onSubmit: async (values,{resetForm}) => {
       try {
         const response = await axios.post(
           `/api/guestReq/create-req/${user._id}`,
@@ -69,6 +68,7 @@ export const HouseKeepingService = ({ booking }) => {
             description:
               "Thank you! Your request has been submitted successfully. Our team will address it shortly.",
           });
+          resetForm();
         }
       } catch (err) {
         toast({
@@ -184,7 +184,12 @@ export const HouseKeepingService = ({ booking }) => {
             <Input value={booking.room.roomNumber} disabled />
           </div>
 
-          <Button type="submit">Submit</Button>
+          <Button
+            type="submit"
+            disabled={formik.isSubmitting  || !formik.isValid}
+          >
+            Submit
+          </Button>
         </form>
       </CardContent>
     </Card>

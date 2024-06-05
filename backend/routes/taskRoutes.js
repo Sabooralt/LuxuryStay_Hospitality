@@ -17,6 +17,6 @@ router.get("/get_admin_tasks/:adminId", getAllTask);
 router.post("/:taskId/seenBy/:staffId", viewBy);
 router.patch("/:taskId/mark_as_completed/:staffId", markAsCompleted);
 
-router.delete("/delete/:id", deleteTask);
+router.post("/delete", deleteTask);
 
 module.exports = router;

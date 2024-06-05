@@ -32,6 +32,7 @@ import { ProfileHome } from "@/pages/Client/componenets/ProfileHome";
 import { GuestBookings } from "@/pages/Client/componenets/ClientBookings";
 import { Services } from "@/pages/AdminDashboard/pages/Services";
 import { Transactions } from "@/pages/AdminDashboard/pages/Transactions";
+import { SendNotificationAdmin } from "@/pages/AdminDashboard/pages/sendNotification";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -93,7 +94,11 @@ export const AdminRoutes = () => {
         <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
         <Route path="/admin/services" element={<Services />} />
-        <Route path="/admin/services" element={<Transactions />} />
+        <Route path="/admin/transactions" element={<Transactions />} />
+        <Route
+          path="/admin/send_notification"
+          element={<SendNotificationAdmin />}
+        />
       </Route>
 
       {/* Staff Routes */}

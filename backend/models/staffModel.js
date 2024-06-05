@@ -26,6 +26,7 @@ const staffSchema = new Schema(
     status: {
       type: String,
       required: true,
+      enum: ["active", "inactive"],
       default: "Active",
     },
   },
@@ -70,6 +71,12 @@ staffSchema.statics.login = async function (username, password) {
   if (!match) {
     throw Error("Incorrect password");
   }
+  if (staff.status === "inactive") {
+    throw new Error(
+      "Your account is currently inactive. Please contact the administrator for assistance."
+    );
+  }
+
   return staff;
 };
 
