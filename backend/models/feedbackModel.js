@@ -6,6 +6,7 @@ const feedbackSchema = new Schema(
   {
     guestId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     roomId: { type: Schema.Types.ObjectId, ref: "Room", required: true },
+    bookingId: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
     rating: { type: Number, required: true },
     body: { type: String, required: true },
     upvotes: {
@@ -29,6 +30,10 @@ const feedbackSchema = new Schema(
       },
     ],
     tags: [{ type: String, default: [] }],
+    show: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

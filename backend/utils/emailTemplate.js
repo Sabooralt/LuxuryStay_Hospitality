@@ -1,3 +1,3 @@
-const htmlContent = `<div>Sex Machine</div>`
+const htmlContent = `<div>/div>`
 
 module.exports = {htmlContent}

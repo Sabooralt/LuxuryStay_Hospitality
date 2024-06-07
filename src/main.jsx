@@ -16,6 +16,7 @@ import "@fontsource-variable/rubik";
 import { ThemeProvider } from "./ThemeProvider.jsx";
 import { ServiceContextProvider } from "./context/serviceContext.jsx";
 import { TransactionContextProvider } from "./context/transactionContext.jsx";
+import { FeedbackContextProvider } from "./context/feedbackContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -30,8 +31,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                     <MemberContextProvider>
                       <ServiceContextProvider>
                         <TransactionContextProvider>
-                          <App />
-                      </TransactionContextProvider>
+                          <FeedbackContextProvider>
+                            <App />
+                          </FeedbackContextProvider>
+                        </TransactionContextProvider>
                       </ServiceContextProvider>
                     </MemberContextProvider>
                   </BookingContextProvider>

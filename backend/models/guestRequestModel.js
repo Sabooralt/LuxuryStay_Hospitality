@@ -12,6 +12,10 @@ const guestRequestSchema = new Schema(
       type: Number,
       required: true,
     },
+    bookingId:{
+      type: mongoose.Types.ObjectId,
+      ref: "Booking",
+    },
     seen: {
       type: Boolean,
       default: false,

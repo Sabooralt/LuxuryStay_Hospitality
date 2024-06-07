@@ -24,7 +24,7 @@ export function StaffSidebar() {
 
   const roleAccess = {
     Housekeeper: ["Dashboard", "Rooms", "Tasks", "Notifications"],
-    Receptionist: ["Dashboard", "Rooms", "Tasks", "Notifications", "Bookings"],
+    Receptionist: ["Dashboard", "Rooms", "Tasks", "Notifications", "Bookings","Feedbacks"],
   };
   const accessibleItems = StaffItems.filter((item) =>
     roleAccess[staff.role]?.includes(item.name)

@@ -33,6 +33,7 @@ const WakeUpCallForm = () => {
   const formik = useFormik({
     initialValues: {
       guestName: "",
+      bookingId: "",
       guestId: "",
       roomNumber: '',
       wakeUpDate: "",
@@ -76,6 +77,7 @@ const WakeUpCallForm = () => {
     formik.setFieldValue("guestName", selectedBooking.member.fullName);
     formik.setFieldValue("roomNumber", selectedBooking.room.roomNumber);
     formik.setFieldValue("guestId", selectedBooking.member._id);
+    formik.setFieldValue("bookingId",selectedBooking._id)
   }, [selectedBooking, formik.resetForm]);
 
   return (

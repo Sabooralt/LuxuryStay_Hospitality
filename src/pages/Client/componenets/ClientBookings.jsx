@@ -10,7 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, ArrowUpRight, CalendarOff, Upload } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  CalendarOff,
+  Plus,
+  Upload,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 import {
@@ -23,7 +29,7 @@ import {
 import { OrderService } from "./OrderService";
 import { OrderedServices } from "./OrderedServices";
 import { useServiceContext } from "@/context/serviceContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTransactionContext } from "@/context/transactionContext";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import axios from "axios";
@@ -33,11 +39,14 @@ import { StayDetails } from "./StayDetails";
 import { HouseKeepingService } from "./HousekeepingService";
 import { YourRequest } from "./YourRequests";
 import WakeUpCallForm from "./WakeUpCallForm";
+import { FeedbackModal } from "./FeedbackModal";
+import { YourFeedback } from "./YourFeedback";
 
 export const GuestBookings = () => {
   const { booking, selectedBooking, selectBooking } = useBookingContext();
   const { dispatch, transaction } = useTransactionContext();
   const { user } = useAuthContextProvider();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchOrderedServices = async () => {
@@ -59,11 +68,27 @@ export const GuestBookings = () => {
     }
   }, [user, selectedBooking]);
 
-  const checkedOutStatus = selectedBooking.status === "checkedOut";
+  useEffect(() => {
+    if (
+      selectedBooking &&
+      selectedBooking.status === "checkedOut" &&
+      !selectedBooking.feedback
+    ) {
+      setTimeout(() => {
+        setOpen(true);
+      }, 3000);
+    }
+  }, [selectedBooking]);
+
+  const checkedOutStatus =
+    selectedBooking && selectedBooking.status === "checkedOut";
+  const checkedInStatus =
+    selectedBooking && selectedBooking.status === "checkedIn";
   return selectedBooking ? (
     <div className="h-full w-full grid gap-5 scroll-smooth">
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl font-semibold">Bookings</h1>
+
         <div>
           <Select
             defaultValue={`${
@@ -103,11 +128,14 @@ export const GuestBookings = () => {
       <div className={`grid  grid-cols-6 gap-3`}>
         <div className={`grid col-span-4 gap-3 size-fit`}>
           <StayDetails booking={selectedBooking} />
-          <YourRequest roomNumber={selectedBooking.room.roomNumber} />
+          <YourRequest
+            bookingId={selectedBooking._id}
+            roomNumber={selectedBooking.room.roomNumber}
+          />
           <OrderedServices />
         </div>
         <div className={`grid col-span-2 size-fit ml-auto gap-5`}>
-          {!checkedOutStatus ? (
+          {!checkedOutStatus && checkedInStatus ? (
             <>
               <HouseKeepingService booking={selectedBooking} />
 
@@ -115,8 +143,20 @@ export const GuestBookings = () => {
             </>
           ) : (
             <div className="size-full grid gap-3">
-              <div className="ml-auto">
+              <div className="ml-auto grid gap-10">
+                <div className="ml-auto">
+                  
                 <OrderSummary />
+                  </div>
+                {!selectedBooking.feedback ? (
+                  <FeedbackModal open={open} setOpen={setOpen}>
+                    <Button className="w-full flex gap-2">
+                      <Plus className="size-4.5" /> Leave A Feedback
+                    </Button>
+                  </FeedbackModal>
+                ) : (
+                  <YourFeedback bookingId={selectedBooking._id} />
+                )}
               </div>
             </div>
           )}
@@ -128,7 +168,7 @@ export const GuestBookings = () => {
           </div>
         )}
 
-        {!checkedOutStatus && (
+        {!checkedOutStatus && checkedInStatus && (
           <div className="grid size-fit ml-auto col-span-2 gap-5">
             <OrderSummary />
           </div>

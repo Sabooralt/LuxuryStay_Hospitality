@@ -33,4 +33,10 @@ export const StaffItems = [
     icon: <BellElectricIcon className="h-4 w-4" />,
     link: "/staff/notifications",
   },
+  {
+    name: "Feedbacks",
+    icon: <BellElectricIcon className="h-4 w-4" />,
+    link: "/staff/feedbacks",
+  },
+
 ];

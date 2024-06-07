@@ -21,7 +21,8 @@ module.exports = {
       },
       colors: {
         primary: "#f2f2f2",
-        secondary: "#b99365"
+        secondary: "#b99365",
+        buttonColor: "#EAEDEF",
       },
       keyframes: {
         "accordion-down": {

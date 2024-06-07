@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatPrice } from "@/utils/seperatePrice";
 import { format, isValid } from "date-fns";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
@@ -70,6 +71,16 @@ export const columnDef = [
   },
 
   {
+    accessorKey: "stay",
+    id: "Stay",
+    header: "Stay",
+    cell: ({ row }) => {
+      const value = row.getValue("Stay");
+
+      return <span className="font-medium text-left">for {value} night(s)</span>;
+    },
+  },
+  {
     accessorKey: "checkInDate",
     header: "Check In",
     cell: ({ row }) => {
@@ -82,6 +93,30 @@ export const columnDef = [
     header: "Check Out",
     cell: ({ row }) => {
       return <div>{format(row.getValue("checkOutDate"), "MM/dd/yyyy")}</div>;
+    },
+  },
+  {
+    accessorKey: "totalCost",
+    id: "Total Spent",
+    header: "Total Spent",
+    cell: ({ row }) => {
+      const value = row.getValue("Total Spent");
+
+      return (
+        <span className="text-sm font-medium">Rs.{formatPrice(value)}</span>
+      );
+    },
+  },
+  {
+    accessorKey: "serviceCost",
+    id: "Service Cost",
+    header: "Service Spent",
+    cell: ({ row }) => {
+      const value = row.getValue("Service Cost");
+
+      return (
+        <span className="text-sm font-medium">Rs.{formatPrice(value)}</span>
+      );
     },
   },
   {
@@ -109,5 +144,6 @@ export const columnDef = [
         </Badge>
       );
     },
+    isVisible: false,
   },
 ];

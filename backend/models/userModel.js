@@ -18,6 +18,9 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
+    phoneNumber: {
+      type: String,
+    },
     role: {
       type: String,
       enum: ["admin", "member"],
@@ -42,11 +45,12 @@ userSchema.statics.signup = async function (
   first_name,
   last_name,
   email,
-  password
+  phoneNumber,
+  password,
 ) {
   const exists = await this.findOne({ email });
   //validation
-  if (!first_name || !last_name || !email || !password) {
+  if (!first_name || !last_name || !email || !password || !phoneNumber) {
     throw Error("All fields must be filled ");
   }
   if (!validator.isEmail(email)) {
@@ -67,6 +71,7 @@ userSchema.statics.signup = async function (
     first_name,
     last_name,
     email,
+    phoneNumber,
     password: hash,
   });
 

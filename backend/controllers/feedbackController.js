@@ -1,66 +1,147 @@
 const Feedback = require("../models/feedbackModel");
-const Room = require("../models/productModel");
+const Booking = require("../models/bookingModel");
 const User = require("../models/userModel");
+const {
+  sendNotificationToAdmins,
+  sendNotificationToReceptionists,
+} = require("./notificationController");
 
-const getAllReviews = async (req, res) => {
+const getAllFeedback = async (req, res) => {
   try {
-    const reviews = await Review.find({}).sort({ createdAt: -1 });
+    const feedbacks = await Feedback.find({})
+      .populate("guestId")
+      .sort({ createdAt: -1 });
 
-    if (reviews.length === 0) {
+    if (feedbacks.length === 0) {
       return null;
     }
 
-    const productIds = reviews.map((review) => review.productId);
-    const userIds = reviews.map((review) => review.userId);
-
-    const products = await Product.find({ _id: { $in: productIds } });
-    const users = await User.find({ _id: { $in: userIds } });
-
-    const reviewsWithDetails = reviews.map((review) => {
-      const product = products.find(
-        (product) => product._id.toString() === review.productId.toString()
-      );
-      const user = users.find(
-        (user) => user._id.toString() === review.userId.toString()
-      );
-      return {
-        review,
-        product: {
-          _id: product._id,
-          title: product.title,
-        },
-        user: {
-          _id: user._id,
-          fullName: user.fullName,
-        },
-      };
-    });
-
-    res.status(200).json(reviewsWithDetails);
+    res.status(200).json({ success: true, feedbacks });
   } catch (error) {
-    console.error("Error fetching reviews:", error);
-    res.status(500).json({ error: "Failed to fetch reviews" });
+    console.error("Error fetching feedbacks:", error);
+    res.status(500).json({ error: "Failed to fetch feedbacks" });
+  }
+};
+
+const getGlobalFeedbacks = async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({ show: true })
+      .populate("guestId")
+      .sort({ createdAt: -1 });
+
+    if (feedbacks.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No global feedback found" });
+    }
+
+    res.status(200).json({ success: true, feedbacks });
+  } catch (error) {
+    console.error("Error fetching global feedbacks:", error);
+    res.status(500).json({ error: "Failed to fetch global feedbacks" });
+  }
+};
+
+const getGuestsFeedback = async (req, res) => {
+  const { guestId } = req.params;
+
+  try {
+    const feedbacks = await Feedback.find({ guestId })
+      .populate("guestId")
+      .sort({ createdAt: -1 });
+
+    if (feedbacks.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No feedback found for the provided guest ID",
+      });
+    }
+
+    res.status(200).json({ success: true, feedbacks });
+  } catch (error) {
+    console.error("Error fetching feedback by guest ID:", error);
+    res.status(500).json({ error: "Failed to fetch feedback by guest ID" });
   }
 };
 
 const createFeedback = async (req, res) => {
   try {
-    const { rating, body, tags } = req.body;
-    const { guestId, roomId } = req.params;
-    if (!guestId || !roomId || !rating || !body) {
-      return res.status(400).json({ error: "Missing required fields" });
+    const { rating, body, tags, guestId, roomId, bookingId } = req.body;
+
+    if (!guestId || !roomId || !bookingId || !rating || !body) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
+
+    const guest = await User.findById(guestId);
     const feedback = await Feedback.create({
       guestId,
       roomId,
+      bookingId,
       rating,
       body,
       tags,
     });
 
-    res.status(201).json({ success: true, feedback });
+    const booking = await Booking.findById(bookingId);
+
+    booking.feedback = true;
+
+    await booking.save();
+
+    const populatedFeedback = await Feedback.findById(feedback._id).populate(
+      "guestId"
+    );
+
+    await sendNotificationToAdmins(
+      req,
+      `New Feedback from ${guest.fullName}`,
+      `${guest.fullName} rated their stay ${rating} stars and left the following feedback: "${body}"`
+    );
+    await sendNotificationToReceptionists(
+      req,
+      `New Feedback from ${guest.fullName}`,
+      `${guest.fullName} rated their stay ${rating} stars and left the following feedback: "${body}"`
+    );
+
+    res.status(201).json({ success: true, populatedFeedback, booking });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Failed to create feedback", message: err });
+  }
+};
+
+const updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { show } = req.body;
+
+    if (typeof show !== "boolean") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid 'show' value" });
+    }
+
+    const feedback = await Feedback.findByIdAndUpdate(
+      id,
+      { show: show },
+      { new: true }
+    );
+
+    if (!feedback) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Feedback not found" });
+    }
+
+    req.io.emit("feedbackStatus", feedback);
+    return res
+      .status(200)
+      .json({ success: true, message: "Status updated", feedback });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -72,8 +153,8 @@ const voteFeedback = async (req, res) => {
 
     const feedback = await Feedback.findById(feedbackId);
 
-    const hasUpvoted = feedback.upvotedBy.includes(userId);
-    const hasDownvoted = feedback.downvotedBy.includes(userId);
+    const hasUpvoted = feedback.upvotedBy.includes(guestId);
+    const hasDownvoted = feedback.downvotedBy.includes(guestId);
 
     if (voteType === "upvote") {
       if (hasDownvoted) {
@@ -123,7 +204,7 @@ const voteFeedback = async (req, res) => {
         new: true,
       }
     );
-
+    req.io.emit("voteFeedback", updatedFeedback);
     res.status(200).json(updatedFeedback);
   } catch (error) {
     console.error("Error voting on feedback:", error);
@@ -131,4 +212,11 @@ const voteFeedback = async (req, res) => {
   }
 };
 
-module.exports = { getAllReviews, createFeedback, voteFeedback };
+module.exports = {
+  getAllFeedback,
+  createFeedback,
+  getGuestsFeedback,
+  getGlobalFeedbacks,
+  updateStatus,
+  voteFeedback,
+};

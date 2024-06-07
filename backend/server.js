@@ -28,6 +28,7 @@ const notiRoutes = require("./routes/notiRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const guestReqRoutes = require("./routes/guestRequestRoutes");
 const wakeUpCallRoutes = require("./routes/wakeUpRoutes");
+const feedbackRoutes = require("./routes/feedbackRoutes");
 
 const serviceRoutes = require("./routes/serviceRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
@@ -67,6 +68,7 @@ app.use("/api/serviceCategory", serviceCategoryRoutes);
 app.use("/api/orderService", orderServiceRoutes);
 app.use("/api/guestReq", guestReqRoutes);
 app.use("/api/wakeUp", wakeUpCallRoutes);
+app.use("/api/feedback", feedbackRoutes)
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -137,12 +139,12 @@ cron.schedule("* * * * * *", () => {
   checkInBookings(req);
 });
 
-cron.schedule(" * * * * *", () => {
+cron.schedule("* * * * *", () => {
   const req = createMockReq();
   checkOutBookings(req);
 });
 
-cron.schedule(" * * * * *", () => {
+cron.schedule("* * * * * *", () => {
   const req = createMockReq();
   scheduleWakeUpCalls(req);
 });

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./componenets/Navbar";
 import { Footer } from "./componenets/Footer";
 import { useEffect } from "react";
@@ -12,6 +12,10 @@ export const Rootlayout = () => {
   const { user } = useAuthContextProvider();
   const { dispatch } = useBookingContext();
   const { noti, dispatch: notiDispatch } = useNotiContext();
+  const location = useLocation();
+  const hideNavbarOnPaths = ["/user/login", "/user/signup"];
+
+  const shouldRenderNavbar = !hideNavbarOnPaths.includes(location.pathname);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -60,7 +64,6 @@ export const Rootlayout = () => {
 
   useEffect(() => {
     if (user) {
-      
       socket.emit("register", { role: "guest", userId: user._id });
     }
   }, [user]);
@@ -68,7 +71,7 @@ export const Rootlayout = () => {
     <div className="bg-white font-rubik">
       <Navbar />
       <Outlet />
-      <Footer />
+      {shouldRenderNavbar && <Footer />}
     </div>
   );
 };

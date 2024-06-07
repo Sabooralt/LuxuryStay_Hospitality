@@ -18,6 +18,7 @@ export const useSignup = () => {
         last_name: data.lastName,
         contact: data.contactNumber,
         email: data.email,
+        phoneNumber: data.phoneNumber,
         password: data.password,
       });
 

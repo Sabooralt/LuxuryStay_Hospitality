@@ -50,12 +50,13 @@ export const HouseKeepingService = ({ booking }) => {
         .required("Preffered time is required!"),
       priority: Yup.string().trim().required("Priorty is required!"),
     }),
-    onSubmit: async (values,{resetForm}) => {
+    onSubmit: async (values, { resetForm }) => {
       try {
         const response = await axios.post(
           `/api/guestReq/create-req/${user._id}`,
           {
             roomNumber: booking.room.roomNumber,
+            bookingId: booking._id,
             serviceType: values.serviceType,
             priority: values.priority,
             issue: values.issue,
@@ -186,7 +187,7 @@ export const HouseKeepingService = ({ booking }) => {
 
           <Button
             type="submit"
-            disabled={formik.isSubmitting  || !formik.isValid}
+            disabled={formik.isSubmitting || !formik.isValid}
           >
             Submit
           </Button>

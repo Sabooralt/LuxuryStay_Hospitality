@@ -33,6 +33,9 @@ import { GuestBookings } from "@/pages/Client/componenets/ClientBookings";
 import { Services } from "@/pages/AdminDashboard/pages/Services";
 import { Transactions } from "@/pages/AdminDashboard/pages/Transactions";
 import { SendNotificationAdmin } from "@/pages/AdminDashboard/pages/sendNotification";
+import { LoginRoot } from "@/pages/Client/Login/components/RootLayout";
+import { Feedbacks } from "@/pages/Client/pages/Feedbacks";
+import { StaffFeedbacks } from "@/pages/StaffDashboard/components/pages/Feedback";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -40,36 +43,45 @@ export const AdminRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Rootlayout />}>
-        <Route index element={user ? <Home /> : <Navigate to="/signup" />} />
+        <Route
+          index
+          element={user ? <Home /> : <Navigate to="/user/login" />}
+        />
 
         <Route path="/blog" element={<Blog />} />
         <Route path="/rooms" element={<ClientRooms />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/feedback" element={<Feedbacks />} />
         <Route
           path="/profile"
-          element={user ? <Profile /> : <Navigate to="/signup" />}
+          element={user ? <Profile /> : <Navigate to="/user/login" />}
         >
           <Route index element={<ProfileHome />} />
           <Route path="/profile/bookings" element={<GuestBookings />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
         </Route>
-        <Route
-          path="/signup"
-          element={user ? <Navigate to="/" /> : <SignupForm />}
-        />
-        <Route
-          path="/login"
-          element={
-            user ? (
-              <Navigate to="/" />
-            ) : user?.role === "admin" ? (
-              <Navigate to="/admin" />
-            ) : (
-              <LoginForm />
-            )
-          }
-        />
+
+        <Route path="/user" element={<LoginRoot />}>
+          <Route
+            path="/user/signup"
+            element={user ? <Navigate to="/" /> : <SignupForm />}
+          />
+          <Route
+            index
+            path="/user/login"
+            element={
+              user?.role === "admin" ? (
+                <Navigate to="/admin" />
+              ) : user ? (
+                <Navigate to="/admin" />
+              ) : (
+                <LoginForm />
+              )
+            }
+          />
+        </Route>
+
         <Route
           path="/StaffLogin"
           element={staff ? <Navigate to="/staff" /> : <StaffLogin />}
@@ -105,7 +117,7 @@ export const AdminRoutes = () => {
 
       <Route
         path="/staff"
-        element={staff ? <StaffDashboard /> : <StaffLogin />}
+        element={staff ? <StaffDashboard /> : <Navigate to="/staffLogin" />}
       >
         <Route index element={<StaffHome />} />
 
@@ -113,6 +125,7 @@ export const AdminRoutes = () => {
         <Route path="/staff/Notifications" element={<StaffNotifications />} />
         <Route path="/staff/Bookings" element={<StaffBookings />} />
         <Route path="/staff/Rooms" element={<StaffRooms />} />
+        <Route path="/staff/feedbacks" element={<StaffFeedbacks />} />
       </Route>
     </Routes>
   );

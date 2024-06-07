@@ -56,6 +56,15 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    feedback: {
+      type: Boolean,
+      default: false,
+    },
+    paid: {
+      type: String,
+      enum: ["paid", "not paid"],
+      default: "not paid",
+    },
     serviceOrders: [
       { type: mongoose.Schema.Types.ObjectId, ref: "ServiceOrder" },
     ],

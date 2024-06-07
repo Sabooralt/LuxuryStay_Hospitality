@@ -9,7 +9,7 @@ const {
 const createGuestReq = async (req, res) => {
   try {
     const { guestId } = req.params;
-    const { roomNumber, serviceType, issue, preferredTime, priority } =
+    const { roomNumber, serviceType, issue, preferredTime, priority,bookingId } =
       req.body;
 
     const guest = await User.findById(guestId);
@@ -24,6 +24,7 @@ const createGuestReq = async (req, res) => {
     const guestRequest = await GuestReq.create({
       guestId: guestId,
       roomNumber: roomNumber,
+      bookingId: bookingId,
       serviceType: serviceType,
       priority: priority,
       issue: issue,

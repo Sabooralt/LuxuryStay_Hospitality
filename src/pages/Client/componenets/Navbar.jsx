@@ -70,6 +70,10 @@ export const Navbar = () => {
       name: "Contact",
       link: "/contact",
     },
+    {
+      name: "Feedbacks",
+      link: "/feedback",
+    },
   ];
   return (
     <motion.nav

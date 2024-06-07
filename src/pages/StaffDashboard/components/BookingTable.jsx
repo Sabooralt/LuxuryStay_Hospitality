@@ -35,7 +35,9 @@ export const BookingTable = ({ user }) => {
   const { booking } = useBookingContext();
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useState({});
+  const [columnVisibility, setColumnVisibility] = useState({
+    createdAt: false,
+  });
   const [rowSelection, setRowSelection] = useState({});
   const { staff } = useStaffAuthContext();
   const { user: admin } = useAuthContextProvider();
@@ -98,11 +100,11 @@ export const BookingTable = ({ user }) => {
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by member email..."
-          value={tableInstance.getColumn("Member")?.getFilterValue() ?? ""}
+          placeholder="Filter by booking id..."
+          value={tableInstance.getColumn("Booking Id")?.getFilterValue() ?? ""}
           onChange={(event) =>
             tableInstance
-              .getColumn("Member")
+              .getColumn("Booking Id")
               ?.setFilterValue(event.target.value)
           }
           className="max-w-sm"

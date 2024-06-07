@@ -47,14 +47,20 @@ const loginUser = async (req, res) => {
 };
 
 const signupUser = async (req, res) => {
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, phoneNumber } = req.body;
 
   try {
-    const user = await User.signup(first_name, last_name, email, password);
+    const user = await User.signup(
+      first_name,
+      last_name,
+      email,
+      phoneNumber,
+      password
+    );
 
     const token = createToken(user._id);
 
-    res.status(200).json({ first_name, last_name, email, token });
+    res.status(200).json({ first_name, last_name, email, phoneNumber, token });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

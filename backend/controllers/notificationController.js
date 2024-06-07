@@ -176,6 +176,26 @@ const sendNotificationToHousekeepers = async (req, title, message, link) => {
     console.error("Error sending notifications:", error);
   }
 };
+const sendNotificationToReceptionists = async (req, title, message, link) => {
+  try {
+    const staffMembers = await Staff.find({ role: "Receptionist" });
+
+    for (const staffMember of staffMembers) {
+      await sendNotification(
+        req,
+        title,
+        message,
+        link,
+        "staff",
+        staffMember._id
+      );
+    }
+
+    console.log("Notifications sent to staff members");
+  } catch (error) {
+    console.error("Error sending notifications:", error);
+  }
+};
 const sendNotificationToStaff = async (req, title, message, link, sentB) => {
   try {
     const staffMembers = await Staff.find();
@@ -313,4 +333,5 @@ module.exports = {
   sendNotificationToAllGuests,
   sendNotificationToHousekeepers,
   sendNotificationFromAdmin,
+  sendNotificationToReceptionists,
 };

@@ -8,6 +8,10 @@ const WakeUpSchema = new Schema(
       ref: "User",
       required: true,
     },
+    bookingId: {
+      type: mongoose.Types.ObjectId,
+      ref: "Booking",
+    },
     roomNumber: {
       type: Number,
       required: true,

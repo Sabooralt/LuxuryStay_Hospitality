@@ -3,21 +3,20 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "outlook",
   auth: {
-    user: "luxurystay7@outlook.com", // your Outlook email
-    pass: "Consolidation@340", // your Outlook password
+    user: "luxurystay7@outlook.com",
+    pass: "Consolidation@340",
   },
 });
 
 // Function to send email
-const sendEmail = async (to, subject, text,htmlContent) => {
+const sendEmail = async (to, subject, text, htmlContent) => {
   try {
-    // Send mail with defined transport object
     const info = await transporter.sendMail({
-      from: '"Luxury Stay" <luxurystay7@outlook.com>', // sender address
-      to: to, // list of receivers
-      subject: subject, // Subject line
-      text: text, // plain text body
-      html: htmlContent
+      from: '"Luxury Stay" <luxurystay7@outlook.com>',
+      to: to,
+      subject: subject,
+      text: text,
+      html: htmlContent,
     });
 
     console.log("Email sent: %s", info.messageId);

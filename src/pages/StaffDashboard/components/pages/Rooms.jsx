@@ -7,7 +7,7 @@ export const StaffRooms = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 flex-wrap items-center justify-center">
+      <div className="grid p-5 flex-wrap items-center justify-center">
         <RoomTable/>
       </div>
     </>

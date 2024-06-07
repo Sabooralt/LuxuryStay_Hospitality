@@ -30,7 +30,7 @@ import { Link } from "react-router-dom";
 const sideItems = [
   {
     name: "Dashboard",
-    link: "/admin",
+    link: "/",
     icon: <Home className="h-5 w-5" />,
   },
   {

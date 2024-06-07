@@ -16,6 +16,7 @@ const ScheduleWakeUpCall = async (req, res) => {
       wakeUpDate,
       wakeUpTime,
       phoneNumber,
+      bookingId
     } = req.body;
 
     // Create a new wake-up call
@@ -23,6 +24,7 @@ const ScheduleWakeUpCall = async (req, res) => {
       guestId,
       guestName,
       roomNumber,
+      bookingId,
       wakeUpDate,
       wakeUpTime,
       phoneNumber,

@@ -16,11 +16,11 @@ import axios from "axios";
 import { formatDate, formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
 
-export const YourRequest = ({ roomNumber }) => {
+export const YourRequest = ({ roomNumber, bookingId }) => {
   const { user } = useAuthContextProvider();
   const { guestTasks, dispatch, wakeUpCalls } = useTaskContext();
   const [selected, setSelected] = useState(false);
-  const {toast} = useToast();
+  const { toast } = useToast();
   useEffect(() => {
     const fetchYourRequest = async () => {
       try {
@@ -81,12 +81,12 @@ export const YourRequest = ({ roomNumber }) => {
   const filteredWakeUpCalls =
     wakeUpCalls &&
     wakeUpCalls.length > 0 &&
-    wakeUpCalls.filter((t) => t.roomNumber === roomNumber);
+    wakeUpCalls.filter((t) => t.bookingId === bookingId);
 
   const filteredTasks =
     guestTasks &&
     guestTasks.length > 0 &&
-    guestTasks.filter((t) => t.roomNumber === roomNumber);
+    guestTasks.filter((t) => t.bookingId === bookingId);
   return (
     ((filteredTasks && filteredTasks.length > 0) ||
       (filteredWakeUpCalls && filteredWakeUpCalls.length > 0)) && (
@@ -137,7 +137,12 @@ export const YourRequest = ({ roomNumber }) => {
                       </div>
                       <div className="flex flex-row justify-between items-center text-xs">
                         {req.status !== "completed" && (
-                          <Button variant="secondary" onClick={()=>cancelWakeUpCall(req._id)}>Cancel</Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => cancelWakeUpCall(req._id)}
+                          >
+                            Cancel
+                          </Button>
                         )}
                         <div className="text-sm text-muted-foreground">
                           {formatDistanceToNow(new Date(req.createdAt), {

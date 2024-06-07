@@ -1,27 +1,56 @@
-const {
-  sendNotification,
-} = require("../controllers/notificationController");
+const { sendNotification } = require("../controllers/notificationController");
 const WakeUp = require("../models/wakeUpCallModel");
 
-const scheduleWakeUpCalls = async (req) => {
+const scheduleWakeUpCalls = async (req, res) => {
   try {
     const now = new Date();
 
+    const nowInPakistan = new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Karachi" })
+    );
+
     const wakeUpCalls = await WakeUp.find({
-      wakeUpDate: now.toISOString().slice(0, 10),
-      wakeUpTime: now.toLocaleTimeString([], { hour12: false }),
+      wakeUpDate: {
+        $gte: new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0
+        ),
+        $lt: new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() + 1,
+          0,
+          0,
+          0
+        ),
+      },
+      status: { $ne: "completed" },
     });
 
+    if (wakeUpCalls && wakeUpCalls.length === 0) {
+      return null;
+    }
+
     for (const wakeUpCall of wakeUpCalls) {
-      await sendNotification(
-        req,
-        "Wake Up!",
-        "Wake Up You Ugly Piece Of Shit!",
-        " ",
-        "member",
-        wakeUpCall.guestId
-      );
-      await WakeUp.findByIdAndUpdate(wakeUpCall._id, { status: "completed" });
+      const [hours, minutes] = wakeUpCall.wakeUpTime.split(":").map(Number);
+      if (
+        nowInPakistan.getHours() === hours &&
+        nowInPakistan.getMinutes() === minutes
+      ) {
+        await sendNotification(
+          req,
+          "Wake Up!",
+          "Wake Up You Ugly Piece Of Shit!",
+          " ",
+          "member",
+          wakeUpCall.guestId
+        );
+        await WakeUp.findByIdAndUpdate(wakeUpCall._id, { status: "completed" });
+      }
     }
   } catch (err) {
     console.error("Error scheduling wake-up calls:", err);
