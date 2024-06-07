@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Home,
   LineChart,
+  MessageSquareText,
   Microwave,
   Package,
   Package2,
@@ -30,7 +31,7 @@ import { Link } from "react-router-dom";
 const sideItems = [
   {
     name: "Dashboard",
-    link: "/",
+    link: "/admin",
     icon: <Home className="h-5 w-5" />,
   },
   {
@@ -67,6 +68,11 @@ const sideItems = [
     name: "Send Notification",
     link: "/admin/send_notification",
     icon: <Bell className="h-5 w-5" />,
+  },
+  {
+    name: "Feedbacks",
+    link: "/admin/feedbacks",
+  icon: <MessageSquareText className="size-5" />,
   },
 ];
 

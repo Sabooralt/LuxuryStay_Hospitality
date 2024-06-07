@@ -73,9 +73,11 @@ const createFeedback = async (req, res) => {
     }
 
     const guest = await User.findById(guestId);
+    const roomType = await Room.findById(roomId);
+
     const feedback = await Feedback.create({
       guestId,
-      roomId,
+      room: roomType._id,
       bookingId,
       rating,
       body,

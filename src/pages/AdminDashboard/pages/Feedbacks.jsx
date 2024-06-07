@@ -4,8 +4,10 @@ import { FeedbackTable } from "../components/feedback/FeedbackTable";
 import { useFeedbackContext } from "@/context/feedbackContext";
 import axios from "axios";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
+import { useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
-export const Feedbacks = () => {
+export const AdminFeedbacks = () => {
   const { user } = useAuthContextProvider();
   const { feedback, dispatch } = useFeedbackContext();
   useEffect(() => {
@@ -26,8 +28,12 @@ export const Feedbacks = () => {
   return (
     <>
       <TopBar>Guest Feedback</TopBar>
-
+<Card className="p-5">
+    <CardContent>
       <FeedbackTable />
+
+    </CardContent>
+</Card>
     </>
   );
 };

@@ -4,6 +4,7 @@ import { useMemberContext } from "@/hooks/useMemberContext";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { GuestTable } from "../components/guest/GuestTable";
 import axios from "axios";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const Guests = () => {
   const { dispatch: memberDispatch } = useMemberContext();
@@ -24,8 +25,11 @@ export const Guests = () => {
   return (
     <>
       <TopBar>Guests</TopBar>
-
-      <GuestTable />
+      <Card className="p-5">
+        <CardContent>
+          <GuestTable />
+        </CardContent>
+      </Card>
     </>
   );
 };

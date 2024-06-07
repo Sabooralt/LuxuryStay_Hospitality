@@ -34,19 +34,27 @@ import { useTransactionContext } from "@/context/transactionContext";
 import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { StayDetails } from "./StayDetails";
 import { HouseKeepingService } from "./HousekeepingService";
 import { YourRequest } from "./YourRequests";
 import WakeUpCallForm from "./WakeUpCallForm";
 import { FeedbackModal } from "./FeedbackModal";
 import { YourFeedback } from "./YourFeedback";
+import { Badge } from "@/components/ui/badge";
 
 export const GuestBookings = () => {
   const { booking, selectedBooking, selectBooking } = useBookingContext();
   const { dispatch, transaction } = useTransactionContext();
   const { user } = useAuthContextProvider();
   const [open, setOpen] = useState(false);
+  const { bookingId } = useParams();
+
+  useEffect(() => {
+    if (bookingId) {
+      selectBooking(bookingId);
+    }
+  }, [bookingId]);
 
   useEffect(() => {
     const fetchOrderedServices = async () => {
@@ -99,7 +107,7 @@ export const GuestBookings = () => {
             onValueChange={selectBooking}
           >
             <SelectTrigger className="w-[180px] bg-white">
-              <SelectValue placeholder="Select a fruit" />
+              <SelectValue placeholder="Select a booking" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -107,12 +115,17 @@ export const GuestBookings = () => {
                 {booking ? (
                   booking.map((booking) => (
                     <SelectItem value={booking.bookingId}>
-                      {booking.bookingId}{" "}
-                      {booking.status === "checkedOut" && (
-                        <span className="text-sm font-medium">
-                          ({booking.status}){" "}
-                        </span>
-                      )}
+                      <div className="flex flex-row flex-nowrap gap-2">
+                        <span>{booking.bookingId}</span>
+                        {booking.status && (
+                          <Badge
+                            variant="secondary"
+                            className="text-xs font-normal"
+                          >
+                            {booking.status}
+                          </Badge>
+                        )}
+                      </div>
                     </SelectItem>
                   ))
                 ) : (
@@ -132,7 +145,8 @@ export const GuestBookings = () => {
             bookingId={selectedBooking._id}
             roomNumber={selectedBooking.room.roomNumber}
           />
-          <OrderedServices />
+          {(checkedInStatus || checkedOutStatus) && <OrderedServices />}
+          {!checkedOutStatus && checkedInStatus && <OrderService />}
         </div>
         <div className={`grid col-span-2 size-fit ml-auto gap-5`}>
           {!checkedOutStatus && checkedInStatus ? (
@@ -140,15 +154,18 @@ export const GuestBookings = () => {
               <HouseKeepingService booking={selectedBooking} />
 
               <WakeUpCallForm />
+              <div className="mx-auto">
+
+              <OrderSummary />
+              </div>
             </>
           ) : (
             <div className="size-full grid gap-3">
               <div className="ml-auto grid gap-10">
                 <div className="ml-auto">
-                  
-                <OrderSummary />
-                  </div>
-                {!selectedBooking.feedback ? (
+                  <OrderSummary />
+                </div>
+                {!selectedBooking.feedback && checkedOutStatus ? (
                   <FeedbackModal open={open} setOpen={setOpen}>
                     <Button className="w-full flex gap-2">
                       <Plus className="size-4.5" /> Leave A Feedback
@@ -161,18 +178,6 @@ export const GuestBookings = () => {
             </div>
           )}
         </div>
-
-        {!checkedOutStatus && (
-          <div className={`grid col-span-4 gap-5 max-h-fit`}>
-            <OrderService />
-          </div>
-        )}
-
-        {!checkedOutStatus && checkedInStatus && (
-          <div className="grid size-fit ml-auto col-span-2 gap-5">
-            <OrderSummary />
-          </div>
-        )}
       </div>
     </div>
   ) : (

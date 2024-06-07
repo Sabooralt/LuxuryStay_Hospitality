@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const feedbackSchema = new Schema(
   {
     guestId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    roomId: { type: Schema.Types.ObjectId, ref: "Room", required: true },
+    room: { type: Schema.Types.ObjectId, ref: "RoomType", required: true },
     bookingId: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
     rating: { type: Number, required: true },
     body: { type: String, required: true },

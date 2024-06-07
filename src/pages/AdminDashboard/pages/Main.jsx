@@ -11,10 +11,13 @@ import { RecentBookings } from "../components/main/RecentBookings";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket";
 import axios from "axios";
+import { formatPrice } from "@/utils/seperatePrice";
 
 export function DashboardHome() {
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [totalBookingRevenue, setTotalBookingRevenue] = useState(0);
+  const [totalServiceRevenue, setTotalServiceRevenue] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const getTotalUsers = (count) => {
@@ -34,7 +37,7 @@ export function DashboardHome() {
 
       try {
         setIsLoading(true);
-        const response = await axios.get("/api/booking/total-revenue");
+        const response = await axios.get("/api/analytics/total_revenue");
 
         if (response.status === 200) {
           setTotalRevenue(response.data.totalRevenue);
@@ -47,6 +50,48 @@ export function DashboardHome() {
 
     getTotalRevenue();
   }, []);
+  useEffect(() => {
+    const getTotalBookingRevenue = async () => {
+      setIsLoading(false);
+
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          "/api/analytics/total_booking_revenue"
+        );
+
+        if (response.status === 200) {
+          setTotalBookingRevenue(response.data.totalBookingRevenue);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getTotalBookingRevenue();
+  }, []);
+  useEffect(() => {
+    const getTotalServiceRevenue = async () => {
+      setIsLoading(false);
+
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          "/api/analytics/total_service_revenue"
+        );
+
+        if (response.status === 200) {
+          setTotalServiceRevenue(response.data.totalServiceRevenue);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getTotalServiceRevenue();
+  }, []);
 
   const handleRefresh = async () => {
     setIsLoading(false);
@@ -54,7 +99,7 @@ export function DashboardHome() {
     try {
       setIsLoading(true);
 
-      const response = await axios.get("/api/booking/total-revenue");
+      const response = await axios.get("/api/analytics/total_revenue");
 
       if (response.status === 200) {
         setTotalRevenue(response.data.totalRevenue);
@@ -80,9 +125,59 @@ export function DashboardHome() {
             />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Rs.{totalRevenue}</div>
+            {totalRevenue && (
+              <div className="text-2xl font-bold">
+                Rs.{formatPrice(totalRevenue)}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Booking Revenue
+            </CardTitle>
+            <RefreshCcw
+              onClick={handleRefresh}
+              className={`h-4 w-4 text-muted-foreground cursor-pointer  ${
+                isLoading ? "animate-spin" : "animate-none"
+              }`}
+            />
+          </CardHeader>
+          <CardContent>
+            {totalBookingRevenue && (
+              <div className="text-2xl font-bold">
+                Rs.{formatPrice(totalBookingRevenue)}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Total booking revenue generated.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Service Revenue
+            </CardTitle>
+            <RefreshCcw
+              onClick={handleRefresh}
+              className={`h-4 w-4 text-muted-foreground cursor-pointer  ${
+                isLoading ? "animate-spin" : "animate-none"
+              }`}
+            />
+          </CardHeader>
+          <CardContent>
+            {totalServiceRevenue && (
+              <div className="text-2xl font-bold">
+                Rs.{formatPrice(totalServiceRevenue)}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Total Service revenue generated.
             </p>
           </CardContent>
         </Card>

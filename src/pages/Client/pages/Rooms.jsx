@@ -4,6 +4,7 @@ import { TiGroupOutline } from "react-icons/ti";
 import { Crop } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOneRoomPerType } from "@/hooks/useOneRoomPerType";
+import { Link } from "react-router-dom";
 
 export const ClientRooms = () => {
   return (
@@ -76,10 +77,11 @@ export const RoomOverview = () => {
                 <p className="tracking-tight line-clamp-6 text-ellipsis overflow-hidden font-normal text-md font-sans">
                   {room.description}
                 </p>
-
-                <Button className="bg-secondary capitalize mt-auto w-fit p-5 rounded-none">
-                  Book Now for Rs.{room.pricePerNight}
-                </Button>
+                <Link to={`/boomRoom/${room.type._id}`}>
+                  <Button className="bg-secondary capitalize mt-auto w-fit p-5 rounded-none">
+                    Book Now for Rs.{room.pricePerNight}
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

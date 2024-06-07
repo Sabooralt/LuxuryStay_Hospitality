@@ -17,6 +17,7 @@ import { ThemeProvider } from "./ThemeProvider.jsx";
 import { ServiceContextProvider } from "./context/serviceContext.jsx";
 import { TransactionContextProvider } from "./context/transactionContext.jsx";
 import { FeedbackContextProvider } from "./context/feedbackContext.jsx";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         <TransactionContextProvider>
                           <FeedbackContextProvider>
                             <App />
+                            <Sonner closeButton richColors position="bottom-left"/>
                           </FeedbackContextProvider>
                         </TransactionContextProvider>
                       </ServiceContextProvider>

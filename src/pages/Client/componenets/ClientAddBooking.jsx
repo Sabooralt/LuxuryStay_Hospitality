@@ -16,7 +16,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { RoomCombobox } from "@/components/ui/roomCombobox";
-import { useToast } from "@/components/ui/use-toast";
 import { useAddBooking } from "@/hooks/useAddBooking";
 import { cn } from "@/lib/utils";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -24,36 +23,53 @@ import { format } from "date-fns";
 import { useFormik } from "formik";
 import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import * as Yup from "yup";
 
-export function AddBooking({ userType }) {
+export function ClientAddBooking({ title, room }) {
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [selectedMember, setSelectedMember] = useState(null);
-  const { isLoading, responseG, error, SubmitBooking } = useAddBooking({
-    userType,
+  const { isLoading, responseG, id, error, SubmitBooking } = useAddBooking({
+    userType: "guest",
+    bookingBy: "guest",
+    room: room,
+    setCheckIn: setCheckIn,
+    setCheckOut: setCheckOut,
   });
-  const { toast } = useToast();
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
-      room: "",
-      member: "",
       checkIn: null,
       checkOut: null,
     },
-
-    validationSchema: Yup.object({
-      room: Yup.string().trim().required("Room is required!"),
-      member: Yup.string().trim().required("Member is required!"),
+    validationSchema: Yup.object().shape({
       checkIn: Yup.date().required("Check-in date is required!"),
-      checkOut: Yup.date().required("Check-out date is required!"),
+      checkOut: Yup.date()
+        .required("Check-out date is required!")
+        .min(
+          Yup.ref("checkIn"),
+          "Check-out date cannot be before check-in date"
+        )
+        .test(
+          "is-different",
+          "Check-out date cannot be the same as check-in date",
+          function (value) {
+            const { checkIn } = this.parent;
+            return (
+              checkIn &&
+              value &&
+              new Date(value).getTime() !== new Date(checkIn).getTime()
+            );
+          }
+        ),
     }),
 
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       console.log(values);
-      SubmitBooking(values);
+      SubmitBooking(values, resetForm);
     },
   });
 
@@ -69,19 +85,22 @@ export function AddBooking({ userType }) {
 
   useEffect(() => {
     if (responseG) {
-      toast({
-        title: "Booking created successfully!",
-        description: responseG,
+      toast("Booking has been created!", {
+        description: responseG.message,
+        action: {
+          label: "View Booking",
+          onClick: () => navigate(`/profile/bookings`),
+        },
       });
+
+      console.log("responseId", responseG._id);
     }
   }, [responseG]);
 
   useEffect(() => {
     if (error) {
-      toast({
-        title: "Oops something went wrong",
+      toast.error("Oops something went wrong", {
         description: error,
-        variant: "destructive",
       });
     }
   }, [error]);
@@ -89,42 +108,13 @@ export function AddBooking({ userType }) {
   return (
     <Card className="max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Create a booking</CardTitle>
+        <CardTitle className="text-2xl">Book {title}</CardTitle>
         <CardDescription>
-          Enter the booking details below to book a room for a member.
+          Enter the booking details below to book a room.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={formik.handleSubmit} className="grid gap-5">
-          <div className="grid gap-2">
-            <Label>Select Room</Label>
-            <RoomCombobox
-              onSelectedRoomChange={(roomId) => {
-                setSelectedRoom(roomId);
-                formik.setFieldValue("room", roomId);
-              }}
-            />
-            {formik.touched.room && (
-              <p className="text-red-600 text-xs">{formik.errors.room}</p>
-            )}
-            <p className="text-muted-foreground text-xs">
-              Note: You can assign the room to a guest even if it's not
-              available. However, you cannot assign the room if it is booked for
-              the selected check-in and check-out dates.
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <Label>Select Member</Label>
-            <MemberCombobox
-              onSelectedMemberChange={(memberId) => {
-                setSelectedMember(memberId);
-                formik.setFieldValue("member", memberId);
-              }}
-            />
-            {formik.touched.member && (
-              <p className="text-red-600 text-xs">{formik.errors.member}</p>
-            )}
-          </div>
           <div className="grid gap-2">
             <Label>Check In Date:</Label>
             <Popover className="w-full">
@@ -181,14 +171,20 @@ export function AddBooking({ userType }) {
                 />
               </PopoverContent>
             </Popover>
-            {formik.touched.checkOut && (
-              <p className="text-red-600 text-xs">{formik.errors.checkOut}</p>
-            )}
+            {formik.touched.checkOut && formik.errors.checkOut ? (
+              <div className="text-red-500 text-sm">
+                {formik.errors.checkOut}
+              </div>
+            ) : null}
+          </div>
+          <div className="grid gap-2">
+            <Label>Capacity:</Label>
+
+            <Input value={room.capacity} disabled />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">
-              Access key will be provided to you and the member after the
-              booking is complete.
+              Access key will be provided to you after the booking is complete.
             </p>
           </div>
           <Button type="submit" disabled={isLoading} className="w-full">

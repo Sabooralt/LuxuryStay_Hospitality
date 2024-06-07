@@ -36,6 +36,8 @@ import { SendNotificationAdmin } from "@/pages/AdminDashboard/pages/sendNotifica
 import { LoginRoot } from "@/pages/Client/Login/components/RootLayout";
 import { Feedbacks } from "@/pages/Client/pages/Feedbacks";
 import { StaffFeedbacks } from "@/pages/StaffDashboard/components/pages/Feedback";
+import { AdminFeedbacks } from "@/pages/AdminDashboard/pages/Feedbacks";
+import { BookRoom } from "@/pages/Client/pages/BookRoom";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -49,16 +51,18 @@ export const AdminRoutes = () => {
         />
 
         <Route path="/blog" element={<Blog />} />
-        <Route path="/rooms" element={<ClientRooms />} />
+        <Route path="/rooms" element={<ClientRooms />}>
+        </Route>
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/feedback" element={<Feedbacks />} />
+        <Route path="/boomRoom/:roomId" element={<BookRoom/>} />
         <Route
           path="/profile"
           element={user ? <Profile /> : <Navigate to="/user/login" />}
         >
           <Route index element={<ProfileHome />} />
-          <Route path="/profile/bookings" element={<GuestBookings />} />
+          <Route path="/profile/bookings/:bookingId?" element={<GuestBookings />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
         </Route>
 
@@ -111,6 +115,7 @@ export const AdminRoutes = () => {
           path="/admin/send_notification"
           element={<SendNotificationAdmin />}
         />
+        <Route path="/admin/feedbacks" element={<AdminFeedbacks />} />
       </Route>
 
       {/* Staff Routes */}

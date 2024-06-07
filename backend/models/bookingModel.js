@@ -46,11 +46,16 @@ const bookingSchema = new mongoose.Schema(
     bookedBy: {
       type: mongoose.Schema.Types.ObjectId,
       refPath: "bookedByModel",
+      required: true,
     },
     bookedByModel: {
       type: String,
       required: true,
       enum: ["Staff", "User"],
+    },
+    bookingCost: {
+      type: Number,
+      required: true,
     },
     totalCost: {
       type: Number,

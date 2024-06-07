@@ -36,7 +36,7 @@ export const RecentBookingItem = ({ booking }) => {
               </p>
             </div>
 
-            <p className="font-semibold">+Rs.{booking.totalCost}</p>
+            <p className="font-semibold">+Rs.{booking.bookingCost}</p>
           </div>
           <div className="flex w-100 flex-row justify-between items-center">
             <p className="text-muted-foreground mx-auto text-xs text-center">

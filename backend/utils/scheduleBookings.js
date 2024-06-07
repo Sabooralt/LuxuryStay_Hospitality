@@ -90,7 +90,7 @@ const checkOutBookings = async (req, res) => {
       await booking.save();
 
       const room = await Room.findById(booking.room);
-      room.status = "maintenance";
+      room.status = "cleaning";
       room.availibility = "available";
       const newRoom = await room.save();
 
