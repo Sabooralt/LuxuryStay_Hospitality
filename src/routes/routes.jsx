@@ -41,6 +41,8 @@ import { BookRoom } from "@/pages/Client/pages/BookRoom";
 import { StaffSettings } from "@/pages/StaffDashboard/components/pages/Settings";
 import { StaffReportMaintenance } from "@/pages/StaffDashboard/components/pages/ReportMaintainanceIssues";
 import { Maintenance } from "@/pages/AdminDashboard/pages/Maintenance";
+import { StaffProfileSettings } from "@/pages/StaffDashboard/components/ProfileSettings";
+import { StaffNotificationSettings } from "@/pages/StaffDashboard/components/NotificationSettings";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -112,10 +114,10 @@ export const AdminRoutes = () => {
         <Route path="/admin/guests" element={<Guests />} />
         <Route path="/admin/rooms" element={<Rooms />} />
         <Route path="/admin/tasks" element={<Tasks />} />
-        <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
+        <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/services" element={<Services />} />
-      <Route path="/admin/transactions" element={<Transactions />} />
+        <Route path="/admin/transactions" element={<Transactions />} />
         <Route
           path="/admin/send_notification"
           element={<SendNotificationAdmin />}
@@ -138,7 +140,17 @@ export const AdminRoutes = () => {
         <Route path="/staff/Rooms" element={<StaffRooms />} />
         <Route path="/staff/feedbacks" element={<StaffFeedbacks />} />
         <Route path="/staff/maintenance" element={<StaffReportMaintenance />} />
-        <Route path="/staff/settings" element={<StaffSettings />} />
+        <Route path="/staff/settings" element={<StaffSettings />}>
+          <Route
+            index
+            path="/staff/settings/profile"
+            element={<StaffProfileSettings />}
+          />
+          <Route
+            path="/staff/settings/notifications"
+            element={<StaffNotificationSettings />}
+          />
+        </Route>
       </Route>
     </Routes>
   );

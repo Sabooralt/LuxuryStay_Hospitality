@@ -19,32 +19,29 @@ import * as Yup from "yup";
 
 export const EditStaff = ({ staff }) => {
   const [details, setDetails] = useState({
-      username: staff.username,
-    });
+    username: staff.username,
+  });
 
-  const {dispatch}   = useStaffContext();
-  const {toast} = useToast();
-  
+  const { dispatch } = useStaffContext();
+  const { toast } = useToast();
 
-  const UpdateStaff = async (data,e) => {
+  const UpdateStaff = async (data, e) => {
     e.preventDefault();
     try {
       const response = await axios.patch(
         "/api/staff/update_details/" + staff._id,
         {
-          username : data.username,
-          password : data.password
+          username: data.username,
+          password: data.password,
         }
       );
 
-      if(response.status === 200){
+      if (response.status === 200) {
+        dispatch({ type: "UPDATE_STAFF_DETAILS", payload: response.data });
 
-        dispatch({type : "UPDATE_STAFF_DETAILS",payload : response.data})
- 
-toast({
-    description: "Updated!"
-})
-
+        toast({
+          description: "Updated!",
+        });
       }
     } catch (err) {
       console.log(err);
@@ -66,7 +63,7 @@ toast({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={(e)=>UpdateStaff(details,e)}>
+        <form onSubmit={(e) => UpdateStaff(details, e)}>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="text-right">
               Username
@@ -74,7 +71,9 @@ toast({
             <Input
               id="username"
               value={details.username}
-              onChange={(e) => setDetails({...details,username: e.target.value})}
+              onChange={(e) =>
+                setDetails({ ...details, username: e.target.value })
+              }
               className="col-span-3"
             />
           </div>
@@ -83,18 +82,34 @@ toast({
               <Label htmlFor="name" className="text-right  text-pretty">
                 New Password
               </Label>
-              <Input id="name" onChange={(e)=>setDetails({...details, password : e.target.value})} type="password" className="col-span-3" />
+              <Input
+                id="name"
+                onChange={(e) =>
+                  setDetails({ ...details, password: e.target.value })
+                }
+                type="password"
+                className="col-span-3"
+              />
             </div>
           </div>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right ">Confirm Password</Label>
-              <Input type="password" onChange={(e)=>SetConfirmPassword({...details, confirmPassword: e.target.value})}  className="col-span-3" />
+              <Input
+                type="password"
+                onChange={(e) =>
+                  SetConfirmPassword({
+                    ...details,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                className="col-span-3"
+              />
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="submit" >Save changes</Button>
+            <Button type="submit">Save changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>
