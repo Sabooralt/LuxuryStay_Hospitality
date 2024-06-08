@@ -1,13 +1,5 @@
 import { Package2, Settings } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { NotiDropDown } from "@/globalComponents/NotiDropDown";
 import { useStaffAuthContext } from "@/hooks/useStaffAuth";
@@ -23,8 +15,24 @@ export function StaffSidebar() {
   const { staff } = useStaffAuthContext();
 
   const roleAccess = {
-    Housekeeper: ["Dashboard", "Rooms", "Tasks", "Notifications"],
-    Receptionist: ["Dashboard", "Rooms", "Tasks", "Notifications", "Bookings","Feedbacks"],
+    Housekeeper: [
+      "Dashboard",
+      "Rooms",
+      "Tasks",
+      "Notifications",
+      "Settings",
+      "Report Maintenance Issues",
+    ],
+    Receptionist: [
+      "Dashboard",
+      "Rooms",
+      "Tasks",
+      "Notifications",
+      "Bookings",
+      "Feedbacks",
+      "Report Maintenance Issues",
+      "Settings",
+    ],
   };
   const accessibleItems = StaffItems.filter((item) =>
     roleAccess[staff.role]?.includes(item.name)
@@ -64,13 +72,14 @@ export function StaffSidebar() {
           </nav>
         </div>
         <div className="mt-auto p-4">
-          <Button
-            className="w-full flex flex-row gap-4 items-center"
-            variant="outline"
-          >
-            {" "}
-            Settings <Settings className="w-4 h-4" />
-          </Button>
+          <Link to="/staff/settings">
+            <Button
+              className="w-full flex flex-row gap-4 items-center"
+              variant="outline"
+            >
+              Settings <Settings className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

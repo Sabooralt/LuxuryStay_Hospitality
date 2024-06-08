@@ -4,13 +4,17 @@ const Room = require("../models/roomModel");
 const User = require("../models/userModel");
 const Staff = require("../models/staffModel");
 const RoomType = require("../models/roomTypeModel");
+const Task = require("../models/taskModel");
 const {
   sendNotificationToAdmins,
   sendNotification,
+  sendNotificationToStaff,
+  sendNotificationToHousekeepers,
 } = require("./notificationController");
 const generateBookingId = require("../utils/generateBookingId");
 const { sendEmail } = require("./emailController");
 const { htmlContent } = require("../utils/emailTemplate");
+const generateTaskId = require("../utils/generateTaskId");
 
 const bookRoomByGuest = async (req, res) => {
   try {
@@ -81,7 +85,6 @@ const bookRoomByGuest = async (req, res) => {
     }
     const memberName = member.fullName;
 
-    // Calculate booking details
     const numberOfNights = Math.ceil(
       (checkOut - checkIn) / (1000 * 60 * 60 * 24)
     );
@@ -92,7 +95,6 @@ const bookRoomByGuest = async (req, res) => {
 
     const description = `${memberName} booked room ${assignedRoom.roomNumber} for ${numberOfNights} night(s).`;
 
-    // Create and save the booking
     const booking = new Booking({
       bookingId,
       room: assignedRoom._id,
@@ -110,7 +112,6 @@ const bookRoomByGuest = async (req, res) => {
 
     const newBooking = await booking.save();
 
-    // Update room status
     assignedRoom.availibility = "not available";
     assignedRoom.bookings.push(newBooking._id);
     await assignedRoom.save();
@@ -149,7 +150,6 @@ const bookRoomByGuest = async (req, res) => {
       memberId
     );
 
-    // Notify users via socket
     const guestIdString = memberId.toString();
     const socketId = req.guestSockets[guestIdString];
     if (socketId) {
@@ -163,6 +163,59 @@ const bookRoomByGuest = async (req, res) => {
     Object.values(req.userSockets).forEach((socketId) => {
       req.io.to(socketId).emit("newBooking", populatedBooking);
     });
+
+    if (assignedRoom.status === "cleaning") {
+      const housekeepers = await Staff.find({ role: "Housekeeper" });
+
+      if (!housekeepers || housekeepers.length === 0) {
+        return res.status(500).json({
+          success: false,
+          message: "No housekeepers available to assign the task.",
+        });
+      }
+
+      const taskId = await generateTaskId();
+      const cleaningTask = new Task({
+        title: `Clean Room ${assignedRoom.roomNumber}`,
+        taskId,
+        description: `The room ${assignedRoom.roomNumber} has been booked and is currently marked as 'cleaning'. It needs to be cleaned and prepared for the new guest, ${memberName}, who will check in on ${checkInDate}. This task includes ensuring all amenities are in place and the room meets the cleanliness standards required for new guests.`,
+        deadlineDate: checkIn,
+        deadlineTime: "00:00",
+        assignedTo: housekeepers.map((housekeeper) => housekeeper._id),
+        createdBy: memberId,
+        priority: "High",
+        status: "Pending",
+      });
+
+      await cleaningTask.save();
+
+      for (const staff of housekeepers) {
+        const StaffIdString = staff._id.toString();
+        const socketId = req.staffSockets[StaffIdString];
+        if (socketId) {
+          req.io.to(socketId).emit("createTask", cleaningTask);
+        }
+        await sendNotificationToHousekeepers(
+          req,
+          `A Task has been assigned to you automatically.`,
+          cleaningTask.description,
+          staff._id,
+          `/tasks/${cleaningTask._id}`
+        );
+      }
+
+      for (const adminId in req.userSockets) {
+        const AdminIdString = adminId.toString();
+        const adminSocketId = req.userSockets[AdminIdString];
+        req.io.to(adminSocketId).emit("createTask", cleaningTask);
+      }
+
+      await sendNotificationToAdmins(
+        req,
+        `A Task has been assigned to Housekeepers`,
+        cleaningTask.description
+      );
+    }
 
     // Send email
     setImmediate(async () => {
@@ -231,15 +284,6 @@ const bookRoom = async (req, res) => {
         .json({ success: false, message: "Room not found" });
     }
 
-    const member = await User.findById(memberId);
-    if (!member) {
-      return res.status(404).json({
-        success: false,
-        message: "No member found with the id provided!",
-      });
-    }
-    const memberName = member.fullName;
-
     const conflictingBookings = await Booking.find({
       room: roomId,
       $or: [
@@ -255,6 +299,15 @@ const bookRoom = async (req, res) => {
       });
     }
 
+    const member = await User.findById(memberId);
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: "No member found with the provided ID!",
+      });
+    }
+    const memberName = member.fullName;
+
     const numberOfNights = Math.ceil(
       (checkOut - checkIn) / (1000 * 60 * 60 * 24)
     );
@@ -267,7 +320,7 @@ const bookRoom = async (req, res) => {
 
     const booking = new Booking({
       bookingId,
-      room: roomId,
+      room: room._id,
       stay: numberOfNights,
       member: memberId,
       bookingCost: totalBookingCost,
@@ -275,17 +328,12 @@ const bookRoom = async (req, res) => {
       uniqueKey,
       checkInDate,
       checkOutDate,
-      bookedBy: userId,
+      bookedBy: memberId,
       bookedByModel: userType,
       totalCost: totalBookingCost,
     });
 
     const newBooking = await booking.save();
-
-    room.status = "occupied";
-    room.availibility = "not available";
-    room.bookings.push(newBooking._id);
-    await room.save();
 
     const fieldsToSelect =
       userType === "User"
@@ -301,6 +349,7 @@ const bookRoom = async (req, res) => {
         select: fieldsToSelect,
       });
 
+    // Send notifications
     if (userType === "Staff") {
       await sendNotificationToAdmins(
         req,
@@ -315,7 +364,7 @@ const bookRoom = async (req, res) => {
       req,
       `Booking Confirmation!`,
       `Your booking has been successfully confirmed. We're thrilled to have you with us! Please keep an eye on your email for all the exciting details. Have a wonderful day!`,
-      `/profile/booking/${populatedBooking._id}`,
+      `/profile/booking`,
       "member",
       memberId
     );
@@ -330,11 +379,69 @@ const bookRoom = async (req, res) => {
     Object.values(req.staffSockets).forEach((socketId) => {
       req.io.to(socketId).emit("newBooking", populatedBooking);
     });
-
     Object.values(req.userSockets).forEach((socketId) => {
       req.io.to(socketId).emit("newBooking", populatedBooking);
     });
 
+    if (room.status === "cleaning") {
+      const housekeepers = await Staff.find({ role: "Housekeeper" });
+
+      if (!housekeepers || housekeepers.length === 0) {
+        return res.status(500).json({
+          success: false,
+          message: "No housekeepers available to assign the task.",
+        });
+      }
+
+      const taskId = await generateTaskId();
+      const cleaningTask = new Task({
+        title: `Clean Room ${room.roomNumber}`,
+        taskId,
+        description: `The room ${room.roomNumber} has been booked and is currently marked as 'cleaning'. It needs to be cleaned and prepared for the new guest, ${memberName}, who will check in on ${checkInDate}. This task includes ensuring all amenities are in place and the room meets the cleanliness standards required for new guests.`,
+        deadlineDate: checkIn,
+        deadlineTime: "00:00",
+        assignedTo: housekeepers.map((housekeeper) => housekeeper._id),
+        createdBy: userId,
+        priority: "High",
+        status: "Pending",
+      });
+
+      await cleaningTask.save();
+
+      for (const staff of housekeepers) {
+        const StaffIdString = staff._id.toString();
+        const socketId = req.staffSockets[StaffIdString];
+        if (socketId) {
+          req.io.to(socketId).emit("createTask", cleaningTask);
+        }
+        await sendNotificationToStaff(
+          req,
+          `A Task has been assigned to you automatically.`,
+          cleaningTask.description,
+          staff._id,
+          `/tasks/${cleaningTask._id}`
+        );
+      }
+
+      for (const adminId in req.userSockets) {
+        const AdminIdString = adminId.toString();
+        const adminSocketId = req.userSockets[AdminIdString];
+        req.io.to(adminSocketId).emit("createTask", cleaningTask);
+      }
+
+      await sendNotificationToAdmins(
+        req,
+        `A Task has been assigned to Housekeepers`,
+        cleaningTask.description
+      );
+    }
+
+    room.availibility = "not available";
+    room.status = "occupied";
+    room.bookings.push(newBooking._id);
+    await room.save();
+
+    // Send email
     setImmediate(async () => {
       const htmlContent = `
         <h1>Booking Confirmation</h1>
@@ -360,13 +467,15 @@ const bookRoom = async (req, res) => {
         console.error("Error sending booking confirmation email:", error);
       }
     });
+
     res.status(201).json({
       success: true,
+      id: populatedBooking._id,
       message: `Booking created successfully, the key to access the room is ${populatedBooking.uniqueKey}`,
     });
   } catch (error) {
     console.error("Error booking room:", error);
-    return res
+    res
       .status(500)
       .json({ success: false, message: "Internal server error", error });
   }

@@ -30,6 +30,7 @@ const guestReqRoutes = require("./routes/guestRequestRoutes");
 const wakeUpCallRoutes = require("./routes/wakeUpRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const analyticsRoutes = require("./routes/analyticRoutes");
+const maintenanceRoutes = require("./routes/maintenanceRoutes");
 
 const serviceRoutes = require("./routes/serviceRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
@@ -69,8 +70,9 @@ app.use("/api/serviceCategory", serviceCategoryRoutes);
 app.use("/api/orderService", orderServiceRoutes);
 app.use("/api/guestReq", guestReqRoutes);
 app.use("/api/wakeUp", wakeUpCallRoutes);
-app.use("/api/feedback", feedbackRoutes)
-app.use("/api/analytics", analyticsRoutes)
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

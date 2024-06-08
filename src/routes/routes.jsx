@@ -38,6 +38,9 @@ import { Feedbacks } from "@/pages/Client/pages/Feedbacks";
 import { StaffFeedbacks } from "@/pages/StaffDashboard/components/pages/Feedback";
 import { AdminFeedbacks } from "@/pages/AdminDashboard/pages/Feedbacks";
 import { BookRoom } from "@/pages/Client/pages/BookRoom";
+import { StaffSettings } from "@/pages/StaffDashboard/components/pages/Settings";
+import { StaffReportMaintenance } from "@/pages/StaffDashboard/components/pages/ReportMaintainanceIssues";
+import { Maintenance } from "@/pages/AdminDashboard/pages/Maintenance";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
@@ -51,18 +54,20 @@ export const AdminRoutes = () => {
         />
 
         <Route path="/blog" element={<Blog />} />
-        <Route path="/rooms" element={<ClientRooms />}>
-        </Route>
+        <Route path="/rooms" element={<ClientRooms />}></Route>
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/feedback" element={<Feedbacks />} />
-        <Route path="/boomRoom/:roomId" element={<BookRoom/>} />
+        <Route path="/boomRoom/:roomId" element={<BookRoom />} />
         <Route
           path="/profile"
           element={user ? <Profile /> : <Navigate to="/user/login" />}
         >
           <Route index element={<ProfileHome />} />
-          <Route path="/profile/bookings/:bookingId?" element={<GuestBookings />} />
+          <Route
+            path="/profile/bookings/:bookingId?"
+            element={<GuestBookings />}
+          />
           <Route path="/profile/settings" element={<ProfileSettings />} />
         </Route>
 
@@ -110,12 +115,13 @@ export const AdminRoutes = () => {
         <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
         <Route path="/admin/services" element={<Services />} />
-        <Route path="/admin/transactions" element={<Transactions />} />
+      <Route path="/admin/transactions" element={<Transactions />} />
         <Route
           path="/admin/send_notification"
           element={<SendNotificationAdmin />}
         />
         <Route path="/admin/feedbacks" element={<AdminFeedbacks />} />
+        <Route path="/admin/maintenance" element={<Maintenance />} />
       </Route>
 
       {/* Staff Routes */}
@@ -131,6 +137,8 @@ export const AdminRoutes = () => {
         <Route path="/staff/Bookings" element={<StaffBookings />} />
         <Route path="/staff/Rooms" element={<StaffRooms />} />
         <Route path="/staff/feedbacks" element={<StaffFeedbacks />} />
+        <Route path="/staff/maintenance" element={<StaffReportMaintenance />} />
+        <Route path="/staff/settings" element={<StaffSettings />} />
       </Route>
     </Routes>
   );

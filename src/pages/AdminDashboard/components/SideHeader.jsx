@@ -13,6 +13,7 @@ import {
   PlusCircle,
   Search,
   Settings,
+  Sheet,
   ShoppingCart,
   Upload,
   Users,
@@ -72,7 +73,12 @@ const sideItems = [
   {
     name: "Feedbacks",
     link: "/admin/feedbacks",
-  icon: <MessageSquareText className="size-5" />,
+    icon: <MessageSquareText className="size-5" />,
+  },
+  {
+    name: "Maintenace",
+    link: "/admin/maintenance",
+    icon: <Sheet className="size-5" />,
   },
 ];
 

@@ -22,6 +22,7 @@ import { Check, CheckCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket";
 import { useToast } from "@/components/ui/use-toast";
+import { FaRunning } from "react-icons/fa";
 
 export const GuestTaskCard = ({ task, admin }) => {
   const { dispatch } = useTaskContext();
@@ -30,7 +31,6 @@ export const GuestTaskCard = ({ task, admin }) => {
   const { toast } = useToast();
 
   const { staff } = useStaffAuthContext();
-
 
   const taskId = task._id;
 
@@ -153,24 +153,29 @@ export const GuestTaskCard = ({ task, admin }) => {
           </>
         )}
       </CardFooter>
+      <div className="mx-auto flex gap-2">
+
       <Button
         onClick={handleOnTheWay}
         disabled={task.seen}
-        className="flex gap-2 text-sm"
+        variant="secondary"
+        className="flex gap-2 w-fit text-sm"
       >
         On The Way
-        <Check className="h-5 w-5" />
+        <FaRunning className="size-4.5" />
       </Button>
       <Button
         onClick={markAsCompleted}
         disabled={task.completed}
-        className="flex gap-2 text-sm"
+        className="flex gap-2 w-fit text-sm"
       >
         {task.completedBy
           ? `Completed by ${task.completedBy.username}`
           : "Mark as Completed "}{" "}
-        <Check className="h-5 w-5" />
+        <Check className="size-4" />
       </Button>
+      </div>
+
     </Card>
   );
 };

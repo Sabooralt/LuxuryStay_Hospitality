@@ -3,6 +3,7 @@ import {
   BookKey,
   ClipboardList,
   Home,
+  Sheet,
   Warehouse,
 } from "lucide-react";
 
@@ -37,6 +38,11 @@ export const StaffItems = [
     name: "Feedbacks",
     icon: <BellElectricIcon className="h-4 w-4" />,
     link: "/staff/feedbacks",
+  },
+  {
+    name: "Report Maintenance Issues",
+    icon: <Sheet className="h-4 w-4" />,
+    link: "/staff/Maintenance",
   },
 
 ];

@@ -1,6 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RoomStatusSelect } from "@/globalComponents/RoomStatusSelect";
+import { useStaffAuthContext } from "@/hooks/useStaffAuth";
 import { format, isValid } from "date-fns";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
@@ -56,13 +58,28 @@ export const RoomColumnDef = [
     header: "Status",
     cell: ({ row }) => {
       const value = row.getValue("Status");
+      const id = row.original._id;
+      const { staff } = useStaffAuthContext();
 
       return (
-        <Badge variant={value === "vacant" ? "default" : "default"}>
-          {value}
-        </Badge>
+        <>
+          {staff ? (
+            staff.role === "Housekeeper" ? (
+              <RoomStatusSelect status={value} id={id} />
+            ) : (
+              <Badge variant={value === "vacant" ? "default" : "default"}>
+                {value}
+              </Badge>
+            )
+          ) : (
+            <Badge variant={value === "vacant" ? "default" : "default"}>
+              {value}
+            </Badge>
+          )}
+        </>
       );
     },
+
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },

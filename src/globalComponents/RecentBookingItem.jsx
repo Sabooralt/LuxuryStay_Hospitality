@@ -58,13 +58,16 @@ export const RecentBookingItem = ({ booking }) => {
             <p className="text-sm flex items-center gap-1">
               This booking was done by
               <span className="font-semibold capitalize">
-                {booking.bookedByModel === "User" ? (
-                  <>{booking.bookedBy.first_name}</>
-                ) : (
-                  <>
-                    {booking.bookedBy.username} ({booking.bookedBy.role})
-                  </>
-                )}
+                {booking.bookedByModel === "User"
+                  ? booking.bookedBy.first_name || "unknown"
+                  : booking.bookedByModel === "Staff" &&
+                    (booking.bookedBy ? (
+                      <>
+                        {booking.bookedBy.username} ({booking.bookedBy.role})
+                      </>
+                    ) : (
+                      "unknown"
+                    ))}
               </span>
             </p>
             <div className="flex flex-col items-start pt-2 gap-2">

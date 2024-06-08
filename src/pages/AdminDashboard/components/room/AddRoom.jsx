@@ -39,7 +39,7 @@ export const AddRoom = () => {
   const [roomNumberStatus, setRoomNumberStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [roomNumber, setRoomNumber] = useState(null);
-  const [multipleRooms,setMultipleRooms] = useState(0);
+  const [multipleRooms, setMultipleRooms] = useState(0);
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
   const [capacity, setCapacity] = useState(null);
@@ -124,6 +124,22 @@ export const AddRoom = () => {
       toast({
         title: responseG,
       });
+      roomNumber,
+        description,
+        type,
+        capacity,
+        pricePerNight,
+        multipleRooms,
+        amenities,
+        images,
+        setRoomData({});
+      setRoomNumber(null);
+      setDescription("");
+      setType(null);
+      setCapacity(null);
+      setPricePerNight(null);
+      setMultipleRooms(null);
+      setImages([]);
     }
   }, [responseG]);
 
@@ -273,7 +289,11 @@ export const AddRoom = () => {
 
           <div className="grid gap-2">
             <Label>Create Multiple Rooms:</Label>
-            <Input type='number' value={multipleRooms} onChange={(e)=>setMultipleRooms(e.target.value)} />
+            <Input
+              type="number"
+              value={multipleRooms}
+              onChange={(e) => setMultipleRooms(e.target.value)}
+            />
             <p className="text-muted-foreground text-sm">
               If you want to create multiple rooms, please enter the number of
               rooms you wish to create. Rooms will be created starting from the
@@ -284,7 +304,11 @@ export const AddRoom = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            disabled={!roomNumber || !description || !capacity || isLoading}
+            className="w-full"
+          >
             {isLoading ? (
               <>
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />

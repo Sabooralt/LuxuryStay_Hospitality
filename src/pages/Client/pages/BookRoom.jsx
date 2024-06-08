@@ -1,12 +1,10 @@
 import { useFeedbackContext } from "@/context/feedbackContext";
 import { FeedbackCard } from "@/globalComponents/FeedbackCard";
-import { RoomCard } from "@/globalComponents/RoomCard";
 import { useOneRoomPerType } from "@/hooks/useOneRoomPerType";
 import { formatPrice } from "@/utils/seperatePrice";
 import { useParams } from "react-router-dom";
 import { ClientAddBooking } from "../componenets/ClientAddBooking";
-import { useEffect } from "react";
-import { toast } from "sonner";
+
 
 export const BookRoom = () => {
   const { roomPerType: rooms, loading } = useOneRoomPerType();
@@ -24,18 +22,11 @@ export const BookRoom = () => {
     feedback &&
     feedback.length > 0 &&
     feedback.filter((f) => f.room === roomId);
-
-    useEffect(()=>{
-      toast("Event has been created!",{
-        cancel: true
-      })
-    },[])
-
   return (
     room && (
       <div className="h-screen grid grid-cols-2 py-20 place-items-center">
         <div>
-            <ClientAddBooking room={room} title={room.name}/>
+          <ClientAddBooking room={room} title={room.name} />
         </div>
 
         <div className="grid col-span-1 p-10 gap-3">

@@ -49,7 +49,7 @@ export const RoomTable = () => {
     onRowSelectionChange: setRowSelection,
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getRowId: (row) => row._id,
+    getRowId: (row) => row?._id,
     state: {
       sorting,
       columnFilters,

@@ -32,21 +32,28 @@ const createRoom = async (req, res) => {
         .json({ success: false, message: "Room type not found!" });
     }
 
-    let rooms = [];
-    let currentRoomNumber = roomNumber;
-
+    const startRoomNumber = parseInt(roomNumber, 10);
     const roomsToCreate = multipleRooms ? parseInt(multipleRooms, 10) : 1;
+    const endRoomNumber = startRoomNumber + roomsToCreate - 1;
 
+    // Check if any room number in the range already exists
+    const existingRooms = await Room.find({
+      roomNumber: { $gte: startRoomNumber, $lte: endRoomNumber },
+    });
+
+    if (existingRooms.length > 0) {
+      const takenRoomNumbers = existingRooms.map((room) => room.roomNumber);
+      return res.status(409).json({
+        success: false,
+        message: `Room numbers ${takenRoomNumbers.join(
+          ", "
+        )} are not available!`,
+      });
+    }
+
+    let rooms = [];
     for (let i = 0; i < roomsToCreate; i++) {
-      const checkRoom = await Room.findOne({ roomNumber: currentRoomNumber });
-
-      if (checkRoom) {
-        // Changed to findOne and variable name checkRoom
-        return res.status(409).json({
-          success: false,
-          message: `Room Number ${currentRoomNumber} not available!`,
-        });
-      }
+      const currentRoomNumber = startRoomNumber + i;
 
       const room = await Room.create({
         ...req.body,
@@ -54,14 +61,10 @@ const createRoom = async (req, res) => {
         name: `${typeOfRoom.type} Room`,
         images: images,
       });
-
       rooms.push(room);
-      currentRoomNumber++;
     }
 
-    res
-      .status(201)
-      .json({ message: "Room(s) created successfully", rooms: rooms });
+    res.status(201).json({ message: "Room(s) created successfully" });
   } catch (err) {
     if (err.name === "ValidationError") {
       res.status(400).json({ error: "Validation error", message: err.message });
@@ -123,6 +126,7 @@ const updateStatus = async (req, res) => {
       });
     }
 
+    req.io.emit("roomStatus", room);
     const staffUsername = staff.username;
 
     await sendNotificationToAdmins(

@@ -26,6 +26,7 @@ import { useToast } from "@/components/ui/use-toast";
 export const TaskCard = ({ task, admin }) => {
   const { dispatch } = useTaskContext();
   const [selected, setSelected] = useState(false);
+  const [truncate, setTruncate] = useState(false);
 
   const { toast } = useToast();
 
@@ -111,7 +112,7 @@ export const TaskCard = ({ task, admin }) => {
     <Card
       onClick={markTaskAsSeen}
       id={task._id}
-      className={`p-4 pb-6 relative grid shadow-md text-nowrap rounded-[0.4rem] w-full hover:bg-gray-100 transition duration-300 gap-2 cursor-pointer  ${
+      className={`p-4 pb-6 relative grid shadow-md h-fit text-nowrap rounded-[0.4rem] w-full hover:bg-gray-100 transition duration-300 gap-2 cursor-pointer  ${
         selected || task.completedBy ? "bg-gray-50" : ""
       } `}
     >
@@ -135,7 +136,12 @@ export const TaskCard = ({ task, admin }) => {
         </div>
       </CardHeader>
 
-      <CardDescription className="line-clamp-[2] text-ellipsis overflow-hidden">
+      <CardDescription
+        onClick={() => setTruncate((e) => !e)}
+        className={` ${
+          !truncate ? "line-clamp-[2]" : ""
+        } truncate text-ellipsis overflow-hidden`}
+      >
         {task.description}
       </CardDescription>
 
@@ -185,28 +191,6 @@ export const TaskCard = ({ task, admin }) => {
             </div>
           )}
         </div>
-        {admin && (
-          <>
-            <div className="flex flex-row ml-auto gap-4">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      className="w-fit h-fit p-2 ml-auto"
-                      onClick={() => handleDeleteTask(task._id)}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Delete Task</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </>
-        )}
       </CardFooter>
       <Button
         onClick={markAsCompleted}

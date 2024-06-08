@@ -10,7 +10,7 @@ export const StaffNotifications = () => {
   const { handleNotiSeen } = useNotiMarkAsSeen();
 
   return (
-    <>
+    <div className="grid gap-5 py-2">
       {noti &&
         noti.map((noti) => (
           <Card
@@ -29,6 +29,6 @@ export const StaffNotifications = () => {
             </CardFooter>
           </Card>
         ))}
-    </>
+    </div>
   );
 };

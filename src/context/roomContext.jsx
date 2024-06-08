@@ -10,17 +10,29 @@ export const RoomReducer = (state, action) => {
       return {
         room: action.payload,
       };
-    case "NEW_ROOM":
+
+    case "DELETE_ROOM":
       return {
-        room: [action.payload, ...state.room],
+        room: state.room
+          ? state.room.filter((w) => !action.payload.includes(w._id))
+          : [],
       };
-      case "DELETE_ROOM":
-        return {
-          
-          room: state.room
-            ? state.room.filter((w) => !action.payload.includes(w._id))
-            : [],
-        };
+    case "UPDATE_STATUS":
+      const updatedStatus = state.room.map((room) => {
+        if (room._id === action.payload._id) {
+          return {
+            ...room,
+            status: action.payload.status,
+            availibility: action.payload.availibility,
+          };
+        }
+        return room;
+      });
+
+      return {
+        ...state,
+        room: updatedStatus,
+      };
     default:
       return state;
   }
@@ -50,16 +62,15 @@ export const RoomContextProvider = ({ children }) => {
       dispatch({ type: "DELETE_ROOM", payload: room });
     };
 
-    const newRoom = (room) => {
-      dispatch({ type: "NEW_ROOM", payload: room.room });
+    const roomStatus = (room) => {
+      dispatch({ type: "UPDATE_STATUS", payload: room });
     };
-
     socket.on("deleteRoom", deleteRoom);
-    socket.on("newRoom", newRoom);
+    socket.on("roomStatus", roomStatus);
 
     return () => {
+      socket.off("roomStatus", roomStatus);
       socket.off("deleteRoom", deleteRoom);
-      socket.off("newRoom", newRoom);
     };
   }, [socket]);
 
