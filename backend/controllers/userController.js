@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 require("dotenv").config();
+const bcrypt = require('bcryptjs')
 
 const jwt = require("jsonwebtoken");
 
@@ -68,12 +69,17 @@ const signupUser = async (req, res) => {
 
 const updateUserDetails = async (req, res) => {
   try {
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, password } = req.body;
     const { userId } = req.params;
 
     let user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+    if (password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      user.password = hashedPassword;
     }
 
     user.first_name = firstName || user.first_name;
@@ -84,12 +90,6 @@ const updateUserDetails = async (req, res) => {
 
     res.status(200).json({
       message: "User details updated successfully",
-      user: {
-        _id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-      },
     });
   } catch (error) {
     console.error(error);
@@ -106,6 +106,7 @@ const updatePassword = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Password updated!" });
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ success: false, message: err });
   }
 };

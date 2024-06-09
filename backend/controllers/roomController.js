@@ -3,10 +3,11 @@ const Staff = require("../models/staffModel");
 const RoomType = require("../models/roomTypeModel");
 const User = require("../models/userModel");
 const { sendNotificationToAdmins } = require("./notificationController");
+const { createBlogUtil } = require("./blogController");
 
 const getRooms = async (req, res) => {
   try {
-    const rooms = await Room.find().populate("type");
+    const rooms = await Room.find().sort({ createdAt: -1 }).populate("type");
 
     if (!rooms) {
       return res.status(404).json({ message: "No Rooms available" });
@@ -19,7 +20,16 @@ const getRooms = async (req, res) => {
 };
 const createRoom = async (req, res) => {
   try {
-    const { type, roomNumber, multipleRooms } = req.body; // Corrected variable name
+    const {
+      type,
+      roomNumber,
+      multipleRooms,
+      blog,
+      blogTitle,
+      blogDescription,
+      blogAuthor,
+      notifyGuests,
+    } = req.body;
     const images = req.files.map((file) => ({
       filepath: file.filename,
     }));
@@ -36,7 +46,6 @@ const createRoom = async (req, res) => {
     const roomsToCreate = multipleRooms ? parseInt(multipleRooms, 10) : 1;
     const endRoomNumber = startRoomNumber + roomsToCreate - 1;
 
-    // Check if any room number in the range already exists
     const existingRooms = await Room.find({
       roomNumber: { $gte: startRoomNumber, $lte: endRoomNumber },
     });
@@ -63,12 +72,26 @@ const createRoom = async (req, res) => {
       });
       rooms.push(room);
     }
+    if (blog) {
+      const blog = await createBlogUtil({
+        req,
+        
+        title: blogTitle,
+        image: "null",
+        content: blogDescription,
+        author: blogAuthor,
+        roomId: typeOfRoom._id,
+        notifyGuests: notifyGuests,
+      });
+      console.log("Blog created:", blog);
+    }
 
     res.status(201).json({ message: "Room(s) created successfully" });
   } catch (err) {
     if (err.name === "ValidationError") {
       res.status(400).json({ error: "Validation error", message: err.message });
     } else {
+      console.log(err);
       res
         .status(500)
         .json({ error: "Internal server error", message: err.message });

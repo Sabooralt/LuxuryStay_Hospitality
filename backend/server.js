@@ -31,6 +31,8 @@ const wakeUpCallRoutes = require("./routes/wakeUpRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const analyticsRoutes = require("./routes/analyticRoutes");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
+const policyRoutes = require("./routes/policyRoutes");
+const blogRoutes = require("./routes/blogRoutes");
 
 const serviceRoutes = require("./routes/serviceRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
@@ -73,6 +75,8 @@ app.use("/api/wakeUp", wakeUpCallRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/policy", policyRoutes);
+app.use("/api/blog", blogRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

@@ -32,14 +32,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { Check, CheckCheckIcon, Cross, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
-export const AddRoom = () => {
+export const AddRoom = ({reMount}) => {
   // Form States
+  const [key, setKey] = useState(0);
 
   const [roomNumberStatus, setRoomNumberStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [roomNumber, setRoomNumber] = useState(null);
-  const [multipleRooms, setMultipleRooms] = useState(0);
+  const [multipleRooms, setMultipleRooms] = useState(1);
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
   const [capacity, setCapacity] = useState(null);
@@ -47,7 +49,36 @@ export const AddRoom = () => {
   const [amenities, setAmenities] = useState([]);
   const [images, setImages] = useState([]);
   const { toast } = useToast();
+  const { roomTypes } = useRoomTypeContext();
+  const { user } = useAuthContextProvider();
+  const { InsertRoom, isLoading, responseG, error } = useAddRoom({reMount});
+  const [blog, setBlog] = useState(false);
+  const [blogTitle, setBlogTitle] = useState("");
+  const [blogDescription, setBlogDescription] = useState("");
+  const [notifyGuests, setNotifyGuests] = useState(false);
+  const [author, setAuthor] = useState(null);
+  const [blogDetails, setBlogDetails] = useState({
+    blogTitle,
+    blogDescription,
+    notifyGuests,
+    author,
+  });
 
+  useEffect(() => {
+    setBlogDetails({
+      blogTitle,
+      blogDescription,
+      notifyGuests,
+      author,
+    });
+    console.log(blogDetails);
+  }, [blogTitle, blogDescription, notifyGuests, author]);
+
+  useEffect(() => {
+    if (user) {
+      setAuthor(user.fullName);
+    }
+  }, [user]);
   const [roomData, setRoomData] = useState({
     roomNumber,
     description,
@@ -57,6 +88,7 @@ export const AddRoom = () => {
     multipleRooms,
     amenities,
     images,
+    blog,
   });
   useEffect(() => {
     setRoomData({
@@ -68,7 +100,9 @@ export const AddRoom = () => {
       multipleRooms,
       amenities,
       images,
+      blog,
     });
+    console.log(blogDetails);
   }, [
     roomNumber,
     description,
@@ -78,12 +112,9 @@ export const AddRoom = () => {
     multipleRooms,
     amenities,
     images,
+    blog,
   ]);
   // Form States
-
-  const { roomTypes } = useRoomTypeContext();
-  const { user } = useAuthContextProvider();
-  const { InsertRoom, isLoading, responseG, error } = useAddRoom();
 
   const checkAvail = async () => {
     setLoading(null);
@@ -153,10 +184,18 @@ export const AddRoom = () => {
     }
   }, [error]);
 
+  const remountComponent = () => {
+    setKey((prevKey) => prevKey + 1);
+  };
+
   return (
     <Card className="w-full max-w-md">
       <form
-        onSubmit={(e) => InsertRoom(roomData, e)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log(blogDetails);
+          InsertRoom(roomData, blogDetails);
+        }}
         encType="multipart/form-data"
       >
         <CardHeader>
@@ -302,11 +341,63 @@ export const AddRoom = () => {
               single room.
             </p>
           </div>
+          <div className="grid gap-2">
+            <div className="flex flex-row gap-2">
+              <Checkbox
+                defaultChecked={blog}
+                onCheckedChange={() => setBlog((e) => !e)}
+              />
+              <Label>Add blog post about the room?</Label>
+            </div>
+
+            {blog && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Blog</CardTitle>
+                  <CardDescription>Blog Details</CardDescription>
+                </CardHeader>
+                <CardContent className=" grid gap-4">
+                  <div className="grid gap-2">
+                    <Label>Blog Title:</Label>
+                    <Input
+                      value={blogTitle}
+                      onChange={(e) => setBlogTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Blog Content: </Label>
+                    <Textarea
+                      rows="8"
+                      value={blogDescription}
+                      onChange={(e) => setBlogDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Author: </Label>
+                    <Input rows="8" value={author} disabled />
+                  </div>
+                  <div className="flex flex-row items-center gap-2">
+                    <Checkbox
+                      defaultChecked={notifyGuests}
+                      onCheckedChange={(e) => setNotifyGuests((e) => !e)}
+                    />
+                    <Label>Notify Guests About this blog? </Label>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </CardContent>
         <CardFooter>
           <Button
             type="submit"
-            disabled={!roomNumber || !description || !capacity || isLoading}
+            disabled={
+              !roomNumber ||
+              !description ||
+              !capacity ||
+              isLoading ||
+              multipleRooms === 0
+            }
             className="w-full"
           >
             {isLoading ? (

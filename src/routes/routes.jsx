@@ -22,7 +22,6 @@ import { StaffBookings } from "@/pages/StaffDashboard/components/pages/Bookings"
 import { AdminBookings } from "@/pages/AdminDashboard/pages/Bookings";
 import { Home } from "@/pages/Client/pages/Home";
 import { Not_Found } from "@/404";
-import { Blog } from "@/pages/Client/pages/Blog";
 import { About } from "@/pages/Client/pages/About";
 import { ContactUs } from "@/pages/Client/pages/Contact";
 import { ClientRooms } from "@/pages/Client/pages/Rooms";
@@ -43,22 +42,29 @@ import { StaffReportMaintenance } from "@/pages/StaffDashboard/components/pages/
 import { Maintenance } from "@/pages/AdminDashboard/pages/Maintenance";
 import { StaffProfileSettings } from "@/pages/StaffDashboard/components/ProfileSettings";
 import { StaffNotificationSettings } from "@/pages/StaffDashboard/components/NotificationSettings";
+import { Policies } from "@/pages/AdminDashboard/components/settings/Policies";
+import { AdminProfile } from "@/pages/AdminDashboard/components/settings/Profile";
+import { ClientPolicies } from "@/pages/Client/pages/Policies";
+import { GuestFeedbacks } from "@/pages/Client/componenets/GuestFeedbacks";
+import { Billings } from "@/pages/Client/componenets/Billings";
+import { Blogs } from "@/pages/Client/pages/Blog";
 
 export const AdminRoutes = () => {
   const { user } = useAuthContextProvider();
   const { staff } = useStaffAuthContext();
   return (
     <Routes>
-      <Route path="/" element={<Rootlayout />}>
-        <Route
-          index
-          element={user ? <Home /> : <Navigate to="/user/login" />}
-        />
+      <Route
+        path="/"
+        element={user ? <Rootlayout /> : <Navigate to="/user/login" />}
+      >
+        <Route index element={<Home />} />
 
-        <Route path="/blog" element={<Blog />} />
+        <Route path="/policies" element={<ClientPolicies />} />
         <Route path="/rooms" element={<ClientRooms />}></Route>
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/blogs" element={<Blogs />} />
         <Route path="/feedback" element={<Feedbacks />} />
         <Route path="/boomRoom/:roomId" element={<BookRoom />} />
         <Route
@@ -71,26 +77,8 @@ export const AdminRoutes = () => {
             element={<GuestBookings />}
           />
           <Route path="/profile/settings" element={<ProfileSettings />} />
-        </Route>
-
-        <Route path="/user" element={<LoginRoot />}>
-          <Route
-            path="/user/signup"
-            element={user ? <Navigate to="/" /> : <SignupForm />}
-          />
-          <Route
-            index
-            path="/user/login"
-            element={
-              user?.role === "admin" ? (
-                <Navigate to="/admin" />
-              ) : user ? (
-                <Navigate to="/admin" />
-              ) : (
-                <LoginForm />
-              )
-            }
-          />
+          <Route path="/profile/feedbacks" element={<GuestFeedbacks />} />
+          <Route path="/profile/billings" element={<Billings />} />
         </Route>
 
         <Route
@@ -100,7 +88,26 @@ export const AdminRoutes = () => {
 
         <Route path="*" element={<Not_Found />} />
       </Route>
-
+      
+      <Route path="/user" element={<LoginRoot />}>
+        <Route
+          path="/user/signup"
+          element={user ? <Navigate to="/" /> : <SignupForm />}
+        />
+        <Route
+          index
+          path="/user/login"
+          element={
+            user?.role === "admin" ? (
+              <Navigate to="/admin" />
+            ) : user ? (
+              <Navigate to="/admin" />
+            ) : (
+              <LoginForm />
+            )
+          }
+        />
+      </Route>
       {/*  Admin Routes */}
       <Route
         path="/admin"
@@ -115,7 +122,6 @@ export const AdminRoutes = () => {
         <Route path="/admin/rooms" element={<Rooms />} />
         <Route path="/admin/tasks" element={<Tasks />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
-        <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/services" element={<Services />} />
         <Route path="/admin/transactions" element={<Transactions />} />
         <Route
@@ -124,6 +130,10 @@ export const AdminRoutes = () => {
         />
         <Route path="/admin/feedbacks" element={<AdminFeedbacks />} />
         <Route path="/admin/maintenance" element={<Maintenance />} />
+        <Route path="/admin/settings" element={<Settings />}>
+          <Route index element={<AdminProfile />} />
+          <Route path="/admin/settings/policies" element={<Policies />} />
+        </Route>
       </Route>
 
       {/* Staff Routes */}
@@ -141,11 +151,7 @@ export const AdminRoutes = () => {
         <Route path="/staff/feedbacks" element={<StaffFeedbacks />} />
         <Route path="/staff/maintenance" element={<StaffReportMaintenance />} />
         <Route path="/staff/settings" element={<StaffSettings />}>
-          <Route
-            index
-            path="/staff/settings/profile"
-            element={<StaffProfileSettings />}
-          />
+          <Route index element={<StaffProfileSettings />} />
           <Route
             path="/staff/settings/notifications"
             element={<StaffNotificationSettings />}

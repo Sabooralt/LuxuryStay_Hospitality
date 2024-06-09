@@ -1,9 +1,11 @@
 const Feedback = require("../models/feedbackModel");
 const Booking = require("../models/bookingModel");
 const User = require("../models/userModel");
+const Room = require("../models/roomModel");
 const {
   sendNotificationToAdmins,
   sendNotificationToReceptionists,
+  sendNotification,
 } = require("./notificationController");
 
 const getAllFeedback = async (req, res) => {
@@ -175,6 +177,14 @@ const voteFeedback = async (req, res) => {
           $inc: { upvotes: 1 },
           $addToSet: { upvotedBy: guestId },
         };
+        await sendNotification(
+          req,
+          "Your feedback got a new upvote!",
+          "Someone upvoted your feedback!",
+          " ",
+          "member",
+          feedback.guestId
+        );
       }
     } else if (voteType === "downvote") {
       if (hasUpvoted) {
@@ -193,6 +203,14 @@ const voteFeedback = async (req, res) => {
           $inc: { downvotes: 1 },
           $addToSet: { downvotedBy: guestId },
         };
+        await sendNotification(
+          req,
+          "Your feedback got a new downvote!",
+          "Someone downvoted your feedback!",
+          " ",
+          "member",
+          feedback.guestId
+        );
       }
     } else {
       return res.status(400).json({ error: "Invalid vote type" });

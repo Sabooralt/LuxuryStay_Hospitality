@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useRoomContext } from "@/hooks/useRoomContext";
+import { useRoomTypeContext } from "@/hooks/useRoomTypeContext";
 
-export const NewsCard = () => {
+export const NewsCard = ({ blog }) => {
   return (
     <Card className="grid col-span-1 text-justify p-0">
       <CardHeader className="p-0">
@@ -17,17 +19,14 @@ export const NewsCard = () => {
           <span className="uppercase text-sm">Rooms</span>
         </div>
 
-        <h1 className="text-secondary text-3xl">New Rooms</h1>
+        <h1 className="text-secondary text-3xl">{blog.title}</h1>
 
-        <p className="font-thin tracking-tight text-gray-600">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Molestiae
-          dignissimos cupiditate corrupti, eius enim aliquid voluptatum
-          laudantium neque atque facilis aut ratione blanditiis obcaecati nam
-          quasi odit nostrum. Error, facilis?
-        </p>
+        <p className="font-thin tracking-tight text-gray-600">{blog.content}</p>
 
-        <Button className="w-fit p-5 rounded-none border-2 border-secondary bg-transparent text-secondary font-normal hover:bg-primary">Read More</Button>
-      </CardContent> 
+        <Button className="w-fit p-5 rounded-none border-2 border-secondary bg-transparent text-secondary font-normal hover:bg-primary">
+          Read More
+        </Button>
+      </CardContent>
     </Card>
   );
 };

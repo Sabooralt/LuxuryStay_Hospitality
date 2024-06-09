@@ -1,6 +1,7 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useOutlet } from "react-router-dom";
 
 export const Profile = () => {
+  const { outlet } = useOutlet();
   const profileNavItems = [
     {
       name: "General",
@@ -17,6 +18,10 @@ export const Profile = () => {
     {
       name: "Settings",
       link: "/profile/settings",
+    },
+    {
+      name: "Feedbacks",
+      link: "/profile/feedbacks",
     },
   ];
   return (

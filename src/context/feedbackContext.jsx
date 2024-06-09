@@ -56,14 +56,8 @@ export const FeedbackReducer = (state, action) => {
         return state;
       }
 
-      case "CLEAR_FEEDBACKS":
-        return{
-          guestFeedback: null,
-          feedback: null,
-        }
-
       const updatedFeedback = action.payload;
-      const updatedFeedbacks = state.feedback.map((item) => {
+      const updatedGuestFeedback = state.guestFeedback.map((item) => {
         if (item._id === updatedFeedback._id) {
           return {
             ...item,
@@ -76,9 +70,28 @@ export const FeedbackReducer = (state, action) => {
         return item;
       });
 
+      const updatedFeedbacks = state.feedback.map((item) => {
+        if (item._id === updatedFeedback._id) {
+          return {
+            ...item,
+            downvotedBy: updatedFeedback.downvotedBy,
+            downvotes: updatedFeedback.downvotes,
+            upvotedBy: updatedFeedback.upvotedBy,
+            upvotes: updatedFeedback.upvotes,
+          };
+        }
+        return item;
+      });
       return {
         ...state,
         feedback: updatedFeedbacks,
+        guestFeedback: updatedGuestFeedback,
+      };
+
+    case "CLEAR_FEEDBACKS":
+      return {
+        guestFeedback: null,
+        feedback: null,
       };
     default:
       return state;

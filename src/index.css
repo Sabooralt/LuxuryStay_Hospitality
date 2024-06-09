@@ -15,3 +15,6 @@
 .bg-overlay_1 {
   background-color: rgba(0, 0, 0, 0.1);
 }
+.items-flex-between{
+  @apply flex flex-row justify-between items-center gap-2
+}

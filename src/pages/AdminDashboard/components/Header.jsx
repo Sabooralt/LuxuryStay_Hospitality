@@ -29,12 +29,9 @@ import { useAuthContextProvider } from "@/hooks/useAuthContext";
 import { BreadcrumbDemo } from "@/globalComponents/Breadcrumb";
 import { NotiDropDown } from "@/globalComponents/NotiDropDown";
 
-
 export const AdminHeader = () => {
   const { user, logout } = useAuthContextProvider();
 
-
- 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <Sheet>
@@ -101,8 +98,7 @@ export const AdminHeader = () => {
         />
       </div>
 
-<NotiDropDown user={user} userType='user'/>
- 
+      <NotiDropDown user={user} userType="user" />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -123,7 +119,11 @@ export const AdminHeader = () => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{user.first_name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <Link to="/admin/settings">
+            <DropdownMenuItem className="cursor-pointer">
+              Settings
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>

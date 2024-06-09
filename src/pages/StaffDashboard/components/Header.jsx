@@ -73,7 +73,7 @@ export const StaffHeader = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
             <Avatar>
-              <AvatarImage src={`StaffPfps/${staff.image}`} alt="@shadcn" />
+              <AvatarImage className=" object-cover" src={`/StaffPfps/${staff.image}`} alt="@staffPfp" />
               <AvatarFallback>{getInitials(staff.username)}</AvatarFallback>
             </Avatar>
 
@@ -81,7 +81,9 @@ export const StaffHeader = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel className="capitalize">{staff.username}</DropdownMenuLabel>
+          <DropdownMenuLabel className="capitalize">
+            {staff.username}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>

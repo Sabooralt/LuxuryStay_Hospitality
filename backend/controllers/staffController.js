@@ -126,6 +126,7 @@ const loginStaff = async (req, res) => {
       _id: staff._id,
       username: staff.username,
       role: staff.role,
+      image: staff.image,
       token,
     });
   } catch (err) {

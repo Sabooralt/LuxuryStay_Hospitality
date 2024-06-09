@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useFeedbackContext } from "@/context/feedbackContext";
 import { FeedbackCard } from "@/globalComponents/FeedbackCard";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Locate } from "lucide-react";
 
 export const LoginRoot = () => {
   const { feedback } = useFeedbackContext();
+  const location = useLocation();
   const [currentFeedback, setCurrentFeedback] = useState(
     feedback ? feedback[0] : null
   );
@@ -20,12 +23,27 @@ export const LoginRoot = () => {
       return () => clearInterval(interval);
     }
   }, [feedback]);
+  const toggleText =
+    location.pathname === "/user/login"
+      ? "Signup"
+      : location.pathname === "/user/signup"
+      ? "Login"
+      : "/user/login";
+  const toggleLink =
+    location.pathname === "/user/login"
+      ? "/user/signup"
+      : location.pathname === "/user/signup"
+      ? "/user/login"
+      : "/user/login";
 
   return (
     <div className="grid w-full place-items-center h-screen overflow-hidden grid-cols-2">
       <div className="bg-zinc-900 relative bg-[url('/ClientImages/luxuryblack.jpg')] bg-no-repeat bg-cover bg-center overflow-hidden size-full grid col-span-1">
         <div className="absolute inset-0 bg-overlay"></div>
-
+<div className="mb-auto p-5 z-50 flex flex-row gap-2 size-fit drop-shadow-lg ">
+  <Locate className="size-10 text-primary "/>
+  <h1 className="text-primary font-mono font-medium text-3xl uppercase ">Luxury Stay</h1>
+</div>
         <AnimatePresence mode="wait" className="z-40">
           {currentFeedback && (
             <motion.div
@@ -44,8 +62,16 @@ export const LoginRoot = () => {
           )}
         </AnimatePresence>
       </div>
-      <div className="grid col-span-1">
-        <Outlet />
+      <div className="grid size-full col-span-1">
+        <div className="size-fit ml-auto p-5">
+          <Link to={toggleLink}>
+            <Button className="tracking-wider ">{toggleText}</Button>
+          </Link>
+        </div>
+
+        <div className="grid place-content-center mb-auto">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

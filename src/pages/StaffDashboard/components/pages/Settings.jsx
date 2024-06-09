@@ -5,7 +5,7 @@ export const StaffSettings = () => {
   const staffSettingsItem = [
     {
       name: "Profile",
-      link: "/settings/profile",
+      link: "/settings",
     },
     {
       name: "Notifications",
@@ -24,7 +24,7 @@ export const StaffSettings = () => {
         <div className="grid col-span-1 h-fit gap-2">
           {staffSettingsItem.map((item, index) => (
             <NavLink
-            to={`/staff${item.link}`}
+              to={`/staff${item.link}`}
               key={index}
               className={({ isActive }) =>
                 `hover:bg-gray-50 rounded-md ease-linear duration-200 p-2 ${
@@ -37,7 +37,7 @@ export const StaffSettings = () => {
           ))}
         </div>
         <div className="grid col-span-3">
-            <Outlet/>
+          <Outlet />
         </div>
       </div>
     </div>

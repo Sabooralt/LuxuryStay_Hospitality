@@ -59,8 +59,12 @@ export const Navbar = () => {
       link: "/rooms",
     },
     {
-      name: "Blog",
-      link: "/blog",
+name: "Blogs",
+link: "/blogs"
+    },
+    {
+      name: "Policies",
+      link: "/policies",
     },
     {
       name: "About",
@@ -130,36 +134,46 @@ export const Navbar = () => {
                   {user && user.role === "admin" && (
                     <>
                       <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <Link className="font-semibold" to="/admin">
+                        <Link className="font-semibold curs" to="/admin">
+                          <DropdownMenuItem className="cursor-pointer">
                             Admin Panel
-                          </Link>
-                        </DropdownMenuItem>
+                          </DropdownMenuItem>
+                        </Link>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                     </>
                   )}
                   <DropdownMenuGroup>
                     <Link to="/profile">
-                      <DropdownMenuItem>Profile</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Profile
+                      </DropdownMenuItem>
                     </Link>
                     <Link to="/profile/bookings">
-                      <DropdownMenuItem>Bookings</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Bookings
+                      </DropdownMenuItem>
                     </Link>
                     <Link to="/profile/billings">
-                      <DropdownMenuItem>Billings</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Billings
+                      </DropdownMenuItem>
                     </Link>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <Link to="/profile/settings">
-                      <DropdownMenuItem>Settings</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Settings
+                      </DropdownMenuItem>
                     </Link>
                   </DropdownMenuGroup>
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

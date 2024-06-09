@@ -60,30 +60,30 @@ export const BookingReducer = (state, action) => {
               }
             : state.selectedBooking,
       };
-      case "UPDATE_FEEDBACK_AND_PAID":
-        const updatedFeedbackandPaid = state.booking.map((booking)=>{
-          if(booking._id === action.payload._id){
-            return{
-              ...booking,
-              feedback: action.payload.feedback,
-              paid: action.payload.paid
-            }
-          }
-          return booking;
-        })
-        return {
-          ...state,
-          booking: updatedFeedbackandPaid,
-          
-          selectedBooking:
-            state.selectedBooking?._id === action.payload._id
-              ? {
-                  ...state.selectedBooking,
-                  paid: action.payload.paid,
-                  feedback: action.payload.feedback,
-                }
-              : state.selectedBooking,
-        };
+    case "UPDATE_FEEDBACK_AND_PAID":
+      const updatedFeedbackandPaid = state.booking.map((booking) => {
+        if (booking._id === action.payload._id) {
+          return {
+            ...booking,
+            feedback: action.payload.feedback,
+            paid: action.payload.paid,
+          };
+        }
+        return booking;
+      });
+      return {
+        ...state,
+        booking: updatedFeedbackandPaid,
+
+        selectedBooking:
+          state.selectedBooking?._id === action.payload._id
+            ? {
+                ...state.selectedBooking,
+                paid: action.payload.paid,
+                feedback: action.payload.feedback,
+              }
+            : state.selectedBooking,
+      };
     case "UPDATE_BOOKING_SERVICE_ORDERS":
       const updatedBookings = state.booking.map((booking) => {
         if (booking._id === action.payload._id) {

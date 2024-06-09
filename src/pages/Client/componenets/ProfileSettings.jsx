@@ -16,6 +16,7 @@ import axios from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
+import { toast as sonner } from "sonner";
 
 export const ProfileSettings = () => {
   const { user, dispatch } = useAuthContextProvider();
@@ -96,14 +97,15 @@ const UpdatePassword = () => {
       );
 
       if (response.status === 200) {
-        toast({
-          title: response.data.message,
-        });
-      }
-      if (response.data.success === false) {
-        toast({
-          variant: "destructive",
-          title: response.data.message,
+        sonner(response.data.message, {
+          action: (
+            <CountdownToast
+              initialCount={5}
+              onCountdownEnd={() => {
+                logout();
+              }}
+            />
+          ),
         });
       }
     } catch (err) {
