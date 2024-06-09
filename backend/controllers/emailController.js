@@ -1,10 +1,10 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "outlook",
+  service: "Gmail",
   auth: {
-    user: "luxurystay7@outlook.com",
-    pass: "Consolidation@340",
+    user: "luxurystay10@gmail.com",
+    pass: "ctqe fmmr ljmy yvli",
   },
 });
 
@@ -24,7 +24,5 @@ const sendEmail = async (to, subject, text, htmlContent) => {
     console.error("Error sending email:", error);
   }
 };
-
-// Usage
 
 module.exports = { sendEmail };

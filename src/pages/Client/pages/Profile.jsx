@@ -7,14 +7,12 @@ export const Profile = () => {
       name: "General",
       link: "/profile",
     },
+
     {
       name: "Bookings",
       link: "/profile/bookings",
     },
-    {
-      name: "Billing",
-      link: "/profile/billing",
-    },
+
     {
       name: "Settings",
       link: "/profile/settings",
@@ -25,11 +23,11 @@ export const Profile = () => {
     },
   ];
   return (
-    <div className="p-24 grid gap-10">
+    <div className="lg:px-24 md:px-10 py-24 px-5 grid gap-10">
       <h1 className="text-4xl font-medium size-fit">Profile</h1>
       <div className="gap-10 grid min-h-screen">
-        <div className="grid grid-cols-12">
-          <div className="grid col-span-2">
+        <div className="grid md:grid-cols-12">
+          <div className="col-span-2 md:block hidden">
             <nav className="grid size-fit gap-5 text-sm text-muted-foreground">
               {profileNavItems.map((item, index) => (
                 <NavLink

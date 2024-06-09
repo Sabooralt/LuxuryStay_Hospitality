@@ -37,13 +37,15 @@ export const LoginRoot = () => {
       : "/user/login";
 
   return (
-    <div className="grid w-full place-items-center h-screen overflow-hidden grid-cols-2">
-      <div className="bg-zinc-900 relative bg-[url('/ClientImages/luxuryblack.jpg')] bg-no-repeat bg-cover bg-center overflow-hidden size-full grid col-span-1">
+    <div className="grid w-full place-items-center h-screen overflow-hidden md:grid-cols-2">
+      <div className="bg-zinc-900 relative bg-[url('/ClientImages/luxuryblack.jpg')] bg-no-repeat bg-cover bg-center overflow-hidden size-full hidden md:grid col-span-1">
         <div className="absolute inset-0 bg-overlay"></div>
-<div className="mb-auto p-5 z-50 flex flex-row gap-2 size-fit drop-shadow-lg ">
-  <Locate className="size-10 text-primary "/>
-  <h1 className="text-primary font-mono font-medium text-3xl uppercase ">Luxury Stay</h1>
-</div>
+        <div className="mb-auto p-5 z-50 flex flex-row gap-2 size-fit drop-shadow-lg ">
+          <Locate className="size-10 text-primary " />
+          <h1 className="text-primary font-mono font-medium text-3xl uppercase ">
+            Luxury Stay
+          </h1>
+        </div>
         <AnimatePresence mode="wait" className="z-40">
           {currentFeedback && (
             <motion.div
@@ -62,11 +64,19 @@ export const LoginRoot = () => {
           )}
         </AnimatePresence>
       </div>
-      <div className="grid size-full col-span-1">
-        <div className="size-fit ml-auto p-5">
-          <Link to={toggleLink}>
-            <Button className="tracking-wider ">{toggleText}</Button>
-          </Link>
+      <div className="grid md:bg-white bg-zinc-50 size-full col-span-1">
+        <div className="flex flex-row h-fit items-center p-5">
+          <div className=" md:hidden z-50 flex flex-row gap-2 size-fit drop-shadow-sm ">
+            <Locate className="size-10 text-black " />
+            <h1 className="text-black font-mono font-medium text-3xl uppercase ">
+              Luxury Stay
+            </h1>
+          </div>
+          <div className="size-fit ml-auto">
+            <Link to={toggleLink}>
+              <Button className="tracking-wider ">{toggleText}</Button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid place-content-center mb-auto">

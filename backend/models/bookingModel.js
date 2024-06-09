@@ -70,6 +70,10 @@ const bookingSchema = new mongoose.Schema(
       enum: ["paid", "not paid"],
       default: "not paid",
     },
+    email: {
+      type: Boolean,
+      default: false,
+    },
     serviceOrders: [
       { type: mongoose.Schema.Types.ObjectId, ref: "ServiceOrder" },
     ],

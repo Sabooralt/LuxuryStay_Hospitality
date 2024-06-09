@@ -15,20 +15,19 @@ const generateBookingId = require("../utils/generateBookingId");
 const { sendEmail } = require("./emailController");
 const { htmlContent } = require("../utils/emailTemplate");
 const generateTaskId = require("../utils/generateTaskId");
+const { formatDate } = require("date-fns");
 
 const bookRoomByGuest = async (req, res) => {
   try {
     const { roomTypeId, memberId, checkInDate, checkOutDate } = req.body;
     const { guestId, userType } = req.params;
 
-    // Validate userType
     if (!["Staff", "User"].includes(userType)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid user type" });
     }
 
-    // Validate dates
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
 
@@ -217,16 +216,18 @@ const bookRoomByGuest = async (req, res) => {
       );
     }
 
-    // Send email
+    const fomattedCheckIn = formatDate(checkInDate, "MM-yyyy-dd");
+    const formattedCheckOut = formatDate(checkOutDate, "MM-yyyy-dd");
+
     setImmediate(async () => {
       const htmlContent = `
         <h1>Booking Confirmation</h1>
         <p>Booking Details:</p>
         <ul>
           <li>BookingId: ${populatedBooking.bookingId}</li>
-          <li>Room Number: ${assignedRoom.roomNumber}</li>
-          <li>Check-In Date: ${checkInDate}</li>
-          <li>Check-Out Date: ${checkOutDate}</li>
+          <li>Room Number: ${populatedBooking.room.roomNumber}</li>
+          <li>Check-In Date: ${fomattedCheckIn}</li>
+          <li>Check-Out Date: ${formattedCheckOut}</li>
           <li>Total Cost: Rs.${totalBookingCost.toLocaleString()}</li>
         </ul>
         <p>Thank you for booking with us!</p>
@@ -441,6 +442,9 @@ const bookRoom = async (req, res) => {
     room.bookings.push(newBooking._id);
     await room.save();
 
+    const fomattedCheckIn = formatDate(checkInDate, "MM-yyyy-dd");
+    const formattedCheckOut = formatDate(checkOutDate, "MM-yyyy-dd");
+
     // Send email
     setImmediate(async () => {
       const htmlContent = `
@@ -449,8 +453,8 @@ const bookRoom = async (req, res) => {
         <ul>
           <li>BookingId: ${populatedBooking.bookingId}</li>
           <li>Room Number: ${room.roomNumber}</li>
-          <li>Check-In Date: ${checkInDate}</li>
-          <li>Check-Out Date: ${checkOutDate}</li>
+          <li>Check-In Date: ${fomattedCheckIn}</li>
+          <li>Check-Out Date: ${formattedCheckOut}</li>
           <li>Total Cost: Rs.${totalBookingCost.toLocaleString()}</li>
         </ul>
         <p>Thank you for booking with us!</p>

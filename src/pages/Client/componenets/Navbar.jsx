@@ -46,7 +46,6 @@ export const Navbar = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const guestNavItems = [
@@ -59,8 +58,8 @@ export const Navbar = () => {
       link: "/rooms",
     },
     {
-name: "Blogs",
-link: "/blogs"
+      name: "Blogs",
+      link: "/blogs",
     },
     {
       name: "Policies",

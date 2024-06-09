@@ -78,6 +78,8 @@ app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/policy", policyRoutes);
 app.use("/api/blog", blogRoutes);
 
+//send order summary
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -142,7 +144,7 @@ const createMockReq = () => {
 
 //Schedule Tasks
 
-cron.schedule("* * * * * *", () => {
+cron.schedule("* * * * *", () => {
   const req = createMockReq();
   checkInBookings(req);
 });

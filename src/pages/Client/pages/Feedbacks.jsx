@@ -4,11 +4,11 @@ import { FeedbackCard } from "@/globalComponents/FeedbackCard";
 export const Feedbacks = () => {
   const { feedback } = useFeedbackContext();
   return (
-    <div className="grid p-20 py-32 gap-10">
+    <div className="grid md:px-20 px-10 py-32 gap-10">
       <div className="grid w-full gap-5 text-center mx-auto">
         <h1 className="text-4xl font-medium">Guest Feedback</h1>
 
-        <p className="text-muted-foreground px-20 ">
+        <p className="text-muted-foreground md:px-20  ">
           Welcome to our guest feedback section! Here, you can explore the
           experiences and opinions shared by our valued guests. Your feedback
           helps us continually improve our services and ensure every stay is
@@ -18,7 +18,7 @@ export const Feedbacks = () => {
           you for taking the time to share your thoughts!
         </p>
       </div>
-      <div className="grid grid-cols-2 place-items-center gap-5">
+      <div className="grid md:grid-cols-2 place-items-center gap-5">
         {feedback &&
           feedback.length > 0 &&
           feedback.map((f) => (

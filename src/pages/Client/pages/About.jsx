@@ -12,7 +12,7 @@ export const About = () => {
         <h1 className="text-8xl">About Luxury Hotel</h1>
         <p className="text-2xl">Discover our world's #1 Luxury Room For VIP.</p>
       </HeroScreen>
-      <div className="grid grid-cols-2 mt-20 bg-white justify-center mx-auto items-center px-20">
+      <div className="grid md:grid-cols-2 gap-20 md:gap-0 mt-20 bg-white justify-center mx-auto items-center px-5 md:px-20">
         <div className="flex flex-col mr-auto text-justify gap-3 px-20">
           <h3 className="uppercase text-gray-400 text-sm">
             STAY WITH OUR LUXURY ROOMS
@@ -54,7 +54,7 @@ export const About = () => {
           <h1 className="text-6xl"> Our Staff</h1>
         </div>
 
-        <div className="grid grid-cols-3 p-20 items-center gap-5 mx-auto">
+        <div className="grid md:grid-cols-3 p-20 items-center gap-5 mx-auto">
           {staff &&
             staff.map((staff) => (
               <div key={staff._id} className="grid col-span-1">

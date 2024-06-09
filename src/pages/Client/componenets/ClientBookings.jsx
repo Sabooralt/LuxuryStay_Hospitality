@@ -181,7 +181,7 @@ export const GuestBookings = () => {
       </div>
     </div>
   ) : (
-    <div className="flex gap-2 flex-col items-center px-20">
+    <div className="flex gap-2 flex-col items-center md:px-20 px-5">
       <CalendarOff className="size-10 text-gray-500" />
       <h1 className="text-2xl font-medium">You Have No Bookings Yet!</h1>
       <p className="">

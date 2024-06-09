@@ -28,9 +28,9 @@ export const Footer = () => {
     },
   ];
   return (
-    <footer className="p-20 bg-gray-200 flex flex-col gap-10">
-      <div className="flex flex-row gap-5 justify-between">
-        <div className="flex flex-col gap-5">
+    <footer className="md:p-20 p-5 bg-gray-200 flex flex-col gap-10">
+      <div className="flex flex-col md:gap-5 md:flex-row gap-10 justify-between">
+        <div className="flex flex-col md:mx-0 mx-auto gap-5">
           <h1 className="text-gray-400">PHONE SUPPORT</h1>
           <p>24/7 Call us now.</p>
           <div>

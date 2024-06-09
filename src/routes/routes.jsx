@@ -81,14 +81,17 @@ export const AdminRoutes = () => {
           <Route path="/profile/billings" element={<Billings />} />
         </Route>
 
-        <Route
+       
+
+        <Route path="*" element={<Not_Found />} />
+      </Route>
+
+      
+      <Route
           path="/StaffLogin"
           element={staff ? <Navigate to="/staff" /> : <StaffLogin />}
         />
 
-        <Route path="*" element={<Not_Found />} />
-      </Route>
-      
       <Route path="/user" element={<LoginRoot />}>
         <Route
           path="/user/signup"

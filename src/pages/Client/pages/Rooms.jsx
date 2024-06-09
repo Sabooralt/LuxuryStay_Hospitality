@@ -30,7 +30,7 @@ export const RoomOverview = () => {
     return <p>No rooms available.</p>;
   }
   return (
-    <div className="grid gap-10 grid-cols-3 p-[7rem] justify-items-center">
+    <div className="grid gap-10 md:grid-cols-3 p-5 md:p-[7rem] justify-items-center">
       {room &&
         room.map((room) => (
           <div

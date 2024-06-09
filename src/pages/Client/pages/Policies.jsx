@@ -38,8 +38,8 @@ export const ClientPolicies = () => {
         <h1 className="text-6xl">Our policies</h1>
         <p className="text-2xl">Read our luxury hotel policies here.</p>
       </HeroScreen>
-      <div className="grid p-20 justify-items-center gap-10 items-center mx-auto">
-        <div className="grid px-[10rem]  grid-cols-3 gap-10 z-40">
+      <div className="grid py-10 justify-items-center gap-10 items-center mx-auto">
+        <div className="grid px-5 md:grid-cols-3 gap-10 z-40">
           {policies && policies.length > 0 ? (
             policies.map((p) => (
               <div key={p._id}>

@@ -6,20 +6,34 @@ import { StarFilledIcon } from "@radix-ui/react-icons";
 import { TiGroupOutline } from "react-icons/ti";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RelaxAndEnjoy } from "../componenets/RelaxAndEnjoy";
+import { useRoomContext } from "@/hooks/useRoomContext";
+import { formatPrice } from "@/utils/seperatePrice";
 
 export const Home = () => {
+  const { room } = useRoomContext();
+
+  const getTop3Rooms = () => {
+    const sortedRooms = [...room].sort(
+      (a, b) => b.bookings.length - a.bookings.length
+    );
+    return sortedRooms.slice(0, 3);
+  };
+
+  const topRooms = getTop3Rooms();
+
   return (
     <main className="grid gap-20">
       <HeroScreen height={"80"}>
         <h1 className="text-7xl drop-shadow-lg w-fit">
-          Welcome To Our Luxury Rooms
+          Welcome To Luxury Stay
         </h1>
 
         <p className="text-2xl">Discover our world's #1 Luxury Room For VIP.</p>
-
-        <Button className="text-primary hover:bg-slate-50 hover:text-black bg-secondary p-6 uppercase text-lg font-thin">
-          Book Now
-        </Button>
+        <Link to="/rooms">
+          <Button className="text-primary hover:bg-slate-50 hover:text-black bg-secondary p-6 uppercase text-lg font-thin">
+            Book Now
+          </Button>
+        </Link>
       </HeroScreen>
 
       <div className="grid grid-cols-2 bg-white justify-center mx-auto items-center px-20">
@@ -49,58 +63,85 @@ export const Home = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4 mx-auto justify-items-center">
-          <div className="grid col-span-1 max-w-[650px]">
-            <div className="relative">
-              <div className="w-fit relative">
-                <img src="/ClientImages/img_1.jpg" alt="" />
-                <div className="absolute inset-0 bg-overlay"></div>
+          {topRooms[0] && (
+            <div className="grid col-span-1 max-w-[650px]">
+              <div className="relative">
+                <div className="w-fit relative">
+                  <img
+                    src={`/RoomImages/${topRooms[0].images[0].filepath}`}
+                    alt=""
+                  />
+                  <div className="absolute inset-0 bg-overlay"></div>
 
-                <div className="absolute bottom-5 left-5 font-light drop-shadow-2xl flex items-center gap-2 text-primary">
-                  Featured Room{" "}
-                  <div className="flex gap-1">
-                    {[1, 2, 3].map((_) => (
-                      <StarFilledIcon />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white px-5 py-10 text-justify font-light grid gap-5">
-                <h1 className="text-3xl text-secondary">Presidental Room</h1>
-
-                <div className="flex gap-5 items-center ">
-                  <div className="flex gap-2 items-center">
-                    <TiGroupOutline className="w-6 h-6" />2 Guests
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <Crop className="w-6 h-6" />
-                    <span>
-                      22 ft <sup>2</sup>
-                    </span>
+                  <div className="absolute bottom-5 left-5 font-light drop-shadow-2xl flex items-center gap-2 text-primary">
+                    Featured Room
+                    <div className="flex gap-1">
+                      {[1, 2, 3].map((_) => (
+                        <StarFilledIcon />
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="">
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. At
-                    consequatur provident laborum odio, dolore voluptatibus
-                    soluta dicta, cupiditate tempora minima quos? Doloribus
-                    accusantium soluta reprehenderit numquam odio veritatis
-                    perferendis praesentium.
-                  </p>
-                </div>
+                <div className="bg-white px-5 py-10 text-justify font-light grid gap-5">
+                  <h1 className="text-3xl text-secondary">
+                    {topRooms[0].name}
+                  </h1>
 
-                <Button className="bg-secondary capitalize w-fit p-5 rounded-none">
-                  Book Now from 20$
-                </Button>
+                  <div className="flex gap-5 items-center ">
+                    <div className="flex gap-2 items-center">
+                      <TiGroupOutline className="w-6 h-6" />
+                      {topRooms[0].capacity} Guests
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Crop className="w-6 h-6" />
+                      <span>
+                        22 ft <sup>2</sup>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="">
+                    <p>{topRooms[0].description}</p>
+                  </div>
+
+                  <Button className="bg-secondary capitalize w-fit p-5 rounded-none">
+                    Book Now for Rs.{formatPrice(topRooms[0].pricePerNight)}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
           <div className="grid gap-2 col-span-1 ">
-            {[1, 2].map((_, index) => (
-              <div key={index} className="relative w-fit ">
+            {topRooms[1] && (
+              <div className="relative w-fit ">
                 <img
-                  src="/ClientImages/img_2.jpg"
+                  src={`/RoomImages/${topRooms[1].images[0].filepath}`}
+                  alt="Featured Room"
+                  className="block max-w-[445px]"
+                />
+                <div className="absolute inset-0 bg-overlay"></div>
+                <div className="absolute text-primary bottom-5 left-5 font-light drop-shadow-2xl flex items-center gap-2">
+                  <span className="flex">{topRooms[1].name}</span>
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map((star, starIndex) => (
+                      <StarFilledIcon key={starIndex} />
+                    ))}
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-yellow-400 hover:bg-yellow-500 font-thin"
+                  >
+                    For Rs.{formatPrice(topRooms[1].pricePerNight)}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {topRooms[1] && (
+              <div className="relative w-fit ">
+                <img
+                  src={`/RoomImages/${topRooms[2].images[0].filepath}`}
                   alt="Featured Room"
                   className="block max-w-[445px]"
                 />
@@ -116,11 +157,11 @@ export const Home = () => {
                     size="sm"
                     className="bg-yellow-400 hover:bg-yellow-500 font-thin"
                   >
-                    From $22
+                    For Rs.{formatPrice(topRooms[2].pricePerNight)}
                   </Button>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
 

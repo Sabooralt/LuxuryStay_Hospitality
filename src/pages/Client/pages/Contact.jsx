@@ -15,7 +15,7 @@ export const ContactUs = () => {
         </p>
       </HeroScreen>
 
-      <div className="grid grid-cols-2 p-[7rem] gap-10">
+      <div className="grid md:grid-cols-2 p-[7rem] gap-10">
         <div className="grid col-span-1">
           <h1 className="text-3xl">Contact Form</h1>
           <form className="grid gap-4">
@@ -37,10 +37,12 @@ export const ContactUs = () => {
               <Textarea placeholder="" className="rounded-md" />
             </div>
 
-            <Button className="bg-secondary p-6 text-xl font-light w-fit">Send Message</Button>
+            <Button className="bg-secondary p-6 text-xl font-light w-fit">
+              Send Message
+            </Button>
           </form>
         </div>
-        <div className="grid col-span-1 gap-10">
+        <div className="md:block hidden col-span-1 gap-10">
           <h1 className="text-3xl">Paragraph </h1>
 
           <div className="max-w-[450px]">
