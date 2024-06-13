@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Balkind";
+  src: url("/public/fonts/Balkind-Font/Balkind-Light.otf") format("otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Balkind";
+  src: url("/fonts/Balkind-Font/Balkind-Regular.otf") format("otf");
+  font-weight: 700;
+  font-style: normal;
+}
+
 .text-muted-foreground {
   @apply text-gray-600;
 }
@@ -10,11 +24,25 @@
 }
 
 .bg-overlay {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.65);
 }
 .bg-overlay_1 {
   background-color: rgba(0, 0, 0, 0.1);
 }
-.items-flex-between{
-  @apply flex flex-row justify-between items-center gap-2
+.items-flex-between {
+  @apply flex flex-row justify-between items-center gap-2;
+}
+::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+  background: black;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #fafafaab;
+  -webkit-border-radius: 1ex;
+}
+
+::-webkit-scrollbar-corner {
+  background: black;
 }

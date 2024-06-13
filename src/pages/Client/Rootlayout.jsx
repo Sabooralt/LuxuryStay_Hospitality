@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { Navbar } from "./componenets/Navbar";
+import { Navbar } from "./componenets/Navbar/Navbar";
 import { Footer } from "./componenets/Footer";
 import { useEffect } from "react";
 import axios from "axios";

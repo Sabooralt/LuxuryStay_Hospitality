@@ -13,6 +13,7 @@ import { NotiContextProvider } from "./context/notiContext.jsx";
 import { BookingContextProvider } from "./context/bookingContext.jsx";
 import { MemberContextProvider } from "./context/memberContext.jsx";
 import "@fontsource-variable/rubik";
+
 import { ThemeProvider } from "./ThemeProvider.jsx";
 import { ServiceContextProvider } from "./context/serviceContext.jsx";
 import { TransactionContextProvider } from "./context/transactionContext.jsx";
@@ -34,7 +35,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         <TransactionContextProvider>
                           <FeedbackContextProvider>
                             <App />
-                            <Sonner closeButton richColors position="bottom-left"/>
+                            <Sonner
+                              closeButton
+                              richColors
+                              position="bottom-left"
+                            />
                           </FeedbackContextProvider>
                         </TransactionContextProvider>
                       </ServiceContextProvider>

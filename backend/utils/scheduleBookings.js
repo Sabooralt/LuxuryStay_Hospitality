@@ -102,8 +102,7 @@ const checkInBookings = async (req) => {
 const checkOutBookings = async (req, res) => {
   try {
     const now = new Date();
-    console.log(now);
-
+    now.setHours(0, 0, 0, 0);
     const pastBookings = await Booking.find({
       checkOutDate: { $eq: now },
       status: "checkedIn",

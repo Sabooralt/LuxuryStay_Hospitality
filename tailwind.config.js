@@ -17,7 +17,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        rubik: ["Rubik Variable", "sans-serif"], // Add your font family here
+        rubik: ["Rubik Variable", "sans-serif"], 
+        balkind: ["Balkind"]
       },
       colors: {
         primary: "#f2f2f2",

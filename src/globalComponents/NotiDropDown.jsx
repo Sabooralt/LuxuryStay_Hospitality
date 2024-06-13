@@ -46,14 +46,14 @@ export const NotiDropDown = ({ user, userType }) => {
 
   return (
     <div className="grid gap-2 relative">
-      <Badge className="absolute font-light rounded-full w-[17px] h-[17px] p-0 bottom-[-2px] right-[-2px] grid items-center justify-center">
+      <Badge className="absolute bg-black text-primary font-light rounded-full w-[17px] h-[17px] p-0 bottom-[-2px] right-[-2px] grid items-center justify-center">
         {totalUnseenLength ? totalUnseenLength : 0}
       </Badge>
 
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <Button variant="secondary" size="icon">
-            <Bell className="w-5 h-5 " />
+          <Button className="bg-gray-300 hover:bg-gray-400" size="icon">
+            <Bell className="w-5 text-black h-5 " />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[25rem] grid gap-2">
@@ -84,18 +84,14 @@ export const NotiDropDown = ({ user, userType }) => {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <ScrollArea className="h-80 grid gap-2 w-full rounded-md border">
-              <div className={`${!noti && "grid gap-1"}`}>
-                {noti ? (
-                  noti.map((noti, index) => (
-                    <NotiItem key={index} noti={noti} />
-                  ))
-                ) : (
-                  <div className="grid place-items-center justify-center w-full">
-                    <p>You have 0 notifications.</p>
-                  </div>
-                )}
-              </div>
+            <ScrollArea className="h-80 w-full rounded-md border">
+              {noti ? (
+                noti.map((noti, index) => <NotiItem key={index} noti={noti} />)
+              ) : (
+                <p className="text-xl size-full justify-center flex items-center font-semibold">
+                  You have 0 notifications.
+                </p>
+              )}
             </ScrollArea>
           </DropdownMenuGroup>
         </DropdownMenuContent>

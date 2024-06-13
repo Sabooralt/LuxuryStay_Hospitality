@@ -8,25 +8,25 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
+export const socials = [
+  {
+    icon: <FaLinkedin className="w-5 h-5" />,
+    link: "https://www.linkedin.com/in/saboor7/",
+  },
+  {
+    icon: <FaGithubAlt className="w-5 h-5" />,
+    link: "https://github.com/Sabooralt",
+  },
+  {
+    icon: <FaFacebookF className="w-5 h-5" />,
+    link: "https://www.facebook.com/profile.php?id=100053190711596",
+  },
+  {
+    icon: <FaInstagram className="w-5 h-5" />,
+    link: "https://www.instagram.com/saboor.dev",
+  },
+];
 export const Footer = () => {
-  const socials = [
-    {
-      icon: <FaLinkedin className="w-5 h-5" />,
-      link: "https://www.linkedin.com/in/saboor7/",
-    },
-    {
-      icon: <FaGithubAlt className="w-5 h-5" />,
-      link: "https://github.com/Sabooralt",
-    },
-    {
-      icon: <FaFacebookF className="w-5 h-5" />,
-      link: "https://www.facebook.com/profile.php?id=100053190711596",
-    },
-    {
-      icon: <FaInstagram className="w-5 h-5" />,
-      link: "https://www.instagram.com/saboor.dev",
-    },
-  ];
   return (
     <footer className="md:p-20 p-5 bg-gray-200 flex flex-col gap-10">
       <div className="flex flex-col md:gap-5 md:flex-row gap-10 justify-between">
